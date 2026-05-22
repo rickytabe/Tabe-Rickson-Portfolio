@@ -10,6 +10,7 @@ import {
   Cloud, 
   Building2 
 } from "lucide-react";
+import { SECTION_STYLES } from "../utils/sectionStyles";
 
 interface Service {
   id: string;
@@ -117,12 +118,12 @@ export default function Services() {
   return (
     <section 
       id="services" 
-      className="snap-start min-h-dvh flex flex-col justify-center py-24 px-8 lg:px-16 border-t border-white/5 relative bg-[#121212] overflow-hidden"
+      className={SECTION_STYLES.wrapper}
     >
-      <div className="max-w-7xl mx-auto w-full relative z-10">
+      <div className={SECTION_STYLES.container}>
         {/* Backdrop text — positioned behind the section title */}
-        <div className="absolute top-0 left-0 pointer-events-none select-none z-0 -mt-12 md:-mt-20">
-          <span className="text-[18vw] md:text-[12vw] font-black font-mono text-white/2 tracking-tighter whitespace-nowrap uppercase leading-none">
+        <div className={SECTION_STYLES.backdropWrapper}>
+          <span className={SECTION_STYLES.backdropText}>
             Services
           </span>
         </div>
@@ -135,15 +136,15 @@ export default function Services() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16"
         >
-          <div className="flex items-center gap-4 mb-6 font-mono text-xs tracking-[0.2em] text-[#39FF14] ">
-            <span className="font-bold text-sm">02</span>
-            <span className="w-10 h-px bg-[#39FF14]/50"></span>
-            <span className="text-white/50 uppercase font-semibold">Services</span>
+          <div className={SECTION_STYLES.headerBadgeWrapper}>
+            <span className={SECTION_STYLES.headerBadgeNumber}>02</span>
+            <span className={SECTION_STYLES.headerBadgeLine}></span>
+            <span className={SECTION_STYLES.headerBadgeText}>Services</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold font-sans text-white mb-6 tracking-tight uppercase">
+          <h2 className={SECTION_STYLES.title}>
             What I Do
           </h2>
-          <p className="text-white/50 font-inter max-w-2xl text-sm leading-relaxed">
+          <p className={SECTION_STYLES.description}>
             I build software that improves operations, attracts customers, and helps businesses grow with confidence.
           </p>
         </motion.div>

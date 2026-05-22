@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import portfolioData from "../../../portfolio-data.json";
+import { SECTION_STYLES } from "../utils/sectionStyles";
 
 // Inline SVG components for updated brand logos
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -26,12 +27,12 @@ export default function About() {
   return (
     <section
       id="about"
-      className="snap-start min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative"
+      className={SECTION_STYLES.wrapper}
     >
-      <div className="max-w-7xl mx-auto w-full relative z-10 ">
+      <div className={SECTION_STYLES.container}>
         {/* Backdrop text — positioned behind the section title */}
-        <div className="absolute top-0 left-0 pointer-events-none select-none z-0 -mt-12 md:-mt-20">
-          <span className="text-[18vw] md:text-[12vw] font-black font-mono text-white/2 tracking-tighter whitespace-nowrap uppercase leading-none">
+        <div className={SECTION_STYLES.backdropWrapper}>
+          <span className={SECTION_STYLES.backdropText}>
             ABOUT-ME
           </span>
         </div>
@@ -41,11 +42,11 @@ export default function About() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-4 font-mono text-lg tracking-[0.2em] text-[#39FF14]"
+          className={SECTION_STYLES.headerBadgeWrapper}
         >
-          <span className="font-bold text-sm">01</span>
-          <span className="w-10 h-px bg-[#39FF14]/50"></span>
-          <span className="text-white/50 uppercase font-semibold">About Me</span>
+          <span className={SECTION_STYLES.headerBadgeNumber}>01</span>
+          <span className={SECTION_STYLES.headerBadgeLine}></span>
+          <span className={SECTION_STYLES.headerBadgeText}>About Me</span>
         </motion.div>
       </div>
        
@@ -77,10 +78,10 @@ export default function About() {
         
 
           <div className="relative z-10">
-            <h4 className="text-[#39FF14] text-xl font-bold font-sans tracking-wide mb-3">
+            <h4 className={SECTION_STYLES.subtitle}>
               Who am I?
             </h4>
-            <h2 className="text-3xl md:text-4xl font-bold font-sans text-white mb-6 leading-tight tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-sans text-white mb-6 leading-tight tracking-tight capitalize">
               I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer
             </h2>
 
