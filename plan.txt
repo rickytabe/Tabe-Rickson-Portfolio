@@ -1,0 +1,21 @@
+darkgray: #121212
+neon-green: #39FF14
+white: #FFFFFF
+
+frosted liquid glass effect
+no-border radius
+custom fonts
+animation on scroll
+scroll indicator
+page scroll animations
+navigation bar at the top
+full screen animations
+mouse hover effects
+motion blur on scroll
+mouse scroll effects
+make every section responsive
+theme toggle with toggle animation
+
+/* Approach 1 — pure CSS */ .glass { background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(12px) saturate(1.6); border: 1px solid rgba(255,255,255,0.45); border-radius: 16px; } .glass::before { /* top-left specular highlight */ content: ""; position: absolute; inset: 0; background: linear-gradient( 135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 50% ); border-radius: 16px; pointer-events: none; }
+/* Approach 2 — SVG displacement map */ /* 1. Define SVG filter (hidden) */ <svg style="display:none"> <filter id="distort"> <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise"/> <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/> <feGaussianBlur stdDeviation="1.5"/> </filter> </svg> /* 2. Reference it in CSS */ .glass { backdrop-filter: blur(3px) url(#distort); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.5); } /* Note: url() in backdrop-filter has limited mobile/Safari support */
+/* Approach 3 — multi-layer + CA */ /* Layer 1: backdrop blur */ .layer-blur { backdrop-filter: blur(8px) brightness(1.1) saturate(1.4); background: rgba(255,255,255,0.12); } /* Layer 2: top-half shine */ .layer-shine { height: 55%; background: linear-gradient( 180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100% ); border-radius: 16px 16px 60% 60%; } /* Layer 3: edge highlight */ .layer-edge { border: 1px solid rgba(255,255,255,0.6); box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.12); } /* Layers 4+5: chromatic aberration */ .layer-ca-r { border: 1.5px solid rgba(255,60,60,0.2); transform: translate(1.5px, 0); } .layer-ca-b { border: 1.5px solid rgba(60,60,255,0.2); transform: translate(-1.5px, 0); }

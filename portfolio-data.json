@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "title": "Tabe Rickson | Full Stack Developer, AI Developer, Tech Enthusiast, UI/UX Designer, Open Source Contributor, Mobile Developer",
+    "description": "Tabe Rickson is a Full-Stack Developer, AI Developer, and Tech Enthusiast with experience in building scalable web & mobile applications, creating stunning UI/UX, and contributing to open source projects. Skilled in Firebase, Supabase, and modern frameworks.",
+    "siteUrl": "https://tabe-rickson.vercel.app/"
+  },
+
+  "identity": {
+    "fullName": "Tabe Rickson",
+    "roles": [
+      "Mobile Developer",
+      "Software Engineer",
+      "Tech Architect",
+      "IT Expert"
+    ],
+    "tagline": "I build fast, scalable, reliable and user-friendly apps that deliver performance and a seamless digital experience."
+  },
+
+  "about": [
+    {
+      "number": "01",
+      "title": "Tech Architect & Software Engineer",
+      "description": "Tabe Rickson is a versatile IT expert and software engineer with a sharp instinct for innovation. With extensive experience in modern software development, mobile app engineering, and full-stack systems, he delivers cutting-edge solutions for businesses of all scales."
+    },
+    {
+      "number": "02",
+      "title": "Entrepreneurial Visionary",
+      "description": "Driven by a passion for meaningful impact, Tabe builds ventures that create value and solve real-world problems. His leadership bridges technology and business strategy to drive sustainable growth."
+    },
+    {
+      "number": "03",
+      "title": "Futurist & Change Maker",
+      "description": "A changemaker by nature, Tabe believes in technology as a force for good. He actively shapes the future by empowering developer communities and nurturing collaborative ecosystems."
+    }
+  ],
+
+  "stats": {
+    "yearsExperience": "2+",
+    "projectsCompleted": "10+",
+    "happyClients": "4+",
+    "commercials": "2"
+  },
+
+  "expertise": [
+    {
+      "title": "Frontend Development",
+      "description": "Building immersive user interfaces with React, TailwindCSS, and animation-first workflows. I specialize in creating fast, interactive, and accessible web experiences that leave lasting impressions.",
+      "technologies": ["Next.js", "React", "Tailwind CSS", "TypeScript", "JavaScript"]
+    },
+    {
+      "title": "Backend Development",
+      "description": "Engineering robust, scalable APIs with Node.js and Supabase. I craft secure backend systems optimized for performance, cloud integration, and seamless frontend synergy.",
+      "technologies": ["Node.js", "FastAPI", "PostgreSQL", "MongoDB", "Prisma", "Express.js"]
+    },
+    {
+      "title": "Mobile Development",
+      "description": "Creating sleek, cross-platform mobile applications with React Native and Expo. From concept to deployment, I deliver high-performing apps with native fluidity and design.",
+      "technologies": ["React Native", "Expo", "JavaScript", "Supabase", "Flutter"]
+    },
+    {
+      "title": "AI Automation & Integration",
+      "description": "Integrating intelligent systems with OpenAI, LangChain, and Supabase edge functions. Automating tasks, enhancing UX, and building smarter apps with AI-first thinking.",
+      "technologies": ["OpenAI", "Gemini", "Python", "Supabase"]
+    },
+    {
+      "title": "UI/UX Design",
+      "description": "Designing futuristic interfaces that align aesthetics with function. I apply design systems, motion design, and accessibility principles to create seamless user journeys.",
+      "technologies": ["Figma", "Framer"]
+    },
+    {
+      "title": "Project Management",
+      "description": "Planning, executing, and scaling tech projects with Agile methods and lean thinking. I manage cross-functional teams, timelines, and deliverables with precision and empathy.",
+      "technologies": ["Jira", "GitHub", "Slack/Trello", "Docker/Kubernetes/GitLab"]
+    }
+  ],
+
+  "companies": [
+    "Tech Chantier",
+    "Fast Chops",
+    "Tutor Finder",
+    "Startwise",
+    "Fabtech Solutions"
+  ],
+
+  "projects": [
+    {
+      "name": "Mobi-Rent",
+      "description": "A secure and intelligent car rental platform built to transform the underdeveloped rental infrastructure in my country. Empowers rental services and customers with seamless online booking, fleet management, and fraud prevention.",
+      "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
+      "liveUrl": "http://mobirent-cameroon.vercel.app/"
+    },
+    {
+      "name": "Tutor-Finder",
+      "description": "A full-stack platform connecting learners to tutors with live collaboration tools, API integrations, and an AI model that recommends the best tutor based on learning style and preferences. Developed during my Tech-Chantier internship.",
+      "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
+      "liveUrl": "https://tutor-finder101.vercel.app"
+    },
+    {
+      "name": "NiaTrust Wallet",
+      "description": "A fintech escrow and savings solution enabling secure peer-to-peer transactions, group savings, and conditional fund releases — designed to revolutionize online financial trust and collaboration.",
+      "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
+      "liveUrl": "https://niatrust-walet.vercel.app"
+    },
+    {
+      "name": "StartWise",
+      "badge": "Hackathon Winner - Code4Change 2025",
+      "description": "Hackathon-winning platform (Code4Change 2025) guiding aspiring tech professionals with real-time mentorship, AI-powered career navigation, and access to local and remote job or internship opportunities.",
+      "codeUrl": "https://github.com/rickytabe/StartWise",
+      "liveUrl": "https://start-wise-five.vercel.app"
+    },
+    {
+      "name": "Cambrilia",
+      "description": "A multimodal AI assistant (text, image, and audio) designed for dynamic and natural interaction. Currently in development as an advanced alternative to traditional AI chat platforms.",
+      "codeUrl": "https://github.com/rickytabe/cam-brillia",
+      "liveUrl": "https://cam-brillia.vercel.app"
+    },
+    {
+      "name": "KMC Restaurant",
+      "description": "A restaurant management and e-commerce site that boosted daily sales by 10×, enabling customers to order online, reserve tables, and make secure payments seamlessly.",
+      "codeUrl": "https://github.com/rickytabe/KMC-WESITE",
+      "liveUrl": "https://kmc-restaurant.vercel.app"
+    },
+    {
+      "name": "stepUp",
+      "description": "A high-speed mini e-commerce site for selling footwear online, focused on lightning-fast transactions and efficient online payment processing.",
+      "codeUrl": "https://github.com/rickytabe/shoe-shop",
+      "liveUrl": "https://shoe-shop-ten.vercel.app"
+    },
+    {
+      "name": "Evogym",
+      "description": "A fitness membership platform for Evogym, streamlining subscriptions, payments, and class bookings to grow their customer base and retention rates.",
+      "codeUrl": "https://github.com/example/evogym",
+      "liveUrl": "https://letsgymify.web.app"
+    }
+  ],
+
+  "contact": {
+    "phone": "+237 671 35 33 41",
+    "whatsapp": "https://wa.me/237671353341",
+    "emails": ["rickytabe2@gmail.com", "rickytabe2@email.com"],
+    "message": "Have a project in mind or want to chat with me? Drop me a message below and I'll get back to you as soon as possible."
+  },
+
+  "socials": {
+    "github": "https://github.com/rickytabe",
+    "twitter": "https://x.com/RickyTabe",
+    "linkedin": "https://linkedin.com/in/taberickson",
+    "resume": "https://tabe-rickson.vercel.app/resume.pdf"
+  },
+
+  "navigation": [
+    { "label": "Home", "href": "#home" },
+    { "label": "About", "href": "#about" },
+    { "label": "Expertise", "href": "#expertise" },
+    { "label": "Projects", "href": "#projects" },
+    { "label": "Contact", "href": "#contact" }
+  ],
+
+  "footer": {
+    "tagline": "Building digital experiences that matter. Let's create something amazing together.",
+    "newsletter": "Subscribe to my newsletter for updates on new projects and articles.",
+    "copyright": "© 2026 TABE RICKSON. All rights reserved.",
+    "quickLinks": [
+      { "label": "Home", "href": "#home" },
+      { "label": "Projects", "href": "#projects" },
+      { "label": "Contact", "href": "#contact" },
+      { "label": "Resume", "href": "/resume.pdf" }
+    ],
+    "legal": [
+      { "label": "Privacy Policy", "href": "/privacy" },
+      { "label": "Terms of Service", "href": "/terms" }
+    ]
+  }
+}

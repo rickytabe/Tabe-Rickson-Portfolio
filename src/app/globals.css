@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+:root {
+  --background: #121212;
+  --foreground: #FFFFFF;
+  --neon-green: #39FF14;
+  --dark-gray: #121212;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-neon-green: var(--neon-green);
+  --font-sans: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  --font-inter: var(--font-inter), "Inter", sans-serif;
+}
+
+/* Smooth scrolling and snapping */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
+  overflow-x: clip;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(57, 255, 20, 0.25);
+  color: #FFFFFF;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.5);
+}
+
+/* ==========================================================================
+   REUSABLE LIQUID GLASS STYLING (iOS 26 Style)
+   To use: Add the 'liquid-glass' class to any element/card.
+   
+   Real glass does NOT whiten — it only distorts & blurs what's behind it.
+   ========================================================================== */
+.liquid-glass {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  
+  /* Nearly invisible background — glass is see-through, not white */
+  background: rgba(0, 0, 0, 0.09);
+  
+  /* Very faint border — just enough to define the glass edge */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  /* The core effect: blur + saturate to make background colors richer through the glass */
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  
+  /* Depth from shadow only — no white inset glows */
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  transition: 
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease,
+    background 0.4s ease;
+}
+
+/* Very subtle top-edge specular — just a thin line, not a white wash */
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Bottom edge reflection — matching thin line */
+.liquid-glass::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Ensure inner content sits above glass layers */
+.liquid-glass > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover: slightly brighter border, lift up, deeper shadow — NO white fill */
+.liquid-glass:hover {
+  transform: translateY(-4px) scale(1.01);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.liquid-glass:hover::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   LIQUID GLASS PILL (For Nav Links & Small Tags)
+   ========================================================================== */
+.liquid-glass-pill {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(57, 255, 20, 0.1);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Thin top specular for pills */
+.liquid-glass-pill::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.liquid-glass-pill > * {
+  position: relative;
+  z-index: 2;
+}
+
