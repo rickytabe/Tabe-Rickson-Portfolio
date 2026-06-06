@@ -21,7 +21,7 @@ export default function Beliefs() {
   return (
     <section 
       id="beliefs" 
-      className="snap-start min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative"
+      className="min-h-dvh flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative"
     >
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <motion.div

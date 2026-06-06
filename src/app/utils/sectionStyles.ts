@@ -1,6 +1,6 @@
 export const SECTION_STYLES = {
   // The outer section wrapper
-  wrapper: "snap-start min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative bg-[#121212]",
+  wrapper: "min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative bg-[#121212]",
   
   // The inner content container limiting max width
   container: "max-w-7xl mx-auto w-full relative z-10",

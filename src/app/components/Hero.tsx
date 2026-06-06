@@ -1,98 +1,79 @@
-"use client";
-
-import { motion, Variants } from "framer-motion";
+import Image from "next/image";
+import type { CSSProperties } from "react";
 
 export default function Hero() {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: "100%" },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-    }
-  };
+  const heroDelay = (delay: string) =>
+    ({ "--hero-delay": delay } as CSSProperties);
 
   return (
     <section 
       id="hero" 
-      className="snap-start min-h-[100dvh] relative flex flex-col justify-between pt-24 pb-12 px-8 lg:px-16 overflow-hidden"
+      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-12 px-8 lg:px-16 overflow-hidden"
     >
       {/* Background Image Reveal */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <motion.div 
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "url('/hero_image.png')",
-            backgroundPosition: "center right",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-        />
+        <div className="hero-bg-reveal absolute inset-0">
+          <Image
+            src="/hero_im.png"
+            alt=""
+            fill
+            preload
+            fetchPriority="high"
+            sizes="100vw"
+            className="object-cover object-[center_right]"
+          />
+        </div>
       </div>
       {/* Top Metadata Row */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="flex justify-between items-start text-[10px] tracking-[0.2em] text-white/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
+      <div
+        className="hero-fade-down flex justify-between items-start text-[10px] tracking-[0.2em] text-white/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
       >
         <div className="w-1/2">CAMEROON-BUEA</div>
         <div className="w-1/2 text-right">SOFTWARE ENGINEER</div>
-      </motion.div>
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-col justify-center flex-1 w-full max-w-7xl mx-auto z-10 mt-16">
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className=""
-         >
+      <div className="flex flex-col justify-center flex-1 w-full max-w-7xl  mx-auto z-10 mt-16">
+        <div>
           {/* Massive Typography */}
           <h1 className="text-6xl md:text-8xl lg:text-[120px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
-            <div className="overflow-hidden pb-2">
-              <motion.div variants={itemVariants} className="text-white">I BUILD</motion.div>
-            </div>
-            <div className="overflow-hidden pb-2">
-              <motion.div variants={itemVariants} className="text-white">TECH THAT</motion.div>
-            </div>
-            <div className="overflow-hidden pb-2">
-              <motion.div variants={itemVariants} style={{ color: "#39FF14" }}>CHANGES</motion.div>
-            </div>
-            <div className="overflow-hidden pb-2">
-              <motion.div variants={itemVariants} className="text-white">LIVES.</motion.div>
-            </div>
+            <span className="block overflow-hidden pb-2">
+              <span className="hero-line block text-white" style={heroDelay("80ms")}>
+                I BUILD
+              </span>
+            </span>
+            <span className="block overflow-hidden pb-2">
+              <span className="hero-line block text-white" style={heroDelay("160ms")}>
+                TECH THAT
+              </span>
+            </span>
+            <span className="block overflow-hidden pb-2">
+              <span className="hero-line block" style={{ ...heroDelay("240ms"), color: "#39FF14" }}>
+                CHANGES
+              </span>
+            </span>
+            <span className="block overflow-hidden pb-2">
+              <span className="hero-line block text-white" style={heroDelay("320ms")}>
+                LIVES.
+              </span>
+            </span>
           </h1>
 
           {/* Subtext */}
           <div className="overflow-hidden mt-8 max-w-md">
-            <motion.p 
-              variants={itemVariants}
-              className="text-sm md:text-base text-white/60 leading-relaxed font-light font-inter"
+            <p
+              className="hero-line text-sm md:text-base text-white/60 leading-relaxed font-light font-inter"
+              style={heroDelay("400ms")}
             >
               Hi, My name is <span className="font-bold text-white">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation. 
-            </motion.p>
+            </p>
           </div>
 
           {/* Buttons */}
           <div className="overflow-hidden mt-10">
-            <motion.div 
-              variants={itemVariants}
-              className="flex items-center gap-4"
+            <div
+              className="hero-line flex items-center gap-4"
+              style={heroDelay("480ms")}
             >
               <a 
                 href="#work" 
@@ -112,24 +93,22 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
                 <span className="relative z-10">LET&apos;S TALK</span>
               </a>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom Right Metadata */}
-      <motion.div 
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-        className="absolute bottom-12 right-8 lg:right-16 text-right z-10 font-mono"
+      <div
+        className="hero-fade-left absolute bottom-12 right-8 lg:right-16 text-right z-10 font-mono"
       >
         <div className="text-[9px] tracking-[0.2em] text-white/50 mb-1">FULL-STACK ENGINEER</div>
         <div className="text-[10px] tracking-[0.15em] font-bold text-white uppercase">Freelancer - CAMEROON</div>
-      </motion.div>
+      </div>
       
       {/* Subtle dark gradient overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#121212]/80 to-transparent pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-linear-to-r from-[#121212] via-[#121212]/80 to-transparent pointer-events-none z-0"></div>
     </section>
   );
 }
+ 

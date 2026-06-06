@@ -31,6 +31,18 @@ export default function Navbar() {
     pillStyleRef.current = pillStyle;
   }, [pillStyle]);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileMenuOpen]);
+
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -76,7 +88,7 @@ export default function Navbar() {
 
       if (currentSection.visibleHeight > 0) {
         setActiveSection(currentSection.label);
-      }
+      };
     };
 
     window.addEventListener("scroll", updateActiveSection, { passive: true });
@@ -340,11 +352,11 @@ export default function Navbar() {
 
     {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 top-[60px] z-40 bg-[#121212]/95 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden ${
+        className={`fixed inset-0 z-40 bg-[#121212]/95 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden ${
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="flex flex-col items-center justify-center h-full gap-8 px-6 pb-20">
+        <div className="flex flex-col items-center h-full gap-6 px-6 pt-32 pb-12 overflow-y-auto">
           {navLinks.map((link) => {
             const isActive = activeSection === link.label;
 
@@ -354,12 +366,11 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${
-                  isActive ? "liquid-glass-pill" : ""
+                  isActive ? "text-[#39FF14] bg-[#39FF14]/10" : "text-white/60 hover:text-white"
                 }`}
                 style={{
-                  color: isActive ? "#FFFFFF" : "rgba(255, 255, 255, 0.65)",
                   textDecoration: "none",
-                  borderRadius: "4px",
+                  borderRadius: "8px",
                 }}
               >
                 <span>{link.label}</span>

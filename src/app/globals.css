@@ -21,17 +21,79 @@ html {
   scroll-behavior: smooth;
 }
 
-@media (min-width: 768px) {
-  html {
-    scroll-snap-type: y mandatory;
-  }
-}
+
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
   overflow-x: clip;
+}
+
+/* First-screen hero reveal: CSS starts immediately, without waiting for hydration. */
+.hero-bg-reveal {
+  transform: translate3d(0, 100%, 0);
+  animation: hero-bg-rise 850ms cubic-bezier(0.16, 1, 0.3, 1) 60ms forwards;
+  will-change: transform;
+}
+
+.hero-line {
+  opacity: 0;
+  transform: translate3d(0, 100%, 0);
+  animation: hero-line-rise 680ms cubic-bezier(0.16, 1, 0.3, 1) var(--hero-delay, 0ms) forwards;
+  will-change: opacity, transform;
+}
+
+.hero-fade-down {
+  opacity: 0;
+  transform: translate3d(0, -16px, 0);
+  animation: hero-fade-down 560ms ease 90ms forwards;
+  will-change: opacity, transform;
+}
+
+.hero-fade-left {
+  opacity: 0;
+  transform: translate3d(16px, 0, 0);
+  animation: hero-fade-left 560ms ease 520ms forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes hero-bg-rise {
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-line-rise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-fade-down {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-fade-left {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-reveal,
+  .hero-line,
+  .hero-fade-down,
+  .hero-fade-left {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Selection styling */
@@ -189,4 +251,3 @@ body {
   position: relative;
   z-index: 2;
 }
-
