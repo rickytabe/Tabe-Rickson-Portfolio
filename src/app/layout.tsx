@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/next";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -21,7 +22,19 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.startsWith("http")
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : `https://${process.env.NEXT_PUBLIC_SITE_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
+const siteUrl = getBaseUrl();
 const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
@@ -54,25 +67,11 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Tabe Rickson Portfolio",
     type: "website",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: previewImageAlt,
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: [
-      {
-        url: "/twitter-image.png",
-        alt: previewImageAlt,
-      },
-    ],
   },
 };
 
@@ -94,6 +93,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
