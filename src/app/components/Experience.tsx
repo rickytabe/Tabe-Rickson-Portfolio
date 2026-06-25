@@ -76,7 +76,7 @@ export default function Experience() {
     <section 
       id="experience" 
       ref={containerRef}
-      className="min-h-screen py-24 px-8 lg:px-16 border-t border-white/5 relative bg-transparent overflow-hidden"
+      className="min-h-screen py-24 px-8 lg:px-16 border-t border-card-border relative bg-transparent overflow-hidden"
     >
       <div className="max-w-7xl mx-auto w-full relative z-10">
         
@@ -109,7 +109,7 @@ export default function Experience() {
         {/* Timeline Container */}
         <div className="relative max-w-6xl mx-auto pl-4 md:pl-8">
           {/* Main vertical line background */}
-          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-[2px] bg-white/5 -translate-x-1/2"></div>
+          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-[2px] bg-timeline-line -translate-x-1/2"></div>
           
           {/* Animated vertical line fill */}
           <motion.div 
@@ -130,12 +130,12 @@ export default function Experience() {
                 >
                   
                   {/* Timeline Dot */}
-                  <div className="absolute left-0 top-8 md:top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center w-6 h-6 rounded-full bg-[#121212] border-4 border-[#39FF14]/50 shadow-[0_0_10px_rgba(57,255,20,0.3)] z-10 overflow-hidden">
+                  <div className="absolute left-0 top-8 md:top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center w-6 h-6 rounded-full bg-background border-4 border-[#39FF14]/50 shadow-[0_0_10px_rgba(57,255,20,0.3)] z-10 overflow-hidden">
                     <div className="w-2 h-2 rounded-full bg-[#39FF14]"></div>
                   </div>
 
                   {/* Content Card */}
-                  <div className="group flex flex-col md:flex-row bg-[#0d0d0d] border border-white/5 hover:border-white/10 transition-all duration-500 overflow-hidden">
+                  <div className="group flex flex-col md:flex-row bg-card-bg border border-card-border shadow-sm dark:shadow-none hover:border-card-border-hover transition-all duration-500 overflow-hidden">
                     
                     {/* Text Side (Left) */}
                     <div className="flex-1 p-8 md:p-12 lg:p-16 relative flex flex-col justify-center order-2 md:order-1">
@@ -146,17 +146,17 @@ export default function Experience() {
                         {item.year}
                       </span>
                       
-                      <h3 className="text-2xl md:text-3xl font-bold font-sans text-white mb-6 tracking-tight group-hover:text-[#39FF14] transition-colors duration-300">
+                      <h3 className="text-2xl md:text-3xl font-bold font-sans text-foreground mb-6 tracking-tight group-hover:text-[#39FF14] transition-colors duration-300">
                         {item.title}
                       </h3>
                       
-                      <p className="text-white/60 font-inter text-sm md:text-base leading-relaxed max-w-xl">
+                      <p className="text-foreground/60 font-inter text-sm md:text-base leading-relaxed max-w-xl">
                         {item.description}
                       </p>
                     </div>
 
                     {/* Image Side (Right) */}
-                    <div className="w-full md:w-5/12 lg:w-1/2 h-64 md:h-125 min-h-75 relative overflow-hidden order-1 md:order-2 border-b md:border-b-0 md:border-l border-white/5">
+                    <div className="w-full md:w-5/12 lg:w-1/2 h-64 md:h-125 min-h-75 relative overflow-hidden order-1 md:order-2 border-b md:border-b-0 md:border-l border-card-border">
                       {item.image ? (
                         <img 
                           src={item.image} 
@@ -164,12 +164,12 @@ export default function Experience() {
                           className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 scale-105 group-hover:scale-100"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-white/10 font-mono text-sm tracking-widest bg-[#121212]/50">
+                        <div className="absolute inset-0 flex items-center justify-center text-foreground/10 font-mono text-sm tracking-widest bg-background/50">
                           [ NO VISUAL ]
                         </div>
                       )}
                       {/* Overlay gradient to blend image into the dark card */}
-                      <div className="absolute inset-0 bg-linear-to-t md:bg-linear-to-r from-[#0d0d0d] via-transparent to-transparent opacity-80"></div>
+                      <div className="absolute inset-0 bg-linear-to-t md:bg-linear-to-r from-card-bg via-transparent to-transparent opacity-80"></div>
                       
                       {/* Accent line border bottom */}
                       <div className="absolute bottom-0 right-0 h-[2px] w-0 bg-[#39FF14] transition-all duration-500 ease-out group-hover:w-full"></div>

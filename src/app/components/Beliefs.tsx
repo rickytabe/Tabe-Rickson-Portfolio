@@ -22,7 +22,7 @@ export default function Beliefs() {
   return (
     <section 
       id="beliefs" 
-      className="min-h-dvh flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative"
+      className="min-h-dvh flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-card-border relative"
     >
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <motion.div
@@ -34,21 +34,21 @@ export default function Beliefs() {
           <div className="flex items-center gap-4 mb-6 font-mono text-xs tracking-[0.2em] text-[#39FF14]">
             <span className="font-bold text-sm">04</span>
             <span className="w-10 h-px bg-[#39FF14]/50"></span>
-            <span className="text-white/50 uppercase font-semibold">Beliefs</span>
+            <span className="text-foreground/50 uppercase font-semibold">Beliefs</span>
           </div>
           <div className="flex flex-col items-start mb-8">
             <AnimatedText
               as="h2"
               text={<>Core Beliefs &<br />Expertise.</>}
               className="items-start"
-              textClassName="text-4xl md:text-5xl font-bold text-white tracking-tight font-sans text-left"
+              textClassName="text-4xl md:text-5xl font-bold text-foreground tracking-tight font-sans text-left"
               underlineClassName="text-[#39FF14]"
             />
           </div>
-          <p className="text-lg text-white/60 leading-relaxed font-light mb-8 font-inter">
+          <p className="text-lg text-foreground/60 leading-relaxed font-light mb-8 font-inter">
             "Design is not just what it looks like and feels like. Design is how it works."
           </p>
-          <p className="text-sm text-white/40 leading-relaxed font-light font-inter">
+          <p className="text-sm text-foreground/40 leading-relaxed font-light font-inter">
             My philosophy revolves around building resilient architecture, defense-in-depth security, and prioritizing visual excellence. Whether developing platforms for local businesses in Cameroon or scalable cloud infrastructures, I ensure technology remains a force for good.
           </p>
         </motion.div>
@@ -65,8 +65,8 @@ export default function Beliefs() {
             >
               <div className="text-[#39FF14] font-mono text-sm mt-1 relative z-10">0{index + 1}</div>
               <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white mb-2 tracking-wide font-sans">{item.title}</h3>
-                <p className="text-sm text-white/50 leading-relaxed font-inter">{item.description}</p>
+                <h3 className="text-lg font-bold text-foreground mb-2 tracking-wide font-sans">{item.title}</h3>
+                <p className="text-sm text-foreground/50 leading-relaxed font-inter">{item.description}</p>
               </div>
             </motion.div>
           ))}

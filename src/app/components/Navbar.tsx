@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 import { AnimatedText } from "@/components/ui/animated-text";
 
 const navLinks = [
@@ -23,6 +25,12 @@ export default function Navbar() {
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0, scale: "scale(1, 1)" });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const linkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
   const pillStyleRef = useRef(pillStyle);
@@ -154,10 +162,10 @@ export default function Navbar() {
         id="main-navbar"
         className="fixed top-0 left-0 w-full z-50"
       style={{
-        background: hasScrolled ? "rgba(18, 18, 18, 0.25)" : "transparent",
+        background: hasScrolled ? "color-mix(in srgb, var(--background) 75%, transparent)" : "transparent",
         backdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
         WebkitBackdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
-        borderBottom: hasScrolled ? "1px solid rgba(255, 255, 255, 0.08)" : "1px solid transparent",
+        borderBottom: hasScrolled ? "1px solid var(--card-border)" : "1px solid transparent",
         transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease",
       }}
     >
@@ -179,14 +187,11 @@ export default function Navbar() {
           />
           <AnimatedText 
             text="Tabe Rickson"
-            textClassName="text-2xl font-bold font-sans text-white"
+            textClassName="text-2xl font-bold font-sans text-foreground"
             underlineClassName="text-[#39FF14]"
           />
           <span
-            className="text-2xl font-light font-sans"
-            style={{
-              color: "rgba(255, 255, 255, 0.4)",
-            }}
+            className="text-2xl font-light font-sans text-foreground/40"
           >
             / 2026
           </span>
@@ -238,7 +243,7 @@ export default function Navbar() {
                 href={link.href}
                 className="relative px-3.5 py-1.5 text-[12px] font-medium tracking-widest transition-colors duration-300 z-10 font-mono"
                 style={{
-                  color: isActive ? "#FFFFFF" : "rgba(255, 255, 255, 0.5)",
+                  color: isActive ? "var(--foreground)" : "var(--muted)",
                   textDecoration: "none",
                 }}
                 onMouseEnter={() => setHoveredLink(link.label)}
@@ -251,7 +256,7 @@ export default function Navbar() {
           {/* Divider */}
           <div
             className="w-px h-4 mx-2 z-10"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            style={{ backgroundColor: "var(--card-border)" }}
           />
 
           {/* Tag Links with liquid-glass styling */}
@@ -264,7 +269,7 @@ export default function Navbar() {
                 href={link.href}
                 className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono"
                 style={{
-                  color: isHovered ? "#FFFFFF" : "rgba(255, 255, 255, 0.7)",
+                  color: isHovered ? "var(--foreground)" : "var(--muted)",
                   textDecoration: "none",
                   borderRadius: "2px",
                 }}
@@ -280,28 +285,36 @@ export default function Navbar() {
             );
           })}
 
+          {/* Theme Toggle Button */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 ml-2 transition-colors duration-300 rounded-full hover:bg-foreground/10"
+              aria-label="Toggle Theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-foreground" />
+              ) : (
+                <Moon className="w-4 h-4 text-foreground" />
+              )}
+            </button>
+          )}
+
           {/* CTA Button */}
           <a
             id="nav-cta-lets-talk"
-            href="#contact"
-            className="flex items-center gap-1.5 ml-3 px-5 py-2 text-xs font-semibold tracking-widest transition-all duration-300 font-mono"
+            href="#portfolio"
+            className="group relative flex items-center gap-1.5 ml-3 px-5 py-2 text-xs font-semibold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
             style={{
               backgroundColor: "#39FF14",
-              color: "#121212",
               textDecoration: "none",
               borderRadius: "0px",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#4dff33";
-              e.currentTarget.style.boxShadow = "0 0 20px rgba(57, 255, 20, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#39FF14";
-              e.currentTarget.style.boxShadow = "none";
-            }}
           >
-            LET&apos;S TALK
+            <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+            <span className="relative z-10">LET&apos;S TALK</span>
             <svg
+              className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
               width="10"
               height="10"
               viewBox="0 0 10 10"
@@ -311,7 +324,7 @@ export default function Navbar() {
             >
               <path
                 d="M1 9L9 1M9 1H3M9 1V7"
-                stroke="#121212"
+                stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -320,11 +333,24 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Mobile: Hamburger Button */}
-        <div className="lg:hidden flex items-center">
+        {/* Mobile: Hamburger Button & Theme Toggle */}
+        <div className="lg:hidden flex items-center gap-3">
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 transition-colors duration-300 rounded-full hover:bg-white/10"
+              aria-label="Toggle Theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-foreground" />
+              ) : (
+                <Moon className="w-4 h-4 text-foreground" />
+              )}
+            </button>
+          )}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors p-2"
+            className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors p-2"
           >
             <span className="text-[10px] font-medium tracking-widest font-mono">
               {isMobileMenuOpen ? "CLOSE" : "MENU"}
@@ -353,7 +379,7 @@ export default function Navbar() {
 
     {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-[#121212]/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${
+        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -367,7 +393,7 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${
-                  isActive ? "text-[#39FF14] bg-[#39FF14]/10" : "text-white/60 hover:text-white"
+                  isActive ? "text-[#39FF14] bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
                 }`}
                 style={{
                   textDecoration: "none",
@@ -394,10 +420,9 @@ export default function Navbar() {
           ))}
 
           <a
-            href="#contact"
+            href="#portfolio"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="mt-8 px-8 py-3 text-sm font-semibold tracking-widest bg-[#39FF14] text-[#121212] transition-colors hover:bg-[#4dff33]"
-            style={{  }}
+            className="mt-8 px-8 py-3 text-sm font-semibold tracking-widest bg-[#39FF14] text-[#121212] transition-colors hover:bg-foreground hover:text-background text-center"
           >
             LET&apos;S TALK
           </a>

@@ -85,7 +85,7 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
       />
 
       {/* Card body */}
-      <div className="relative bg-[#0d0d0d] border border-white/4 flex flex-col h-full overflow-hidden">
+      <div className="relative bg-card-bg border border-card-border shadow-sm dark:shadow-none flex flex-col h-full overflow-hidden">
         {/* Inner cursor glow */}
         <div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -96,17 +96,17 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
 
         <div className="relative z-10 flex flex-col h-full p-8 md:p-9">
           <div className="flex justify-between items-start mb-10">
-            <div className="text-white/50 group-hover:text-[#39FF14] group-hover:scale-110 transition-all duration-400 ease-out origin-top-left">
+            <div className="text-foreground/50 group-hover:text-[#39FF14] group-hover:scale-110 transition-all duration-400 ease-out origin-top-left">
               {service.icon}
             </div>
-            <div className="text-[10px] font-mono tracking-widest text-white/30 group-hover:text-[#39FF14] transition-colors duration-400 mt-1">
+            <div className="text-[10px] font-mono tracking-widest text-foreground/30 group-hover:text-[#39FF14] transition-colors duration-400 mt-1">
               {service.id}
             </div>
           </div>
-          <h3 className="text-lg md:text-xl font-bold font-sans text-white mb-4 whitespace-pre-line tracking-tight leading-tight">
+          <h3 className="text-lg md:text-xl font-bold font-sans text-foreground mb-4 whitespace-pre-line tracking-tight leading-tight">
             {service.title}
           </h3>
-          <p className="text-white/50 font-inter text-[13px] leading-relaxed mt-auto">
+          <p className="text-foreground/50 font-inter text-[13px] leading-relaxed mt-auto">
             {service.desc}
           </p>
         </div>

@@ -14,7 +14,7 @@ export default function Hero() {
 
       {/* Top Metadata Row */}
       <div
-        className="hero-fade-down flex justify-between items-start text-[10px] tracking-[0.2em] text-white/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
+        className="hero-fade-down flex justify-between items-start text-[10px] tracking-[0.2em] text-foreground/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
       >
         <div className="w-1/2">CAMEROON-BUEA</div>
         <div className="w-1/2 text-right">SOFTWARE ENGINEER</div>
@@ -28,12 +28,12 @@ export default function Hero() {
           {/* Massive Typography */}
           <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
             <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-white" style={heroDelay("80ms")}>
+              <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
                 I BUILD  
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-white" style={heroDelay("80ms")}>
+              <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
                TECH THAT
               </span>
             </span>
@@ -43,7 +43,7 @@ export default function Hero() {
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-white" style={heroDelay("320ms")}>
+              <span className="hero-line block text-foreground" style={heroDelay("320ms")}>
                 LIVES.
               </span>
             </span>
@@ -52,10 +52,10 @@ export default function Hero() {
           {/* Subtext */}
           <div className="overflow-hidden mt-8 max-w-md">
             <p
-              className="hero-line text-sm md:text-base text-white/60 leading-relaxed font-light font-inter"
+              className="hero-line text-sm md:text-base text-foreground/60 leading-relaxed font-light font-inter"
               style={heroDelay("400ms")}
             >
-              Hi, My name is <span className="font-bold text-white">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation. 
+              Hi, My name is <span className="font-bold text-foreground">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation. 
             </p>
           </div>
 
@@ -66,21 +66,21 @@ export default function Hero() {
               style={heroDelay("480ms")}
             >
               <a 
-                href="#work" 
-                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-[#121212] overflow-hidden transition-all duration-300 font-mono"
+                href="#portfolio" 
+                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
                 style={{ backgroundColor: "#39FF14" }}
               >
-                <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+                <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
                 <span className="relative z-10">SEE MY WORK</span>
                 <svg className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </a>
               <a 
-                href="#contact" 
-                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-white border border-white/20 hover:border-white/60 transition-all duration-300 font-mono"
+                href="#portfolio" 
+                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-foreground/20 hover:border-foreground/60 transition-all duration-300 font-mono"
               >
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
+                <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
                 <span className="relative z-10">LET&apos;S TALK</span>
               </a>
             </div>
@@ -146,8 +146,8 @@ export default function Hero() {
       <div
         className="hero-fade-left absolute bottom-12 right-8 lg:right-16 text-right z-10 font-mono"
       >
-        <div className="text-[9px] tracking-[0.2em] text-white/50 mb-1">FULL-STACK ENGINEER</div>
-        <div className="text-[10px] tracking-[0.15em] font-bold text-white uppercase">Freelancer - CAMEROON</div>
+        <div className="text-[9px] tracking-[0.2em] text-foreground/50 mb-1">FULL-STACK ENGINEER</div>
+        <div className="text-[10px] tracking-[0.15em] font-bold text-foreground uppercase">Freelancer - CAMEROON</div>
       </div>
       
     </section>

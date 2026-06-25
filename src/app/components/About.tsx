@@ -90,29 +90,29 @@ export default function About() {
               />
             </div>
 
-            <p className="text-white/60 text-md leading-relaxed mb-8 font-light font-inter">
+            <p className="text-foreground/60 text-md leading-relaxed mb-8 font-light font-inter">
               I develop modern web and mobile applications with a focus on performance, scalability, and clean user experience. I also work with AI automation systems and RAG pipelines to build smarter and more efficient digital solutions. My goal is to create software that solves real-world problems and helps businesses and communities grow.
             </p>
 
-            <hr className="border-white/10 mb-8" />
+            <hr className="border-card-border mb-8" />
 
             {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-10 text-sm">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-white min-w-[60px]">Name:</span>
-                <span className="text-white/60">Tabe Rickson</span>
+                <span className="font-bold text-foreground min-w-[60px]">Name:</span>
+                <span className="text-foreground/60">Tabe Rickson</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white min-w-[60px]">From:</span>
-                <span className="text-white/60">Cameroon</span>
+              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
+                <span className="font-bold text-foreground min-w-[60px]">From:</span>
+                <span className="text-foreground/60">Cameroon</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white min-w-[60px]">Email:</span>
-                <span className="text-white/60">rickytabe2@gmail.com</span>
+              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
+                <span className="font-bold text-foreground min-w-[60px]">Email:</span>
+                <span className="text-foreground/60">rickytabe2@gmail.com</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white min-w-[60px]">Status:</span>
-                <span className="text-white/60">Available for Work</span>
+              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
+                <span className="font-bold text-foreground min-w-[60px]">Status:</span>
+                <span className="text-foreground/60">Available for Work</span>
               </div>
             </div>
 
@@ -120,9 +120,11 @@ export default function About() {
               <div className="flex flex-wrap items-center gap-6">
                 <a
                   href="/Tabe_Rickson_CV.pdf"
-                  className="inline-block px-8 py-3 text-sm font-semibold font-mono tracking-widest text-[#121212] bg-[#39FF14] transition-all duration-300 hover:bg-[#4dff33] hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] uppercase"
+                  className="group relative inline-flex items-center justify-center px-8 py-3 text-sm font-semibold font-mono tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 uppercase"
+                  style={{ backgroundColor: "#39FF14" }}
                 >
-                  Download CV
+                  <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+                  <span className="relative z-10">Download CV</span>
                 </a>
 
                 <div className="flex items-center gap-4">
@@ -131,7 +133,7 @@ export default function About() {
                       href={portfolioData.socials.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
+                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
                     >
                       <GithubIcon size={24} />
                     </a>
@@ -141,7 +143,7 @@ export default function About() {
                       href={portfolioData.socials.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
+                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
                     >
                       <LinkedinIcon size={24} />
                     </a>
@@ -151,7 +153,7 @@ export default function About() {
                       href={portfolioData.socials.twitter}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
+                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
                     >
                       <TwitterIcon size={24} />
                     </a>

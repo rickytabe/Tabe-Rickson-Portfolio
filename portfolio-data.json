@@ -87,50 +87,58 @@
       "name": "Mobi-Rent",
       "description": "A secure and intelligent car rental platform built to transform the underdeveloped rental infrastructure in my country. Empowers rental services and customers with seamless online booking, fleet management, and fraud prevention.",
       "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
-      "liveUrl": "http://mobirent-cameroon.vercel.app/"
+      "liveUrl": "http://mobirent-cameroon.vercel.app/",
+      "techIcons": ["Next.js", "TailwindCSS", "Supabase", "Git", "GitHub"]
     },
     {
       "name": "Tutor-Finder",
       "description": "A full-stack platform connecting learners to tutors with live collaboration tools, API integrations, and an AI model that recommends the best tutor based on learning style and preferences. Developed during my Tech-Chantier internship.",
       "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
-      "liveUrl": "https://tutor-finder101.vercel.app"
+      "liveUrl": "https://tutor-finder101.vercel.app",
+      "techIcons": ["React", "TailwindCSS", "Framer", "Node.js", "Git", "GitHub"]
     },
     {
       "name": "NiaTrust Wallet",
       "description": "A fintech escrow and savings solution enabling secure peer-to-peer transactions, group savings, and conditional fund releases — designed to revolutionize online financial trust and collaboration.",
       "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
-      "liveUrl": "https://niatrust-walet.vercel.app"
+      "liveUrl": "https://niatrust-walet.vercel.app",
+      "techIcons": ["Next.js", "TailwindCSS", "Supabase", "Git", "GitHub"]
     },
     {
       "name": "StartWise",
       "badge": "Hackathon Winner - Code4Change 2025",
       "description": "Hackathon-winning platform (Code4Change 2025) guiding aspiring tech professionals with real-time mentorship, AI-powered career navigation, and access to local and remote job or internship opportunities.",
       "codeUrl": "https://github.com/rickytabe/StartWise",
-      "liveUrl": "https://start-wise-five.vercel.app"
+      "liveUrl": "https://start-wise-five.vercel.app",
+      "techIcons": ["React", "TailwindCSS", "Firebase", "Gemini", "Git", "GitHub", "OpenAI"]
     },
     {
       "name": "Cambrilia",
       "description": "A multimodal AI assistant (text, image, and audio) designed for dynamic and natural interaction. Currently in development as an advanced alternative to traditional AI chat platforms.",
       "codeUrl": "https://github.com/rickytabe/cam-brillia",
-      "liveUrl": "https://cam-brillia.vercel.app"
+      "liveUrl": "https://cam-brillia.vercel.app",
+      "techIcons": ["React", "TailwindCSS", "Firebase", "Gemini", "Git", "GitHub", "OpenAI"]
     },
     {
       "name": "KMC Restaurant",
       "description": "A restaurant management and e-commerce site that boosted daily sales by 10×, enabling customers to order online, reserve tables, and make secure payments seamlessly.",
       "codeUrl": "https://github.com/rickytabe/KMC-WESITE",
-      "liveUrl": "https://kmc-restaurant.vercel.app"
+      "liveUrl": "https://kmc-restaurant.vercel.app",
+      "techIcons": ["Next.js", "TailwindCSS", "Node.js", "MongoDB", "Git", "GitHub"]
     },
     {
       "name": "stepUp",
       "description": "A high-speed mini e-commerce site for selling footwear online, focused on lightning-fast transactions and efficient online payment processing.",
       "codeUrl": "https://github.com/rickytabe/shoe-shop",
-      "liveUrl": "https://shoe-shop-ten.vercel.app"
+      "liveUrl": "https://shoe-shop-ten.vercel.app",
+      "techIcons": ["HTML5", "TailwindCSS", "JavaScript", "Git", "GitHub"]
     },
     {
       "name": "Evogym",
       "description": "A fitness membership platform for Evogym, streamlining subscriptions, payments, and class bookings to grow their customer base and retention rates.",
       "codeUrl": "https://github.com/example/evogym",
-      "liveUrl": "https://letsgymify.web.app"
+      "liveUrl": "https://letsgymify.web.app",
+      "techIcons": ["React", "TailwindCSS", "Node.js", "MongoDB", "Git", "GitHub"]
     }
   ],
 

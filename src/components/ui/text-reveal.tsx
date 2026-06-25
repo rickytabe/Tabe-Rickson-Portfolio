@@ -27,7 +27,7 @@ const TextRevealByWord: FC<TextRevealByWordProps> = ({
       <div className="mx-auto flex w-full items-center bg-transparent py-2">
         <p
           className={
-            "flex flex-wrap text-3xl font-bold text-black/20 dark:text-white/20 md:text-4xl lg:text-5xl leading-tight tracking-tight capitalize"
+            "flex flex-wrap text-3xl font-bold text-foreground/20 md:text-4xl lg:text-5xl leading-tight tracking-tight capitalize"
           }
         >
           {words.map((word, i) => {
@@ -58,7 +58,7 @@ const Word: FC<WordProps> = ({ children, progress, range }) => {
       <span className={"absolute opacity-30"}>{children}</span>
       <motion.span
         style={{ opacity: opacity }}
-        className={"text-black dark:text-white"}
+        className={"text-foreground"}
       >
         {children}
       </motion.span>
