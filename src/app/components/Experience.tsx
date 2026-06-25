@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
+import { AnimatedText } from "@/components/ui/animated-text";
 
 const timelineData = [
   {
@@ -75,7 +76,7 @@ export default function Experience() {
     <section 
       id="experience" 
       ref={containerRef}
-      className="min-h-screen py-24 px-8 lg:px-16 border-t border-white/5 relative bg-[#121212] overflow-hidden"
+      className="min-h-screen py-24 px-8 lg:px-16 border-t border-white/5 relative bg-transparent overflow-hidden"
     >
       <div className="max-w-7xl mx-auto w-full relative z-10">
         
@@ -93,7 +94,13 @@ export default function Experience() {
             </span>
           </div>
           
-          <h2 className={SECTION_STYLES.title}>Experience & Timeline</h2>
+          <AnimatedText
+            as="h2"
+            text="Experience & Timeline"
+            className="items-start mb-6"
+            textClassName={SECTION_STYLES.title}
+            underlineClassName="text-[#39FF14]"
+          />
           <p className={SECTION_STYLES.description}>
             The path hasn't always been clean, but it's been real. Here is the timeline of my journey.
           </p>
@@ -150,11 +157,17 @@ export default function Experience() {
 
                     {/* Image Side (Right) */}
                     <div className="w-full md:w-5/12 lg:w-1/2 h-64 md:h-125 min-h-75 relative overflow-hidden order-1 md:order-2 border-b md:border-b-0 md:border-l border-white/5">
-                      <img 
-                        src={item.image} 
-                        alt={`Rickson ${item.year}`}
-                        className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 scale-105 group-hover:scale-100"
-                      />
+                      {item.image ? (
+                        <img 
+                          src={item.image} 
+                          alt={`Rickson ${item.year}`}
+                          className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 scale-105 group-hover:scale-100"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-white/10 font-mono text-sm tracking-widest bg-[#121212]/50">
+                          [ NO VISUAL ]
+                        </div>
+                      )}
                       {/* Overlay gradient to blend image into the dark card */}
                       <div className="absolute inset-0 bg-linear-to-t md:bg-linear-to-r from-[#0d0d0d] via-transparent to-transparent opacity-80"></div>
                       

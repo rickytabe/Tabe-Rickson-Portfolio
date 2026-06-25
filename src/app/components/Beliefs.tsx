@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { AnimatedText } from "@/components/ui/animated-text";
 
 export default function Beliefs() {
   const expertise = [
@@ -35,12 +36,15 @@ export default function Beliefs() {
             <span className="w-10 h-px bg-[#39FF14]/50"></span>
             <span className="text-white/50 uppercase font-semibold">Beliefs</span>
           </div>
-          <h2 
-            className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight font-sans"
-          >
-            Core Beliefs &<br />Expertise.
-          </h2>
-          <div className="w-12 h-1 bg-[#39FF14] mb-8"></div>
+          <div className="flex flex-col items-start mb-8">
+            <AnimatedText
+              as="h2"
+              text={<>Core Beliefs &<br />Expertise.</>}
+              className="items-start"
+              textClassName="text-4xl md:text-5xl font-bold text-white tracking-tight font-sans text-left"
+              underlineClassName="text-[#39FF14]"
+            />
+          </div>
           <p className="text-lg text-white/60 leading-relaxed font-light mb-8 font-inter">
             "Design is not just what it looks like and feels like. Design is how it works."
           </p>

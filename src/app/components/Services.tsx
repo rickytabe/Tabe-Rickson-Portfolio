@@ -11,6 +11,7 @@ import {
   Building2 
 } from "lucide-react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
+import { AnimatedText } from "@/components/ui/animated-text";
 
 interface Service {
   id: string;
@@ -141,9 +142,13 @@ export default function Services() {
             <span className={SECTION_STYLES.headerBadgeLine}></span>
             <span className={SECTION_STYLES.headerBadgeText}>Services</span>
           </div>
-          <h2 className={SECTION_STYLES.title}>
-            What I Do
-          </h2>
+          <AnimatedText
+            as="h2"
+            text="What I Do"
+            className="items-start mb-6"
+            textClassName={SECTION_STYLES.title}
+            underlineClassName="text-[#39FF14]"
+          />
           <p className={SECTION_STYLES.description}>
             I build software that improves operations, attracts customers, and helps businesses grow with confidence.
           </p>

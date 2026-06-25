@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
+import { TextRevealByWord } from "@/components/ui/text-reveal";
+
 
 // Inline SVG components for updated brand logos
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -13,7 +15,7 @@ const GithubIcon = ({ size = 24 }: { size?: number }) => (
 
 const LinkedinIcon = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
   </svg>
 );
 
@@ -49,7 +51,7 @@ export default function About() {
           <span className={SECTION_STYLES.headerBadgeText}>About Me</span>
         </motion.div>
       </div>
-       
+
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
 
         {/* Left Column: Image */}
@@ -58,7 +60,7 @@ export default function About() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full aspect-square md:aspect-[4/5] "
+          className="relative w-full aspect-square md:aspect-4/5 "
         >
           <img
             src="/my_pic1.png"
@@ -75,15 +77,18 @@ export default function About() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col justify-center relative"
         >
-        
+
 
           <div className="relative z-10">
             <h4 className={SECTION_STYLES.subtitle}>
               Who am I?
             </h4>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-sans text-white mb-6 leading-tight tracking-tight capitalize">
-              I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer
-            </h2>
+            <div className="mb-6 relative z-20">
+              <TextRevealByWord 
+                text="I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer" 
+                className="w-full"
+              />
+            </div>
 
             <p className="text-white/60 text-md leading-relaxed mb-8 font-light font-inter">
               I develop modern web and mobile applications with a focus on performance, scalability, and clean user experience. I also work with AI automation systems and RAG pipelines to build smarter and more efficient digital solutions. My goal is to create software that solves real-world problems and helps businesses and communities grow.
@@ -119,10 +124,10 @@ export default function About() {
                 >
                   Download CV
                 </a>
-                
+
                 <div className="flex items-center gap-4">
                   {portfolioData.socials.github && (
-                    <a 
+                    <a
                       href={portfolioData.socials.github}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -132,7 +137,7 @@ export default function About() {
                     </a>
                   )}
                   {portfolioData.socials.linkedin && (
-                    <a 
+                    <a
                       href={portfolioData.socials.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -142,7 +147,7 @@ export default function About() {
                     </a>
                   )}
                   {portfolioData.socials.twitter && (
-                    <a 
+                    <a
                       href={portfolioData.socials.twitter}
                       target="_blank"
                       rel="noopener noreferrer"

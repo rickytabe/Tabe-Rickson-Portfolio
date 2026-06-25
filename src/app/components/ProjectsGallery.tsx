@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ExternalLink, ArrowRight } from "lucide-react";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
+import { AnimatedText } from "@/components/ui/animated-text";
 
 const GithubIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -56,7 +57,7 @@ export default function ProjectsGallery() {
     <section
       ref={containerRef}
       id="portfolio"
-      className="relative border-t border-white/5 bg-[#121212] pb-10"
+      className="relative border-t border-white/5 bg-transparent pb-10"
       // Height determines how much vertical scroll is needed to traverse all cards
       style={{ height: '700vh' }}
     >
@@ -78,8 +79,14 @@ export default function ProjectsGallery() {
               </span>
             </div>
             <div className="flex items-end justify-between">
-              <div>
-                <h2 className={SECTION_STYLES.title}>Top Work</h2>
+              <div className="flex flex-col items-start">
+                <AnimatedText
+                  as="h2"
+                  text="Top Work"
+                  className="items-start mb-6"
+                  textClassName={SECTION_STYLES.title}
+                  underlineClassName="text-[#39FF14]"
+                />
                 <p className={SECTION_STYLES.description}>
                   Scroll to explore a curated selection of standout projects
                   I&apos;ve built.

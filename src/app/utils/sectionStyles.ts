@@ -1,6 +1,6 @@
 export const SECTION_STYLES = {
   // The outer section wrapper
-  wrapper: "min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative bg-[#121212]",
+  wrapper: "min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-white/5 relative bg-transparent",
   
   // The inner content container limiting max width
   container: "max-w-7xl mx-auto w-full relative z-10",
@@ -19,7 +19,7 @@ export const SECTION_STYLES = {
   subtitle: "text-[#39FF14] text-lg md:text-xl font-bold font-sans tracking-wide mb-3",
   
   // The main section title
-  title: "text-3xl md:text-4xl lg:text-5xl font-bold font-sans text-white mb-6 leading-tight tracking-tight uppercase",
+  title: "text-3xl md:text-4xl lg:text-5xl font-bold font-sans text-white leading-tight tracking-tight uppercase",
   
   // Standard text description paragraph
   description: "text-white/60 text-sm md:text-md font-light font-inter leading-relaxed max-w-2xl",

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { AnimatedText } from "@/components/ui/animated-text";
 
 const navLinks = [
   { label: "Home", href: "#hero", sectionId: "hero" },
@@ -176,11 +177,11 @@ export default function Navbar() {
               animation: "greenDotPulse 1.8s ease-in-out infinite",
             }}
           />
-          <span
-            className="text-white text-2xl font-bold font-sans"
-          >
-            Tabe Rickson
-          </span>
+          <AnimatedText 
+            text="Tabe Rickson"
+            textClassName="text-2xl font-bold font-sans text-white"
+            underlineClassName="text-[#39FF14]"
+          />
           <span
             className="text-2xl font-light font-sans"
             style={{
@@ -204,7 +205,7 @@ export default function Navbar() {
         `}</style>
 
         {/* Desktop: Center + Right Nav Links */}
-        <div className="hidden md:flex items-center gap-2 relative" onMouseLeave={() => setHoveredLink(null)}>
+        <div className="hidden lg:flex items-center gap-2 relative" onMouseLeave={() => setHoveredLink(null)}>
           
           {/* Animated Liquid Glass Pill with Squash & Stretch Physics */}
           <div
@@ -320,7 +321,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile: Hamburger Button */}
-        <div className="md:hidden flex items-center">
+        <div className="lg:hidden flex items-center">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="flex items-center gap-2 text-white/70 hover:text-white transition-colors p-2"
@@ -352,7 +353,7 @@ export default function Navbar() {
 
     {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-[#121212]/95 backdrop-blur-xl transition-all duration-500 ease-in-out md:hidden ${
+        className={`fixed inset-0 z-40 bg-[#121212]/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >

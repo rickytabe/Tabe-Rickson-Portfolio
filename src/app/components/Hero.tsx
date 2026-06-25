@@ -8,22 +8,10 @@ export default function Hero() {
   return (
     <section 
       id="hero" 
-      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-12 px-8 lg:px-16 overflow-hidden"
+      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-12 px-8 lg:px-16 overflow-hidden bg-transparent"
     >
-      {/* Background Image Reveal */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="hero-bg-reveal absolute inset-0">
-          <Image
-            src="/hero_im.png"
-            alt=""
-            fill
-            preload
-            fetchPriority="high"
-            sizes="100vw"
-            className="object-cover object-[center_right]"
-          />
-        </div>
-      </div>
+      {/* Removed Mobile Background Image to unify layout */}
+
       {/* Top Metadata Row */}
       <div
         className="hero-fade-down flex justify-between items-start text-[10px] tracking-[0.2em] text-white/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
@@ -32,19 +20,21 @@ export default function Hero() {
         <div className="w-1/2 text-right">SOFTWARE ENGINEER</div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col justify-center flex-1 w-full max-w-7xl  mx-auto z-10 mt-16">
-        <div>
+      {/* Main Content Area — two-column on lg */}
+      <div className="flex flex-col lg:flex-row items-center justify-between flex-1 w-full max-w-7xl mx-auto z-10 mt-5 gap-8 lg:gap-8">
+        
+        {/* Left Column — Text */}
+        <div className="flex-1 min-w-0">
           {/* Massive Typography */}
-          <h1 className="text-6xl md:text-8xl lg:text-[120px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
+          <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
             <span className="block overflow-hidden pb-2">
               <span className="hero-line block text-white" style={heroDelay("80ms")}>
-                I BUILD
+                I BUILD  
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-white" style={heroDelay("160ms")}>
-                TECH THAT
+              <span className="hero-line block text-white" style={heroDelay("80ms")}>
+               TECH THAT
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
@@ -96,6 +86,60 @@ export default function Hero() {
             </div>
           </div>
         </div>
+
+        {/* Right Column — Profile Picture with Spiral Aura */}
+        <div 
+          className="shrink-0 flex items-center justify-center mt-12 lg:mt-0"
+        >
+          <div className="hero-portrait-wrapper hero-portrait-roll-in">
+            {/* Soft ambient glow behind the circle */}
+            <div className="hero-portrait-glow" />
+
+            {/* Rotating spiral ring */}
+            <svg 
+              className="hero-spiral-ring" 
+              viewBox="0 0 400 400" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Spiral dots — placed along a circle path with varying opacity */}
+              {Array.from({ length: 48 }).map((_, i) => {
+                const angle = (i / 48) * Math.PI * 2;
+                const radius = 194;
+                const cx = 200 + Math.cos(angle) * radius;
+                const cy = 200 + Math.sin(angle) * radius;
+                // Create spiral effect: dots fade and vary in size
+                const opacity = 0.15 + 0.55 * Math.sin((i / 48) * Math.PI * 2);
+                const r = i % 6 === 0 ? 2.5 : i % 3 === 0 ? 1.8 : 1.2;
+                return (
+                  <circle
+                    key={i}
+                    cx={cx}
+                    cy={cy}
+                    r={r}
+                    fill="#39FF14"
+                    opacity={opacity}
+                  />
+                );
+              })}
+              {/* Thin arc segments for additional depth */}
+              <circle cx="200" cy="200" r="194" stroke="#39FF14" strokeWidth="0.5" opacity="0.12" strokeDasharray="8 24" />
+              <circle cx="200" cy="200" r="188" stroke="white" strokeWidth="0.3" opacity="0.06" strokeDasharray="4 32" />
+            </svg>
+
+            {/* The actual circular image */}
+            <div className="hero-portrait-frame">
+              <Image
+                src="/my_pic1.png"
+                alt="Tabe Rickson — Full-Stack Engineer"
+                width={510}
+                height={510}
+                priority
+                className="hero-portrait-img"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Right Metadata */}
@@ -106,8 +150,6 @@ export default function Hero() {
         <div className="text-[10px] tracking-[0.15em] font-bold text-white uppercase">Freelancer - CAMEROON</div>
       </div>
       
-      {/* Subtle dark gradient overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-linear-to-r from-[#121212] via-[#121212]/80 to-transparent pointer-events-none z-0"></div>
     </section>
   );
 }
