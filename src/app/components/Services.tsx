@@ -1,16 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
-import { 
-  MonitorSmartphone, 
-  Cpu, 
-  PenTool, 
-  Landmark, 
-  Cloud, 
-  Building2 
+import {
+  MonitorSmartphone,
+  Cpu,
+  PenTool,
+  Landmark,
+  Cloud,
+  Building2
 } from "lucide-react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
@@ -104,12 +103,6 @@ const services: Service[] = [
 
 function ServiceCard({ service, idx }: { service: Service; idx: number }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -166,11 +159,7 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
           return (
             <div
               key={tech.name}
-              className={`absolute pointer-events-none z-[1] transition-opacity duration-700 animate-float-around ${
-                mounted && resolvedTheme === "dark"
-                  ? "opacity-[0.06] group-hover:opacity-[0.14]"
-                  : "opacity-[0.12] group-hover:opacity-[0.25]"
-              }`}
+              className="absolute pointer-events-none z-[1] opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-700 animate-float-around"
               style={{
                 ...pos,
                 animationDuration: `${duration}s`,
@@ -182,7 +171,7 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
                 width={size}
                 height={size}
                 alt=""
-                className={mounted && resolvedTheme === "dark" ? "invert" : ""}
+                className="dark:invert"
                 style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
               />
             </div>
@@ -212,8 +201,8 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
 
 export default function Services() {
   return (
-    <section 
-      id="services" 
+    <section
+      id="services"
       className={SECTION_STYLES.wrapper}
     >
       <div className={SECTION_STYLES.container}>
@@ -223,9 +212,9 @@ export default function Services() {
             Services
           </span>
         </div>
-        
+
         {/* Header Block */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
