@@ -31,7 +31,7 @@ export default function Beliefs() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex items-center gap-4 mb-6 font-mono text-xs tracking-[0.2em] text-[#39FF14]">
+          <div className="flex items-center gap-4 mb-6 font-mono text-xs tracking-[0.2em] text-[#39FF14] neon-text">
             <span className="font-bold text-sm">04</span>
             <span className="w-10 h-px bg-[#39FF14]/50"></span>
             <span className="text-foreground/50 uppercase font-semibold">Beliefs</span>
@@ -63,7 +63,7 @@ export default function Beliefs() {
               transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="flex gap-6 liquid-glass-pill p-6 transition-transform hover:-translate-x-2 duration-300"
             >
-              <div className="text-[#39FF14] font-mono text-sm mt-1 relative z-10">0{index + 1}</div>
+              <div className="text-[#39FF14] neon-text font-mono text-sm mt-1 relative z-10">0{index + 1}</div>
               <div className="relative z-10">
                 <h3 className="text-lg font-bold text-foreground mb-2 tracking-wide font-sans">{item.title}</h3>
                 <p className="text-sm text-foreground/50 leading-relaxed font-inter">{item.description}</p>

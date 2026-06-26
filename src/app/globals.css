@@ -46,6 +46,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── Neon green text shadow for readability ──
+   Light mode: subtle dark shadow so #39FF14 doesn't wash out on white.
+   Dark mode:  soft neon glow for depth. */
+:root {
+  --neon-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 2px rgba(0, 0, 0, 0.2);
+}
+.dark {
+  --neon-text-shadow: 0 0 10px rgba(57, 255, 20, 0.35), 0 0 3px rgba(57, 255, 20, 0.2);
+}
+
+.neon-text {
+  text-shadow: var(--neon-text-shadow);
+}
+
 
 
 body {
@@ -169,7 +183,7 @@ body {
   inset: -10px;
   width: calc(100% + 20px);
   height: calc(100% + 20px);
-  animation: hero-spiral-spin 30s linear infinite;
+  animation: hero-spiral-spin 60s linear infinite;
   pointer-events: none;
 }
 
@@ -442,4 +456,47 @@ body {
 .dark .liquid-glass-pill,
 .dark .liquid-glass-pill::before {
   /* Dark mode uses the base styles above — no overrides needed */
+}
+
+/* ==========================================================================
+   FLOATING ANIMATION (For Background Illustrations)
+   ========================================================================== */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes float-around {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(40px, -20px);
+  }
+  40% {
+    transform: translate(-25px, -40px);
+  }
+  60% {
+    transform: translate(30px, 25px);
+  }
+  80% {
+    transform: translate(-40px, 15px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-float-around {
+  animation: float-around 15s linear infinite;
+  will-change: transform;
 }

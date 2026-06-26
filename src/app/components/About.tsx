@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { TextRevealByWord } from "@/components/ui/text-reveal";
-
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 // Inline SVG components for updated brand logos
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -26,6 +27,13 @@ const TwitterIcon = ({ size = 24 }: { size?: number }) => (
 );
 
 export default function About() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section
       id="about"
@@ -164,6 +172,17 @@ export default function About() {
           </div>
         </motion.div>
 
+      </div>
+
+      {/* Globe Background Illustration — dynamically rendered based on theme */}
+      <div className="absolute bottom-[5%] right-[2%] lg:right-[5%] w-[200px] md:w-[300px] lg:w-[350px] opacity-[0.12] pointer-events-none z-0 animate-float" style={{ animationDuration: '10s' }}>
+        {mounted && (
+          <img
+            src={resolvedTheme === 'light' ? "/globe.png" : "/globe-light.png"}
+            alt=""
+            className="w-full h-auto object-contain"
+          />
+        )}
       </div>
     </section>
   );

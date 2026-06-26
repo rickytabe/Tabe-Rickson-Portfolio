@@ -34,6 +34,13 @@ const TechIcon = ({ name, className = "w-4 h-4" }: { name: string; className?: s
     'MongoDB': '/mongodb.svg',
     'HTML5': '/html5.svg',
     'JavaScript': '/javascript.svg',
+    'React': '/react.svg',
+    'TailwindCSS': '/tailwindcss.svg',
+    'Supabase': '/supabase.svg',
+    'OpenAI': '/openai.svg',
+    'TypeScript': '/typescript.svg',
+    'PostgreSQL': '/postgresql.svg',
+    'Python': '/python.svg'
   };
 
   if (iconMap[name]) {
@@ -41,35 +48,6 @@ const TechIcon = ({ name, className = "w-4 h-4" }: { name: string; className?: s
   }
 
   switch (name) {
-    case 'React':
-      return (
-        <svg className={className} viewBox="-11.5 -10.23174 23 20.46348" fill="currentColor">
-          <circle cx="0" cy="0" r="2.05" fill="currentColor"/>
-          <g stroke="currentColor" strokeWidth="1" fill="none">
-            <ellipse rx="11" ry="4.2"/>
-            <ellipse rx="11" ry="4.2" transform="rotate(60)"/>
-            <ellipse rx="11" ry="4.2" transform="rotate(120)"/>
-          </g>
-        </svg>
-      );
-    case 'TailwindCSS':
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 C13.666,10.618,15.027,12,18.001,12c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 c1.177,1.194,2.538,2.576,5.512,2.576c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C10.337,13.382,8.976,12,6.001,12z"/>
-        </svg>
-      );
-    case 'Supabase':
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M21.362 9.354H12V.396a.396.396 0 0 0-.716-.233L1.442 13.845a.396.396 0 0 0 .32.634H12v8.959a.396.396 0 0 0 .716.233l9.842-13.683a.396.396 0 0 0-.32-.634Z" />
-        </svg>
-      );
-    case 'OpenAI':
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2057 5.9847 5.9847 0 0 0 3.989-2.9 6.051 6.051 0 0 0-.7388-7.0732zM13.2599 22.5002c-1.2242 0-2.3828-.4803-3.2678-1.3533L16.242 17.535l1.6268-.9401-1.6268-2.8152 2.6506-1.5303v3.7056c0 3.6593-2.9732 6.6346-6.6327 6.6346zm-7.6062-1.8906a5.132 5.132 0 0 1-1.644-2.8464l4.9084-2.8361.8134 1.4087-2.44 4.2255-2.6502 1.5292c-1.3202-1.3732-2.1382-3.238-2.1382-5.3015zm-2.0366-9.1554a5.13 5.13 0 0 1 2.8251-1.6315l1.6841 4.9143-1.6268.9413v4.8812L2.6506 18.25v-3.7056c0-1.8152.7423-3.551 2.0624-4.8219zM10.7401 1.4998c1.2241 0 2.3827.4804 3.2677 1.3534L7.758 6.465l-1.6267.9401 1.6267 2.8153L5.1074 11.75V8.0454c0-3.6593 2.9732-6.6346 6.6327-6.6346zm7.6061 1.8906a5.132 5.132 0 0 1 1.644 2.8464l-4.9083 2.836-.8134-1.4086 2.44-4.2256 2.6503-1.5292c1.3202 1.3733 2.1381 3.238 2.1381 5.3015zm2.0366 9.1554a5.13 5.13 0 0 1-2.825 1.6315l-1.6841-4.9142 1.6268-.9413v-4.8812l3.8549 2.226v3.7056c0 1.8152-.7423 3.551-2.0625 4.8219zM12 15.2285a3.2285 3.2285 0 1 1 0-6.457 3.2285 3.2285 0 0 1 0 6.457z"/>
-        </svg>
-      );
     default:
       return <FallbackIcon text={name.charAt(0)} className={className} />;
   }
@@ -109,6 +87,22 @@ export default function ProjectsGallery() {
       id="portfolio"
       className="relative border-t border-card-border bg-transparent py-32"
     >
+      {/* Floating Code Symbol Background Illustration */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="sticky top-[30vh] mt-[15vh] md:mt-[20vh] left-0 right-0 mx-auto w-[250px] md:w-[400px] lg:w-[500px] opacity-[0.12] animate-float" style={{ animationDuration: '10s' }}>
+          <img
+            src="/code-symbol.png"
+            alt=""
+            className="w-full h-auto object-contain block dark:hidden"
+          />
+          <img
+            src="/code-symbol-light.png"
+            alt=""
+            className="w-full h-auto object-contain hidden dark:block"
+          />
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto w-full px-8 lg:px-16 relative z-10">
         
         {/* Backdrop text */}

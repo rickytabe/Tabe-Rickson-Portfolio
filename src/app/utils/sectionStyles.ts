@@ -1,6 +1,6 @@
 export const SECTION_STYLES = {
   // The outer section wrapper
-  wrapper: "min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-card-border relative bg-transparent",
+  wrapper: "min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-card-border relative bg-transparent overflow-hidden",
   
   // The inner content container limiting max width
   container: "max-w-7xl mx-auto w-full relative z-10",
@@ -10,13 +10,13 @@ export const SECTION_STYLES = {
   backdropText: "text-[18vw] md:text-[12vw] font-black font-mono text-foreground/5 tracking-tighter whitespace-nowrap uppercase leading-none",
 
   // The small "01 --- Section Name" pre-header style
-  headerBadgeWrapper: "flex items-center gap-4 font-mono text-sm md:text-lg tracking-[0.2em] text-[#39FF14] dark:text-[#39FF14] mb-6", 
+  headerBadgeWrapper: "flex items-center gap-4 font-mono text-sm md:text-lg tracking-[0.2em] text-[#39FF14] dark:text-[#39FF14] neon-text mb-6", 
   headerBadgeNumber: "font-bold text-sm md:text-xl",
   headerBadgeLine: "w-10 h-px bg-[#39FF14]/50 dark:bg-[#39FF14]/50",
   headerBadgeText: "text-foreground/50 uppercase font-semibold text-sm md:text-xl",
 
   // Subtitle (e.g., "Who am I?", "What I Do")
-  subtitle: "text-[#39FF14] dark:text-[#39FF14] text-lg md:text-xl font-bold font-sans tracking-wide mb-3",
+  subtitle: "text-[#39FF14] dark:text-[#39FF14] neon-text text-lg md:text-xl font-bold font-sans tracking-wide mb-3",
   
   // The main section title
   title: "text-3xl md:text-4xl lg:text-5xl font-bold font-sans text-foreground leading-tight tracking-tight uppercase",

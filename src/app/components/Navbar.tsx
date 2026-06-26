@@ -393,7 +393,7 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${
-                  isActive ? "text-[#39FF14] bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
+                  isActive ? "text-[#39FF14] neon-text bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
                 }`}
                 style={{
                   textDecoration: "none",
@@ -412,7 +412,7 @@ export default function Navbar() {
               key={link.label}
               href={link.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-sm tracking-widest text-[#39FF14] hover:text-[#4dff33] transition-colors flex items-center gap-2"
+              className="text-sm tracking-widest text-[#39FF14] neon-text hover:text-[#4dff33] transition-colors flex items-center gap-2"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current" />
               {link.label}

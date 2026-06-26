@@ -1,16 +1,27 @@
+"use client";
+
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 export default function Hero() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const heroDelay = (delay: string) =>
     ({ "--hero-delay": delay } as CSSProperties);
 
   return (
-    <section 
-      id="hero" 
-      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-12 px-8 lg:px-16 overflow-hidden bg-transparent"
+    <section
+      id="hero"
+      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-40 lg:pb-12 px-8 lg:px-16 overflow-hidden bg-transparent"
     >
-      {/* Removed Mobile Background Image to unify layout */}
 
       {/* Top Metadata Row */}
       <div
@@ -22,23 +33,23 @@ export default function Hero() {
 
       {/* Main Content Area — two-column on lg */}
       <div className="flex flex-col lg:flex-row items-center justify-between flex-1 w-full max-w-7xl mx-auto z-10 mt-5 gap-8 lg:gap-8">
-        
+
         {/* Left Column — Text */}
         <div className="flex-1 min-w-0">
           {/* Massive Typography */}
           <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
             <span className="block overflow-hidden pb-2">
               <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
-                I BUILD  
+                I BUILD
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
               <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
-               TECH THAT
+                TECH THAT
               </span>
             </span>
             <span className="block overflow-hidden pb-2">
-              <span className="hero-line block" style={{ ...heroDelay("240ms"), color: "#39FF14" }}>
+              <span className="hero-line block neon-text" style={{ ...heroDelay("240ms"), color: "#39FF14" }}>
                 CHANGES
               </span>
             </span>
@@ -55,7 +66,7 @@ export default function Hero() {
               className="hero-line text-sm md:text-base text-foreground/60 leading-relaxed font-light font-inter"
               style={heroDelay("400ms")}
             >
-              Hi, My name is <span className="font-bold text-foreground">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation. 
+              Hi, My name is <span className="font-bold text-foreground">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation.
             </p>
           </div>
 
@@ -65,19 +76,19 @@ export default function Hero() {
               className="hero-line flex items-center gap-4"
               style={heroDelay("480ms")}
             >
-              <a 
-                href="#portfolio" 
+              <a
+                href="#portfolio"
                 className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
                 style={{ backgroundColor: "#39FF14" }}
               >
                 <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
                 <span className="relative z-10">SEE MY WORK</span>
                 <svg className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </a>
-              <a 
-                href="#portfolio" 
+              <a
+                href="#portfolio"
                 className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-foreground/20 hover:border-foreground/60 transition-all duration-300 font-mono"
               >
                 <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
@@ -88,43 +99,30 @@ export default function Hero() {
         </div>
 
         {/* Right Column — Profile Picture with Spiral Aura */}
-        <div 
+        <div
           className="shrink-0 flex items-center justify-center mt-12 lg:mt-0"
         >
           <div className="hero-portrait-wrapper hero-portrait-roll-in">
             {/* Soft ambient glow behind the circle */}
             <div className="hero-portrait-glow" />
 
-            {/* Rotating spiral ring */}
-            <svg 
-              className="hero-spiral-ring" 
-              viewBox="0 0 400 400" 
-              fill="none" 
+            {/* Rotating dashed ring */}
+            <svg
+              className="hero-spiral-ring"
+              viewBox="0 0 400 400"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Spiral dots — placed along a circle path with varying opacity */}
-              {Array.from({ length: 48 }).map((_, i) => {
-                const angle = (i / 48) * Math.PI * 2;
-                const radius = 194;
-                const cx = 200 + Math.cos(angle) * radius;
-                const cy = 200 + Math.sin(angle) * radius;
-                // Create spiral effect: dots fade and vary in size
-                const opacity = 0.15 + 0.55 * Math.sin((i / 48) * Math.PI * 2);
-                const r = i % 6 === 0 ? 2.5 : i % 3 === 0 ? 1.8 : 1.2;
-                return (
-                  <circle
-                    key={i}
-                    cx={cx}
-                    cy={cy}
-                    r={r}
-                    fill="#39FF14"
-                    opacity={opacity}
-                  />
-                );
-              })}
-              {/* Thin arc segments for additional depth */}
-              <circle cx="200" cy="200" r="194" stroke="#39FF14" strokeWidth="0.5" opacity="0.12" strokeDasharray="8 24" />
-              <circle cx="200" cy="200" r="188" stroke="white" strokeWidth="0.3" opacity="0.06" strokeDasharray="4 32" />
+              <circle 
+                cx="200" 
+                cy="200" 
+                r="194" 
+                stroke="#39FF14" 
+                strokeWidth="3" 
+                opacity="0.8" 
+                strokeDasharray="8 16" 
+                strokeLinecap="round" 
+              />
             </svg>
 
             {/* The actual circular image */}
@@ -149,8 +147,17 @@ export default function Hero() {
         <div className="text-[9px] tracking-[0.2em] text-foreground/50 mb-1">FULL-STACK ENGINEER</div>
         <div className="text-[10px] tracking-[0.15em] font-bold text-foreground uppercase">Freelancer - CAMEROON</div>
       </div>
-      
+
+      {/* Large Lottie Arrow Animation */}
+      <div className={`hidden md:block absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-32 h-32 md:w-40 md:h-40 opacity-80 hover:opacity-100 transition-opacity ${mounted && resolvedTheme === 'dark' ? 'invert' : ''}`}>
+        <a href="#portfolio">
+          <DotLottieReact
+            src="https://lottie.host/aa8627f5-359a-4656-a0eb-5d8b5ae649e4/s3PT4aOdCD.lottie"
+            autoplay
+          />
+        </a>
+      </div>
+
     </section>
   );
 }
- 
