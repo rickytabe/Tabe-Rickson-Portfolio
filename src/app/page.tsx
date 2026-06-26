@@ -4,6 +4,7 @@ import About from "./components/About";
 import Services from "./components/Services";
 import ProjectsGallery from "./components/ProjectsGallery";
 import Experience from "./components/Experience";
+import Contact from "./components/Contact";
 import { InteractiveBackground } from "./components/InteractiveBackground";
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
           <Services />
           <ProjectsGallery />
           <Experience />
+          <Contact />
         </div>
       </InteractiveBackground>
     </>

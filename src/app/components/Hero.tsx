@@ -88,11 +88,11 @@ export default function Hero() {
                 </svg>
               </a>
               <a
-                href="#portfolio"
+                href="#contact"
                 className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-foreground/20 hover:border-foreground/60 transition-all duration-300 font-mono"
               >
                 <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
-                <span className="relative z-10">LET&apos;S TALK</span>
+                <span className="relative z-10">LET&apos;S WORK</span>
               </a>
             </div>
           </div>
