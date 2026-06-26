@@ -40,25 +40,25 @@ const timelineData = [
     year: "Apr – Aug 2025",
     title: "First Work",
     description: "A few freelance projects came through. Nothing huge, but they were paid and they were mine. In August, followed up with Tech Chantier and got a fullstack internship. Things were moving.",
-    image: ""
+    image: "/fw.png"
   },
   {
     year: "October 2025",
     title: "A Rough Month",
     description: "Power cuts at home became a consistent problem. The internship ended. Phone broke. Laptop broke — same week. It wasn't a crisis of confidence, just bad timing and circumstance stacking up. Had to wait it out.",
-    image: "/my_pic1.png"
+    image: "/rough-m.png"
   },
   {
     year: "Nov 2025 – Jan 2026",
     title: "Getting Back",
     description: "Got a new phone in November, a laptop in January. No big reset, no dramatic comeback story. Just picked up where I left off and kept going.",
-    image: "/hero_image.png"
+    image: "/back.png"
   },
   {
     year: "2026",
     title: "Still at It",
     description: "Shipping across web, mobile, and AI. Some things are going well, some are still figuring themselves out. The journey's been uneven, but it's been honest — and there's still a lot I want to build.",
-    image: "/my_pic1.png"
+    image: "/stillait.png"
   }
 ];
 
