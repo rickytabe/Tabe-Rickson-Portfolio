@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
@@ -73,6 +73,122 @@ const projectImages: Record<string, string> = {
   "KMC Restaurant": "/kmc-restaurant.png",
   stepUp: "/stepup.png",
   Evogym: "/evo-gym.png",
+};
+
+const MobileProjectImage = ({ project, imageSrc, accent }: { project: any, imageSrc: string, accent: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
+
+  if (!imageSrc) return null;
+
+  return (
+    <div ref={ref} className="block lg:hidden mt-8 relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden bg-card-bg border border-card-border group">
+      <motion.div style={{ y }} className="absolute -inset-8">
+        <Image src={imageSrc} alt={project.name} fill className="object-contain p-6 md:p-8 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+      </motion.div>
+    </div>
+  );
+};
+
+const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { activeProject: any, activeAccent: string, hoveredIdx: number }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+  
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+  
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div className="hidden lg:block lg:col-span-5 relative perspective-[1200px]" ref={containerRef}>
+      <motion.div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="sticky top-32 w-full aspect-square rounded-[2rem] overflow-hidden bg-card-bg border border-card-border shadow-2xl"
+      >
+        {/* Dynamic Grid Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.05] transition-opacity duration-700"
+          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, var(--foreground) 1px, transparent 0)', backgroundSize: '24px 24px' }}
+        />
+
+        {/* Dynamic Gradient Background */}
+        <div 
+          className="absolute inset-0 opacity-30 transition-colors duration-700"
+          style={{ background: `radial-gradient(circle at center, ${activeAccent}40 0%, transparent 70%)` }}
+        />
+
+        {/* Crossfading Parallax Images */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={hoveredIdx}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            {activeProject && projectImages[activeProject.name] ? (
+              <motion.div style={{ y: parallaxY, translateZ: 50 }} className="relative w-full h-full drop-shadow-2xl">
+                <Image
+                  src={projectImages[activeProject.name]}
+                  alt={activeProject.name}
+                  fill
+                  className="object-contain p-8"
+                  priority
+                />
+              </motion.div>
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-foreground/20 font-mono tracking-widest text-sm uppercase">
+                [ Visual Unavailable ]
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+        
+        {/* Corner Accent Glow */}
+        <div 
+          className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full blur-[80px] pointer-events-none transition-colors duration-700" 
+          style={{ backgroundColor: `${activeAccent}60` }} 
+        />
+        
+        {/* Shine effect */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 mix-blend-overlay opacity-30"
+          style={{
+            background: useTransform(
+              () => `radial-gradient(circle at ${(x.get() + 0.5) * 100}% ${(y.get() + 0.5) * 100}%, rgba(255,255,255,0.8), transparent 40%)`
+            )
+          }}
+        />
+      </motion.div>
+    </div>
+  );
 };
 
 export default function ProjectsGallery() {
@@ -226,17 +342,12 @@ export default function ProjectsGallery() {
                             )}
                           </div>
 
-                          {/* Mobile Inline Image Display */}
-                          <div className="block lg:hidden mt-8 relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden bg-card-bg border border-card-border">
-                             {projectImages[project.name] && (
-                               <Image
-                                 src={projectImages[project.name]}
-                                 alt={project.name}
-                                 fill
-                                 className="object-contain p-6"
-                               />
-                             )}
-                          </div>
+                          {/* Mobile Inline Image Display with Parallax */}
+                          <MobileProjectImage 
+                            project={project} 
+                            imageSrc={projectImages[project.name]} 
+                            accent={accent} 
+                          />
                         </div>
                       </motion.div>
                     )}
@@ -246,57 +357,12 @@ export default function ProjectsGallery() {
             })}
           </div>
 
-          {/* Right Column: Sticky Image Container (Desktop Only) */}
-          <div className="hidden lg:block lg:col-span-5 relative">
-            <div className="sticky top-32 w-full aspect-square rounded-[2rem] overflow-hidden bg-card-bg border border-card-border shadow-2xl transition-all duration-700">
-              
-              {/* Dynamic Grid Pattern */}
-              <div
-                className="absolute inset-0 opacity-[0.05] transition-opacity duration-700"
-                style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, var(--foreground) 1px, transparent 0)', backgroundSize: '24px 24px' }}
-              />
-
-              {/* Dynamic Gradient Background */}
-              <div 
-                className="absolute inset-0 opacity-30 transition-colors duration-700"
-                style={{ background: `radial-gradient(circle at center, ${activeAccent}40 0%, transparent 70%)` }}
-              />
-
-              {/* Crossfading Images */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={hoveredIdx}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute inset-0 flex items-center justify-center p-8"
-                >
-                  {activeProject && projectImages[activeProject.name] ? (
-                    <div className="relative w-full h-full drop-shadow-2xl">
-                      <Image
-                        src={projectImages[activeProject.name]}
-                        alt={activeProject.name}
-                        fill
-                        className="object-contain"
-                        priority
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-foreground/20 font-mono tracking-widest text-sm uppercase">
-                      [ Visual Unavailable ]
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-              
-              {/* Corner Accent Glow */}
-              <div 
-                className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full blur-[80px] pointer-events-none transition-colors duration-700" 
-                style={{ backgroundColor: `${activeAccent}60` }} 
-              />
-            </div>
-          </div>
+          {/* Right Column: Sticky Image Container (Desktop Only) with 3D Tilt & Parallax */}
+          <DesktopProjectDisplay 
+            activeProject={activeProject} 
+            activeAccent={activeAccent} 
+            hoveredIdx={hoveredIdx} 
+          />
           
         </div>
       </div>

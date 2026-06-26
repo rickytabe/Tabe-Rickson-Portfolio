@@ -212,17 +212,8 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            onMouseMove={handleMouseMove}
             className="relative group/form"
           >
-            {/* Cursor glow behind form */}
-            <div
-              className="pointer-events-none absolute -inset-px opacity-0 group-hover/form:opacity-100 transition-opacity duration-500 z-0"
-              style={{
-                background: `radial-gradient(500px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(57, 255, 20, 0.06), transparent 40%)`,
-              }}
-            />
-
             <div className="relative border border-foreground/30 dark:border-card-border bg-card-bg/50 p-8 md:p-10 z-10 shadow-sm">
               {/* Success State */}
               <AnimatePresence mode="wait">
@@ -432,17 +423,37 @@ export default function Contact() {
           transition={{ duration: 1, delay: 0.3 }}
           className="mt-24 pt-10 border-t border-foreground/20 dark:border-card-border"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
               <span className="text-foreground font-sans font-bold text-sm tracking-widest">TABE RICKSON</span>
               <span className="hidden md:inline text-foreground/20">|</span>
               <span className="text-foreground/60 dark:text-foreground/40 font-inter text-xs">All rights reserved © {new Date().getFullYear()}</span>
             </div>
 
-            <div className="flex items-center gap-6 text-xs font-mono uppercase tracking-widest text-foreground/70 dark:text-foreground/50">
+            <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 text-xs font-mono uppercase tracking-widest text-foreground/70 dark:text-foreground/50">
+              <a href="#hero" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">Home</a>
               <a href="#about" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">About</a>
+              <a href="#services" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">Services</a>
               <a href="#portfolio" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">Portfolio</a>
-              <a href="mailto:rickytabe2@gmail.com" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">Email</a>
+              <a href="#experience" className="hover:text-[#39FF14] hover:neon-text transition-all duration-300">Experience</a>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {portfolioData.socials.github && (
+                <a href={portfolioData.socials.github} target="_blank" rel="noopener noreferrer" className="text-foreground/60 dark:text-foreground/40 hover:text-[#39FF14] hover:neon-text transition-all duration-300">
+                  <GithubIcon size={18} />
+                </a>
+              )}
+              {portfolioData.socials.linkedin && (
+                <a href={portfolioData.socials.linkedin} target="_blank" rel="noopener noreferrer" className="text-foreground/60 dark:text-foreground/40 hover:text-[#39FF14] hover:neon-text transition-all duration-300">
+                  <LinkedinIcon size={18} />
+                </a>
+              )}
+              {portfolioData.socials.twitter && (
+                <a href={portfolioData.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-foreground/60 dark:text-foreground/40 hover:text-[#39FF14] hover:neon-text transition-all duration-300">
+                  <TwitterIcon size={18} />
+                </a>
+              )}
             </div>
 
             <div className="flex items-center gap-1">
