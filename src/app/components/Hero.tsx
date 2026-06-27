@@ -131,7 +131,7 @@ export default function Hero() {
             {/* The actual circular image */}
             <div className="hero-portrait-frame">
               <Image
-                src="/suit-hero.png"
+                src="/Suithero.png"
                 alt="Tabe Rickson — Full-Stack Engineer"
                 width={510}
                 height={510}
