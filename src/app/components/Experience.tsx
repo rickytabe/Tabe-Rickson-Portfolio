@@ -16,7 +16,7 @@ const timelineData = [
     year: "2023",
     title: "My Tech Journey begins",
     description: "Second year, something shifted. I started actually enjoying it, staying up late to figure things out, not because I had to. Joined Google developers group on campus. Being around other people who were building things made a difference.",
-    image: "/devfest.png, /aws.png, /bwa.png, /journey-started.png"
+    image: "/devfest.png, /aws.png, /bwa.png, /journeystarted.png"
   },
   {
     year: "Early 2024",
