@@ -128,14 +128,13 @@ export default function Hero() {
               />
             </svg>
 
-            {/* The actual circular image */}
+            {/* The actual rectangular image */}
             <div className="hero-portrait-frame">
-              <Image
-                src="/Suithero.png"
+              <img
+                src={mounted && resolvedTheme === 'light' ? '/Tabe_RIckson_light.png' : '/Tabe_Rickson.png'}
                 alt="Tabe Rickson — Full-Stack Engineer"
                 width={510}
                 height={510}
-                priority
                 className="hero-portrait-img"
               />
             </div>
