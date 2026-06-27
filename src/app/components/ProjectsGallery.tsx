@@ -349,7 +349,12 @@ export default function ProjectsGallery() {
                         transition={{ duration: 0.4, ease: "easeOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="pt-6">
+                        <div className="mt-6 p-6 md:p-8 rounded-2xl bg-background/30 dark:bg-card-bg/40 backdrop-blur-[3px] border border-card-border/50 shadow-sm relative overflow-hidden">
+                          {/* Accent Gradient Glow inside the box */}
+                          <div 
+                            className="absolute top-0 left-0 w-full h-1 opacity-50"
+                            style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
+                          />
                           
                           {/* Tech Icons */}
                           {techIcons.length > 0 && (
