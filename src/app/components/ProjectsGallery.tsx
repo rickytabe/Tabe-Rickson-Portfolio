@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
@@ -43,8 +44,23 @@ const TechIcon = ({ name, className = "w-4 h-4" }: { name: string; className?: s
     'Python': '/python.svg'
   };
 
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (iconMap[name]) {
-    return <Image src={iconMap[name]} width={16} height={16} alt={name} className={`${className} invert opacity-80`} />;
+    return (
+      <Image 
+        src={iconMap[name]} 
+        width={16} 
+        height={16} 
+        alt={name} 
+        className={`${className} opacity-80 ${mounted && resolvedTheme === "dark" ? "invert" : ""}`} 
+      />
+    );
   }
 
   switch (name) {
@@ -260,42 +276,68 @@ export default function ProjectsGallery() {
               return (
                 <motion.div
                   key={project.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                  className={`group relative flex flex-col py-8 border-b border-card-border transition-all duration-500 cursor-default ${
-                    isActive ? "opacity-100 pl-4 md:pl-8" : "opacity-40 hover:opacity-70"
-                  }`}
-                  style={{ "--hover-accent": accent } as React.CSSProperties}
+                  custom={idx}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  variants={{
+                    hidden: (i: number) => ({
+                      opacity: 0,
+                      x: -60,
+                      y: 60,
+                      scale: 0.95
+                    }),
+                    visible: (i: number) => ({
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 18,
+                        mass: 1,
+                        delay: i * 0.1
+                      }
+                    })
+                  }}
                 >
-                  {/* Active Indicator Line */}
-                  <div 
-                    className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-full transition-all duration-500 ease-out ${isActive ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"}`}
-                    style={{ backgroundColor: accent }}
-                  />
-
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="font-mono text-sm md:text-base font-bold tracking-widest transition-colors duration-500" style={{ color: isActive ? accent : "inherit" }}>
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    {hasBadge && (
-                      <div 
-                        className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-mono font-bold tracking-widest uppercase transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`}
-                        style={{ borderColor: `${accent}40`, backgroundColor: `${accent}15`, color: accent }}
-                      >
-                        🏆 {project.badge}
-                      </div>
-                    )}
-                  </div>
-
-                  <h3 
-                    className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tighter uppercase transition-colors duration-500"
-                    style={{ color: isActive ? "var(--foreground)" : "inherit" }}
+                  <div
+                    onMouseEnter={() => setHoveredIdx(idx)}
+                    onClick={() => setHoveredIdx(idx)}
+                    className={`group relative flex flex-col py-8 border-b border-card-border transition-all duration-500 cursor-pointer ${
+                      isActive ? "pl-4 md:pl-8" : "hover:pl-2"
+                    }`}
+                    style={{ "--hover-accent": accent } as React.CSSProperties}
                   >
-                    {project.name}
-                  </h3>
+                    {/* Active Indicator Line */}
+                    <div 
+                      className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-full transition-all duration-500 ease-out ${isActive ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"}`}
+                      style={{ backgroundColor: accent }}
+                    />
+
+                    <div className={`flex items-center gap-4 mb-4 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-70"}`}>
+                      <span className="font-mono text-sm md:text-base font-bold tracking-widest transition-colors duration-500" style={{ color: isActive ? accent : "inherit" }}>
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      {hasBadge && (
+                        <div 
+                          className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-mono font-bold tracking-widest uppercase transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                          style={{ borderColor: `${accent}40`, backgroundColor: `${accent}15`, color: accent }}
+                        >
+                          🏆 {project.badge}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-row items-center justify-between w-full gap-4">
+                      <h3 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tighter uppercase text-foreground">
+                        {project.name}
+                      </h3>
+                      <div className={`shrink-0 transition-transform duration-500 ${isActive ? 'rotate-45' : 'opacity-40 group-hover:opacity-100'}`} style={{ color: isActive ? accent : 'var(--foreground)' }}>
+                        <Plus size={32} strokeWidth={1.5} />
+                      </div>
+                    </div>
 
                   {/* Expanded Content (Visible only when active or on mobile) */}
                   <AnimatePresence>
@@ -352,6 +394,7 @@ export default function ProjectsGallery() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  </div>
                 </motion.div>
               );
             })}

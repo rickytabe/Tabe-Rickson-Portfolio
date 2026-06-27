@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import {
   MonitorSmartphone,
   Cpu,
@@ -103,6 +104,12 @@ const services: Service[] = [
 
 function ServiceCard({ service, idx }: { service: Service; idx: number }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -111,10 +118,36 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      custom={idx}
+      initial="hidden"
+      whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      variants={{
+        hidden: (i: number) => {
+          const col = i % 3;
+          // Scatter outwards based on column (left, center, right)
+          const xOffset = col === 0 ? -100 : col === 2 ? 100 : 0;
+          return { 
+            opacity: 0, 
+            scale: 1.2,
+            x: xOffset,
+            y: 80 
+          };
+        },
+        visible: (i: number) => ({
+          opacity: 1,
+          scale: 1,
+          x: 0,
+          y: 0,
+          transition: {
+            type: "spring",
+            stiffness: 200,
+            damping: 18,
+            mass: 1,
+            delay: i * 0.1,
+          }
+        })
+      }}
       onMouseMove={handleMouseMove}
       className="group relative p-[1px] overflow-hidden"
     >
@@ -171,7 +204,7 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
                 width={size}
                 height={size}
                 alt=""
-                className="dark:invert"
+                className={mounted && resolvedTheme === "dark" ? "invert" : ""}
                 style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
               />
             </div>
