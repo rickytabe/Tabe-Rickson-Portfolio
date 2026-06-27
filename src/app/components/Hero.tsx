@@ -106,17 +106,20 @@ export default function Hero() {
             {/* Soft ambient glow behind the circle */}
             <div className="hero-portrait-glow" />
 
-            {/* Rotating dashed ring */}
+            {/* Flowing dashed ring */}
             <svg
-              className="hero-spiral-ring"
+              className="hero-dash-ring"
               viewBox="0 0 400 400"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle 
-                cx="200" 
-                cy="200" 
-                r="194" 
+              <rect 
+                x="4" 
+                y="4" 
+                width="392" 
+                height="392" 
+                rx="24" 
+                ry="24"
                 stroke="#39FF14" 
                 strokeWidth="3" 
                 opacity="0.8" 
@@ -128,7 +131,7 @@ export default function Hero() {
             {/* The actual circular image */}
             <div className="hero-portrait-frame">
               <Image
-                src="/my_pic1.png"
+                src="/suit-hero.png"
                 alt="Tabe Rickson — Full-Stack Engineer"
                 width={510}
                 height={510}
@@ -142,7 +145,7 @@ export default function Hero() {
 
       {/* Bottom Right Metadata */}
       <div
-        className="hero-fade-left absolute bottom-12 right-8 lg:right-16 text-right z-10 font-mono"
+        className="hero-fade-left absolute bottom-6 right-8 lg:right-16 text-right z-10 font-mono"
       >
         <div className="text-[9px] tracking-[0.2em] text-foreground/50 mb-1">FULL-STACK ENGINEER</div>
         <div className="text-[10px] tracking-[0.15em] font-bold text-foreground uppercase">Freelancer - CAMEROON</div>
