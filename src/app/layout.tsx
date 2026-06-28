@@ -31,7 +31,9 @@ const getBaseUrl = () => {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "http://localhost:3000";
+  return process.env.NODE_ENV === "production" 
+    ? "https://tabe-rickson-portfolio.vercel.app" 
+    : "http://localhost:3000";
 };
 
 const siteUrl = getBaseUrl();
@@ -39,6 +41,7 @@ const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 const previewImageAlt = "Tabe Rickson portfolio preview";
+const previewImage = "/og-image.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -67,11 +70,20 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Tabe Rickson Portfolio",
     type: "website",
+    images: [
+      {
+        url: previewImage,
+        width: 1200,
+        height: 630,
+        alt: previewImageAlt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
+    images: [previewImage],
   },
 };
 
