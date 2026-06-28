@@ -41,7 +41,7 @@ const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 const previewImageAlt = "Tabe Rickson portfolio preview";
-const previewImage = `${siteUrl}/og-image.png`; // Use absolute URL for WhatsApp
+const previewImage = `${siteUrl}/Tabe-Rickson.png`; // Use absolute URL for WhatsApp
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -53,15 +53,8 @@ export const metadata: Metadata = {
   publisher: "Tabe Rickson",
   manifest: "/site.webmanifest",
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    icon:'/Tabe_Rickson_light.png',
+    apple: '/Tabe_Rickson_light.png',
     shortcut: ["/favicon.ico"],
   },
   openGraph: {
@@ -87,6 +80,7 @@ export const metadata: Metadata = {
     description,
     images: [previewImage],
   },
+  
 };
 
 export default function RootLayout({
