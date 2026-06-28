@@ -41,7 +41,7 @@ const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 const previewImageAlt = "Tabe Rickson portfolio preview";
-const previewImage = "/og-image.png";
+const previewImage = `${siteUrl}/og-image.png`; // Use absolute URL for WhatsApp
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -67,15 +67,17 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    url: "/",
+    url: siteUrl,
     siteName: "Tabe Rickson Portfolio",
     type: "website",
+    locale: "en_US",
     images: [
       {
         url: previewImage,
         width: 1200,
         height: 630,
         alt: previewImageAlt,
+        type: "image/png",
       },
     ],
   },
@@ -97,6 +99,10 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <meta name="image" content={previewImage} />
+        <meta name="thumbnail" content={previewImage} />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-300">
         <ThemeProvider
           attribute="class"
