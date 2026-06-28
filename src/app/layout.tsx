@@ -22,21 +22,11 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.startsWith("http")
-      ? process.env.NEXT_PUBLIC_SITE_URL
-      : `https://${process.env.NEXT_PUBLIC_SITE_URL}`;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return process.env.NODE_ENV === "production" 
-    ? "https://tabe-rickson-portfolio.vercel.app" 
-    : "http://localhost:3000";
-};
 
-const siteUrl = getBaseUrl();
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "http://localhost:3000";
 const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
