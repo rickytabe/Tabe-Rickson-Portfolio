@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   icons: {
     icon:'/Tabe_Rickson_light.png',
     apple: '/Tabe_Rickson_light.png',
-    shortcut: ["/favicon.ico"],
+    shortcut: '/Tabe_Rickson_light.png',
   },
   openGraph: {
     title,
