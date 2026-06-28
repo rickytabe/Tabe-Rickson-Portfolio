@@ -28,13 +28,13 @@ const timelineData = [
     year: "Dec 2024 – Mar 2025",
     title: "First Real Pressure",
     description: "Joined the RNN24 Bootcamp by Tech Chantier. Three months of actual deadlines and accountability. Built Tutor Finder — a platform for connecting learners with local tutors. First time the work felt less like practice and more like something real.",
-    image: "/first-real.png"
+    image: "/first-real.png, /rnn24_1.png, /rnn24_2.png"
   },
   {
     year: "March 2025",
     title: "First Hackathon",
     description: "Code4Change Hackathon by DeltechHub. Four of us, one week, barely recovered from the bootcamp. We shipped. Didn't win, but learned that getting something out the door matters more than waiting for it to be perfect.",
-    image: "/first-hack.png, /first-hack2.png"
+    image: "/first-hack.png, /first-hack2.png, /c4c.png"
   },
   {
     year: "Apr – Aug 2025",
@@ -46,7 +46,7 @@ const timelineData = [
     year: "October 2025",
     title: "A Rough Month",
     description: "Power cuts at home became a consistent problem. The internship ended. Phone broke. Laptop broke — same week. It wasn't a crisis of confidence, just bad timing and circumstance stacking up. Had to wait it out.",
-    image: "/rough-m.png"
+    image: "/rough-m.png, /codingnight.png"
   },
   {
     year: "Nov 2025 – Jan 2026",
@@ -58,7 +58,7 @@ const timelineData = [
     year: "2026",
     title: "Still at It",
     description: "Shipping across web, mobile, and AI. Some things are going well, some are still figuring themselves out. The journey's been uneven, but it's been honest — and there's still a lot I want to build.",
-    image: "/stillait.png"
+    image: "/stillait.png, /pawapay2.png, /pawapay3.png, /pawapay4.png"
   }
 ];
 
