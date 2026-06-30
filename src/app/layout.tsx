@@ -23,7 +23,6 @@ const inter = Inter({
 });
 
 
-
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   "http://localhost:3000";
@@ -31,7 +30,7 @@ const title = "Tabe Rickson - Website & Mobile App Developer";
 const description =
   "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 const previewImageAlt = "Tabe Rickson portfolio preview";
-const previewImage = `${siteUrl}/Tabe-Rickson.png`; // Use absolute URL for WhatsApp
+const previewImage = `${siteUrl}/Tabe-Rickson.png`; 
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
