@@ -91,6 +91,7 @@ function TimelineEntry({ item, index }: { item: typeof timelineData[0]; index: n
       onMouseLeave={() => setIsHovered(false)}
       className="group relative"
     >
+      
       {/* ── Desktop layout (md+) ── */}
       <div className={`hidden md:grid md:grid-cols-[1fr_auto_1fr] gap-0 items-start`}>
 
