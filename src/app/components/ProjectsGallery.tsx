@@ -80,16 +80,6 @@ const cardAccents = [
   "#10B981", // emerald
 ];
 
-const projectImages: Record<string, string> = {
-  "Mobi-Rent": "/MobiRent.png",
-  "Tutor-Finder": "/TutorFinder.png",
-  "NiaTrust Wallet": "/NiaTrust.png",
-  StartWise: "/StartWise.png",
-  Cambrilia: "/Cambrillia.png",
-  "KMC Restaurant": "/kmc-restaurant.png",
-  stepUp: "/stepup.png",
-  Evogym: "/evo-gym.png",
-};
 
 const MobileProjectImage = ({ project, imageSrc, accent }: { project: any, imageSrc: string, accent: string }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -175,10 +165,10 @@ const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { ac
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="absolute inset-0"
           >
-            {activeProject && projectImages[activeProject.name] ? (
+            {activeProject && activeProject.image ? (
               <motion.div style={{ y: parallaxY, translateZ: 50 }} className="relative w-full h-full drop-shadow-2xl">
                 <Image
-                  src={projectImages[activeProject.name]}
+                  src={activeProject.image}
                   alt={activeProject.name}
                   fill
                   sizes="(min-width: 1024px) 38vw, 0px"
@@ -415,7 +405,7 @@ export default function ProjectsGallery() {
                           {/* Mobile Inline Image Display with Parallax */}
                           <MobileProjectImage 
                             project={project} 
-                            imageSrc={projectImages[project.name]} 
+                            imageSrc={project.image} 
                             accent={accent} 
                           />
                         </div>
