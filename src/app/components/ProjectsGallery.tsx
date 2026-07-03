@@ -101,7 +101,13 @@ const MobileProjectImage = ({ project, imageSrc, accent }: { project: any, image
   return (
     <div ref={ref} className="block lg:hidden mt-8 relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden bg-card-bg border border-card-border group">
       <motion.div style={{ y }} className="absolute -inset-8">
-        <Image src={imageSrc} alt={project.name} fill className="object-contain p-6 md:p-8 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+        <Image
+          src={imageSrc}
+          alt={project.name}
+          fill
+          sizes="(max-width: 1023px) calc(100vw - 4rem), 0px"
+          className="object-contain p-6 md:p-8 opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+        />
       </motion.div>
     </div>
   );
@@ -175,8 +181,8 @@ const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { ac
                   src={projectImages[activeProject.name]}
                   alt={activeProject.name}
                   fill
+                  sizes="(min-width: 1024px) 38vw, 0px"
                   className="object-contain p-8"
-                  priority
                 />
               </motion.div>
             ) : (
@@ -222,14 +228,20 @@ export default function ProjectsGallery() {
       {/* Floating Code Symbol Background Illustration */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="sticky top-[30vh] mt-[15vh] md:mt-[20vh] left-0 right-0 mx-auto w-[250px] md:w-[400px] lg:w-[500px] opacity-[0.12] animate-float" style={{ animationDuration: '10s' }}>
-          <img
+          <Image
             src="/code-symbol.png"
             alt=""
+            width={500}
+            height={500}
+            sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"
             className="w-full h-auto object-contain block dark:hidden"
           />
-          <img
+          <Image
             src="/code-symbol-light.png"
             alt=""
+            width={500}
+            height={500}
+            sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"
             className="w-full h-auto object-contain hidden dark:block"
           />
         </div>

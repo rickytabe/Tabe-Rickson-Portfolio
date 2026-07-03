@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
@@ -143,10 +144,12 @@ function TimelineEntry({ item, index }: { item: typeof timelineData[0]; index: n
               <div className="relative w-full h-full overflow-hidden group/img">
                 <div className="absolute inset-0 w-full h-full transition-transform duration-700 scale-100 group-hover:scale-110">
                   {images.map((src, i) => (
-                    <img
+                    <Image
                       key={i}
                       src={src}
                       alt={`Rickson ${item.year} - ${i + 1}`}
+                      fill
+                      sizes="384px"
                       className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                         i === currentImgIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
                       }`}
@@ -195,10 +198,12 @@ function TimelineEntry({ item, index }: { item: typeof timelineData[0]; index: n
           <div className="relative w-full aspect-video overflow-hidden mb-5 rounded-sm border border-card-border/50 group/img">
             <div className="absolute inset-0 w-full h-full transition-transform duration-700 scale-100 group-hover:scale-105">
               {images.map((src, i) => (
-                <img
+                <Image
                   key={i}
                   src={src}
                   alt={`Rickson ${item.year} - ${i + 1}`}
+                  fill
+                  sizes="(max-width: 767px) calc(100vw - 5rem), 0px"
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                     i === currentImgIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
                   }`}

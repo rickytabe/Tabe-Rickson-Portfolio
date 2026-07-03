@@ -1,21 +1,38 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 
+const DotLottieReact = dynamic(
+  () => import("@lottiefiles/dotlottie-react").then((mod) => mod.DotLottieReact),
+  { ssr: false }
+);
+
 export default function Hero() {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { theme } = useTheme();
+  const [showLottie, setShowLottie] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const updateLottieVisibility = () => setShowLottie(mediaQuery.matches);
+
+    updateLottieVisibility();
+    mediaQuery.addEventListener("change", updateLottieVisibility);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateLottieVisibility);
+    };
   }, []);
 
   const heroDelay = (delay: string) =>
     ({ "--hero-delay": delay } as CSSProperties);
+  const isLightTheme = theme === "light";
+  const portraitSrc = isLightTheme
+    ? "/tabe-rickson-portrait-light-hq.webp"
+    : "/tabe-rickson-portrait-dark-hq.webp";
 
   return (
     <section
@@ -130,11 +147,15 @@ export default function Hero() {
 
             {/* The actual rectangular image */}
             <div className="hero-portrait-frame">
-              <img
-                src={mounted && resolvedTheme === 'light' ? '/Tabe_RIckson_light.png' : '/Tabe_Rickson.png'}
+              <Image
+                key={portraitSrc}
+                src={portraitSrc}
                 alt="Tabe Rickson — Full-Stack Engineer"
-                width={510}
-                height={510}
+                fill
+                priority
+                unoptimized
+                fetchPriority="high"
+                sizes="(max-width: 640px) 300px, (max-width: 1023px) 375px, 510px"
                 className="hero-portrait-img"
               />
             </div>
@@ -151,14 +172,16 @@ export default function Hero() {
       </div>
 
       {/* Large Lottie Arrow Animation */}
-      <div className={`hidden md:block absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-32 h-32 md:w-40 md:h-40 opacity-80 hover:opacity-100 transition-opacity ${mounted && resolvedTheme === 'dark' ? 'invert' : ''}`}>
-        <a href="#portfolio">
-          <DotLottieReact
-            src="https://lottie.host/aa8627f5-359a-4656-a0eb-5d8b5ae649e4/s3PT4aOdCD.lottie"
-            autoplay
-          />
-        </a>
-      </div>
+      {showLottie && (
+        <div className={`hidden md:block absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-32 h-32 md:w-40 md:h-40 opacity-80 hover:opacity-100 transition-opacity ${!isLightTheme ? 'invert' : ''}`}>
+          <a href="#portfolio" aria-label="Skip to portfolio">
+            <DotLottieReact
+              src="https://lottie.host/aa8627f5-359a-4656-a0eb-5d8b5ae649e4/s3PT4aOdCD.lottie"
+              autoplay
+            />
+          </a>
+        </div>
+      )}
 
     </section>
   );

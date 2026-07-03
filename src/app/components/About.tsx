@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { TextRevealByWord } from "@/components/ui/text-reveal";
@@ -70,9 +71,12 @@ export default function About() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="relative w-full aspect-square md:aspect-4/5 "
         >
-          <img
+          <Image
             src="/my_pic1.png"
             alt="Tabe Rickson"
+            width={900}
+            height={900}
+            sizes="(max-width: 767px) calc(100vw - 4rem), 45vw"
             className="w-full h-full md:h-4/5 object-cover shadow-2xl  hover:grayscale-0 transition-all duration-700 relative z-10 mt-20"
           />
         </motion.div>
@@ -177,9 +181,12 @@ export default function About() {
       {/* Globe Background Illustration — dynamically rendered based on theme */}
       <div className="absolute bottom-[5%] right-[2%] lg:right-[5%] w-[200px] md:w-[300px] lg:w-[350px] opacity-[0.12] pointer-events-none z-0 animate-float" style={{ animationDuration: '10s' }}>
         {mounted && (
-          <img
+          <Image
             src={resolvedTheme === 'light' ? "/globe.png" : "/globe-light.png"}
             alt=""
+            width={350}
+            height={350}
+            sizes="(max-width: 767px) 200px, (max-width: 1023px) 300px, 350px"
             className="w-full h-auto object-contain"
           />
         )}

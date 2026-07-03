@@ -42,9 +42,13 @@ export const metadata: Metadata = {
   publisher: "Tabe Rickson",
   manifest: "/site.webmanifest",
   icons: {
-    icon:'/Tabe_Rickson_light.png',
-    apple: '/Tabe_Rickson_light.png',
-    shortcut: '/Tabe_Rickson_light.png',
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon-32x32.png",
   },
   openGraph: {
     title,

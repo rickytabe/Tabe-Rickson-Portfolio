@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
 import portfolioData from "../../../portfolio-data.json";
@@ -57,19 +59,56 @@ export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const router = useRouter();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Let the native form submit to formsubmit.co
-    if (formRef.current) {
-      formRef.current.submit();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      data[key] = value.toString();
+    });
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/rickytabe2@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          ...data,
+          _subject: formMode === "project" ? "New Project Inquiry — Portfolio" : "New Message — Portfolio",
+          _captcha: "false",
+          _template: "table",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success === "true") {
+        toast.success("Message sent successfully!");
+        form.reset();
+        // Wait for the toast to be visible before navigating away
+        setTimeout(() => {
+          router.push("/thank-you");
+        }, 2000);
+      } else {
+        toast.error("Failed to send message. Please try again.");
+        setIsSubmitting(false);
+      }
+    } catch {
+      toast.error("Failed to send message. Please check your connection.");
+      setIsSubmitting(false);
     }
   };
 
@@ -81,6 +120,16 @@ export default function Contact() {
 
   return (
     <section id="contact" className={SECTION_STYLES.wrapper}>
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            fontSize: '16px',
+            padding: '16px 24px',
+            maxWidth: '500px',
+          }
+        }}
+      />
       <div className={SECTION_STYLES.container}>
         {/* Backdrop text */}
         <div className={SECTION_STYLES.backdropWrapper}>
@@ -265,8 +314,6 @@ export default function Contact() {
                     {/* The Form */}
                     <form
                       ref={formRef}
-                      action="https://formsubmit.co/rickytabe2@gmail.com"
-                      method="POST"
                       onSubmit={handleSubmit}
                       className="space-y-6"
                     >
