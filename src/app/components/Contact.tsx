@@ -48,23 +48,11 @@ const SendIcon = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
-type FormMode = "hello" | "project";
-
-const budgetOptions = ["< $500", "$500 – $2k", "$2k – $5k", "$5k+", "Not sure yet"];
-const timelineOptions = ["ASAP", "1–2 weeks", "1 month", "Flexible"];
-
 export default function Contact() {
-  const [formMode, setFormMode] = useState<FormMode>("hello");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,7 +75,7 @@ export default function Contact() {
         },
         body: JSON.stringify({
           ...data,
-          _subject: formMode === "project" ? "New Project Inquiry — Portfolio" : "New Message — Portfolio",
+          _subject: "New Message — Portfolio",
           _captcha: "false",
           _template: "table",
         }),
@@ -98,6 +86,7 @@ export default function Contact() {
       if (response.ok && result.success === "true") {
         toast.success("Message sent successfully!");
         form.reset();
+        setIsSubmitted(true);
         // Wait for the toast to be visible before navigating away
         setTimeout(() => {
           router.push("/thank-you");
@@ -120,8 +109,8 @@ export default function Contact() {
 
   return (
     <section id="contact" className={SECTION_STYLES.wrapper}>
-      <Toaster 
-        position="top-center" 
+      <Toaster
+        position="top-center"
         toastOptions={{
           style: {
             fontSize: '16px',
@@ -164,7 +153,7 @@ export default function Contact() {
 
         {/* Main content — two columns */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20">
-          
+
           {/* ── Left Column: Info + Socials ── */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -257,6 +246,7 @@ export default function Contact() {
 
           {/* ── Right Column: The Dynamic Form ── */}
           <motion.div
+            id="contact-form"
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -285,30 +275,26 @@ export default function Contact() {
                   </motion.div>
                 ) : (
                   <motion.div key="form" initial={{ opacity: 1 }}>
-                    {/* Mode Toggle */}
-                    <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                      <button
-                        type="button"
-                        onClick={() => setFormMode("hello")}
-                        className={`flex-1 py-3 px-5 text-[10px] font-mono tracking-[0.25em] uppercase border transition-all duration-300 ${
-                          formMode === "hello"
-                            ? "border-[#39FF14] text-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_20px_rgba(57,255,20,0.15)] neon-text"
-                            : "border-foreground/30 dark:border-foreground/10 text-foreground/60 dark:text-foreground/40 hover:border-foreground/50 dark:hover:border-foreground/20 hover:text-foreground/80"
-                        }`}
-                      >
-                        👋 Just saying hi
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormMode("project")}
-                        className={`flex-1 py-3 px-5 text-[10px] font-mono tracking-[0.25em] uppercase border transition-all duration-300 ${
-                          formMode === "project"
-                            ? "border-[#39FF14] text-[#39FF14] bg-[#39FF14]/5 shadow-[0_0_20px_rgba(57,255,20,0.15)] neon-text"
-                            : "border-foreground/30 dark:border-foreground/10 text-foreground/60 dark:text-foreground/40 hover:border-foreground/50 dark:hover:border-foreground/20 hover:text-foreground/80"
-                        }`}
-                      >
-                        🚀 I have a project
-                      </button>
+                    {/* ── Hire Me CTA ── */}
+                    <div className="mb-10 p-6 border border-[#39FF14]/30 bg-[#39FF14]/5 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-[#39FF14]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0"></div>
+                      <div className="relative z-10">
+                        <h4 className="text-foreground font-sans font-bold text-lg mb-2">Want to hire me or start a project?</h4>
+                        <p className="text-foreground/70 font-inter text-xs mb-5 max-w-sm">I have a dedicated short-form to collect your requirements quickly and get back to you.</p>
+                        <button
+                          type="button"
+                          onClick={() => router.push('/lets-work')}
+                          className="px-5 py-2 text-[10px] font-mono tracking-widest uppercase border border-[#39FF14] text-[#39FF14] bg-background hover:bg-[#39FF14] hover:text-[#121212] transition-colors duration-300"
+                        >
+                          Let's Work
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="h-px flex-1 bg-foreground/10"></div>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-foreground/40">Or just send a message</span>
+                      <div className="h-px flex-1 bg-foreground/10"></div>
                     </div>
 
                     {/* The Form */}
@@ -320,8 +306,8 @@ export default function Contact() {
                       {/* FormSubmit config */}
                       <input type="hidden" name="_captcha" value="false" />
                       <input type="hidden" name="_template" value="table" />
-                      <input type="hidden" name="_subject" value={formMode === "project" ? "New Project Inquiry — Portfolio" : "New Message — Portfolio"} />
-                      <input type="hidden" name="inquiry_type" value={formMode === "project" ? "Project Inquiry" : "General Message"} />
+                      <input type="hidden" name="_subject" value="New Message — Portfolio" />
+                      <input type="hidden" name="inquiry_type" value="General Message" />
 
                       {/* Name + Email row */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -347,84 +333,25 @@ export default function Contact() {
                         </div>
                       </div>
 
-                      {/* ── Project-specific fields (animated) ── */}
-                      <AnimatePresence initial={false}>
-                        {formMode === "project" && (
-                          <motion.div
-                            key="project-fields"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="overflow-hidden"
-                          >
-                            <div className="space-y-6 pt-2">
-                              {/* Budget */}
-                              <div>
-                                <label className={labelClasses}>Budget Range</label>
-                                <div className="flex flex-wrap gap-2">
-                                  {budgetOptions.map((opt) => (
-                                    <label key={opt} className="cursor-pointer">
-                                      <input type="radio" name="budget" value={opt} className="peer sr-only" />
-                                      <span className="inline-block px-4 py-2 text-[10px] font-mono tracking-wider uppercase border border-foreground/30 dark:border-foreground/10 text-foreground/60 dark:text-foreground/40 peer-checked:border-[#39FF14] peer-checked:text-[#39FF14] peer-checked:bg-[#39FF14]/5 peer-checked:neon-text hover:border-foreground/50 dark:hover:border-foreground/20 transition-all duration-300">
-                                        {opt}
-                                      </span>
-                                    </label>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {/* Timeline */}
-                              <div>
-                                <label className={labelClasses}>Timeline</label>
-                                <div className="flex flex-wrap gap-2">
-                                  {timelineOptions.map((opt) => (
-                                    <label key={opt} className="cursor-pointer">
-                                      <input type="radio" name="timeline" value={opt} className="peer sr-only" />
-                                      <span className="inline-block px-4 py-2 text-[10px] font-mono tracking-wider uppercase border border-foreground/30 dark:border-foreground/10 text-foreground/60 dark:text-foreground/40 peer-checked:border-[#39FF14] peer-checked:text-[#39FF14] peer-checked:bg-[#39FF14]/5 peer-checked:neon-text hover:border-foreground/50 dark:hover:border-foreground/20 transition-all duration-300">
-                                        {opt}
-                                      </span>
-                                    </label>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {/* Project type */}
-                              <div>
-                                <label className={labelClasses}>Project Type</label>
-                                <select
-                                  name="project_type"
-                                  className={`${inputClasses} appearance-none cursor-pointer`}
-                                  defaultValue=""
-                                >
-                                  <option value="" disabled className="bg-background text-foreground/40">Select a type...</option>
-                                  <option value="Website" className="bg-background text-foreground">Website</option>
-                                  <option value="Web Application" className="bg-background text-foreground">Web Application</option>
-                                  <option value="Mobile App" className="bg-background text-foreground">Mobile App</option>
-                                  <option value="Dashboard / Admin Panel" className="bg-background text-foreground">Dashboard / Admin Panel</option>
-                                  <option value="API / Backend" className="bg-background text-foreground">API / Backend</option>
-                                  <option value="Other" className="bg-background text-foreground">Other</option>
-                                </select>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {/* WhatsApp row */}
+                      <div>
+                        <label className={labelClasses}>WhatsApp Number (Optional)</label>
+                        <input
+                          type="tel"
+                          name="whatsapp"
+                          placeholder="+1 (555) 000-0000"
+                          className={inputClasses}
+                        />
+                      </div>
 
                       {/* Message */}
                       <div>
-                        <label className={labelClasses}>
-                          {formMode === "project" ? "Project Details" : "Message"}
-                        </label>
+                        <label className={labelClasses}>Message</label>
                         <textarea
                           name="message"
                           required
-                          rows={5}
-                          placeholder={
-                            formMode === "project"
-                              ? "Tell me about your project — what problem does it solve, who is it for, and what's your vision?"
-                              : "What's on your mind?"
-                          }
+                          rows={4}
+                          placeholder="What's on your mind?"
                           className={`${inputClasses} resize-none`}
                         />
                       </div>
@@ -448,7 +375,7 @@ export default function Contact() {
                             </>
                           ) : (
                             <>
-                              {formMode === "project" ? "Send Project Brief" : "Send Message"}
+                              Send Message
                               <SendIcon size={14} />
                             </>
                           )}

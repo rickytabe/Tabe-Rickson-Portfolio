@@ -28,11 +28,11 @@ export default function Navbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   const linkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
   const pillStyleRef = useRef(pillStyle);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -115,7 +115,7 @@ export default function Navbar() {
   useEffect(() => {
     const targetLink = hoveredLink || activeSection;
     let el = linkRefs.current[targetLink];
-    
+
     // Fallback to active section if hovering over a tag link that isn't tracked
     if (!el && activeSection) {
       el = linkRefs.current[activeSection];
@@ -162,42 +162,42 @@ export default function Navbar() {
       <nav
         id="main-navbar"
         className="fixed top-0 left-0 w-full z-50"
-      style={{
-        background: hasScrolled ? "color-mix(in srgb, var(--background) 75%, transparent)" : "transparent",
-        backdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
-        WebkitBackdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
-        borderBottom: hasScrolled ? "1px solid var(--card-border)" : "1px solid transparent",
-        transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease",
-      }}
-    >
-      <div className="mx-auto flex items-center justify-between px-6 py-3 max-w-[1400px]">
-        {/* Logo / Brand */}
-        <Link
-          href="/"
-          id="navbar-brand"
-          className="flex items-center gap-2 group"
-          style={{ textDecoration: "none" }}
-        >
-          <span
-            className="inline-block w-2 h-2 rounded-full"
-            style={{
-              backgroundColor: "#39FF14",
-              boxShadow: "0 0 0 0 rgba(57, 255, 20, 0.55)",
-              animation: "greenDotPulse 1.8s ease-in-out infinite",
-            }}
-          />
-          <AnimatedText 
-            text="Tabe Rickson"
-            textClassName="text-2xl font-bold font-sans text-foreground"
-            underlineClassName="text-[#39FF14]"
-          />
-          <span
-            className="text-2xl font-light font-sans text-foreground/40"
+        style={{
+          background: hasScrolled ? "color-mix(in srgb, var(--background) 75%, transparent)" : "transparent",
+          backdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
+          WebkitBackdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
+          borderBottom: hasScrolled ? "1px solid var(--card-border)" : "1px solid transparent",
+          transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease",
+        }}
+      >
+        <div className="mx-auto flex items-center justify-between px-6 py-3 max-w-[1400px]">
+          {/* Logo / Brand */}
+          <Link
+            href="/"
+            id="navbar-brand"
+            className="flex items-center gap-2 group"
+            style={{ textDecoration: "none" }}
           >
-            / 2026
-          </span>
-        </Link>
-        <style jsx>{`
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{
+                backgroundColor: "#39FF14",
+                boxShadow: "0 0 0 0 rgba(57, 255, 20, 0.55)",
+                animation: "greenDotPulse 1.8s ease-in-out infinite",
+              }}
+            />
+            <AnimatedText
+              text="Tabe Rickson"
+              textClassName="text-2xl font-bold font-sans text-foreground"
+              underlineClassName="text-[#39FF14]"
+            />
+            <span
+              className="text-2xl font-light font-sans text-foreground/40"
+            >
+              / 2026
+            </span>
+          </Link>
+          <style jsx>{`
           @keyframes greenDotPulse {
             0%, 100% {
               transform: scale(1);
@@ -210,179 +210,184 @@ export default function Navbar() {
           }
         `}</style>
 
-        {/* Desktop: Center + Right Nav Links */}
-        <div className="hidden lg:flex items-center gap-2 relative" onMouseLeave={() => setHoveredLink(null)}>
-          
-          {/* Animated Liquid Glass Pill with Squash & Stretch Physics */}
-          <div
-            className="liquid-glass-pill"
-            style={{
-              position: "absolute",
-              transition: "all 700ms cubic-bezier(0.34, 1.56, 0.64, 1.0)", // Snappy Spring Physics
-              left: `${pillStyle.left}px`,
-              top: `${pillStyle.top}px`,
-              width: `${pillStyle.width}px`,
-              height: `${pillStyle.height}px`,
-              transform: pillStyle.scale,
-              opacity: pillStyle.opacity,
-              borderRadius: "4px",
-              zIndex: 1,
-              pointerEvents: "none", // ensure it doesn't intercept hovers
-            }}
-          />
+          {/* Desktop: Center + Right Nav Links */}
+          <div className="hidden lg:flex items-center gap-2 relative" onMouseLeave={() => setHoveredLink(null)}>
 
-          {/* Primary Nav Links */}
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.label || hoveredLink === link.label;
-            return (
-              <a
-                key={link.label}
-                ref={(el) => {
-                  linkRefs.current[link.label] = el;
-                }}
-                id={`nav-link-${link.label.toLowerCase()}`}
-                href={link.href}
-                className="relative px-3.5 py-1.5 text-[12px] font-medium tracking-widest transition-colors duration-300 z-10 font-mono"
-                style={{
-                  color: isActive ? "var(--foreground)" : "var(--muted)",
-                  textDecoration: "none",
-                }}
-                onMouseEnter={() => setHoveredLink(link.label)}
+            {/* Animated Liquid Glass Pill with Squash & Stretch Physics */}
+            <div
+              className="liquid-glass-pill"
+              style={{
+                position: "absolute",
+                transition: "all 700ms cubic-bezier(0.34, 1.56, 0.64, 1.0)", // Snappy Spring Physics
+                left: `${pillStyle.left}px`,
+                top: `${pillStyle.top}px`,
+                width: `${pillStyle.width}px`,
+                height: `${pillStyle.height}px`,
+                transform: pillStyle.scale,
+                opacity: pillStyle.opacity,
+                borderRadius: "4px",
+                zIndex: 1,
+                pointerEvents: "none", // ensure it doesn't intercept hovers
+              }}
+            />
+
+            {/* Primary Nav Links */}
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.label || hoveredLink === link.label;
+              return (
+                <a
+                  key={link.label}
+                  ref={(el) => {
+                    linkRefs.current[link.label] = el;
+                  }}
+                  id={`nav-link-${link.label.toLowerCase()}`}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const targetId = link.href.replace('#', '');
+                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="relative px-3.5 py-1.5 text-[12px] font-medium tracking-widest transition-colors duration-300 z-10 font-mono"
+                  style={{
+                    color: isActive ? "var(--foreground)" : "var(--muted)",
+                    textDecoration: "none",
+                  }}
+                  onMouseEnter={() => setHoveredLink(link.label)}
+                >
+                  <span>{link.label}</span>
+                </a>
+              );
+            })}
+
+            {/* Divider */}
+            <div
+              className="w-px h-4 mx-2 z-10"
+              style={{ backgroundColor: "var(--card-border)" }}
+            />
+
+            {/* Tag Links with liquid-glass styling */}
+            {tagLinks.map((link) => {
+              const isHovered = hoveredLink === link.label;
+              return (
+                <a
+                  key={link.label}
+                  id={`nav-tag-${link.label.toLowerCase()}`}
+                  href={link.href}
+                  className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono"
+                  style={{
+                    color: isHovered ? "var(--foreground)" : "var(--muted)",
+                    textDecoration: "none",
+                    borderRadius: "2px",
+                  }}
+                  onMouseEnter={() => setHoveredLink(link.label)}
+                  onMouseLeave={() => setHoveredLink(null)}
+                >
+                  <span
+                    className="inline-block w-1 h-1 rounded-full"
+                    style={{ backgroundColor: "#39FF14", position: "relative", zIndex: 2 }}
+                  />
+                  <span>{link.label}</span>
+                </a>
+              );
+            })}
+
+            {/* Theme Toggle Button */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2 ml-2 transition-colors duration-300 rounded-full hover:bg-foreground/10"
+                aria-label="Toggle Theme"
               >
-                <span>{link.label}</span>
-              </a>
-            );
-          })}
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4 text-foreground" />
+                ) : (
+                  <Moon className="w-4 h-4 text-foreground" />
+                )}
+              </button>
+            )}
 
-          {/* Divider */}
-          <div
-            className="w-px h-4 mx-2 z-10"
-            style={{ backgroundColor: "var(--card-border)" }}
-          />
-
-          {/* Tag Links with liquid-glass styling */}
-          {tagLinks.map((link) => {
-            const isHovered = hoveredLink === link.label;
-            return (
-              <a
-                key={link.label}
-                id={`nav-tag-${link.label.toLowerCase()}`}
-                href={link.href}
-                className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono"
-                style={{
-                  color: isHovered ? "var(--foreground)" : "var(--muted)",
-                  textDecoration: "none",
-                  borderRadius: "2px",
-                }}
-                onMouseEnter={() => setHoveredLink(link.label)}
-                onMouseLeave={() => setHoveredLink(null)}
+            {/* CTA Button */}
+            <a
+              id="nav-cta-lets-talk"
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="group relative flex items-center gap-1.5 ml-3 px-5 py-2 text-xs font-semibold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
+              style={{
+                backgroundColor: "#39FF14",
+                textDecoration: "none",
+                borderRadius: "0px",
+              }}
+            >
+              <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+              <span className="relative z-10">LET&apos;S TALK</span>
+              <svg
+                className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ marginLeft: "2px" }}
               >
-                <span
-                  className="inline-block w-1 h-1 rounded-full"
-                  style={{ backgroundColor: "#39FF14", position: "relative", zIndex: 2 }}
+                <path
+                  d="M1 9L9 1M9 1H3M9 1V7"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <span>{link.label}</span>
-              </a>
-            );
-          })}
+              </svg>
+            </a>
+          </div>
 
-          {/* Theme Toggle Button */}
-          {mounted && (
+          {/* Mobile: Hamburger Button & Theme Toggle */}
+          <div className="lg:hidden flex items-center gap-3">
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2 transition-colors duration-300 rounded-full hover:bg-white/10"
+                aria-label="Toggle Theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4 text-foreground" />
+                ) : (
+                  <Moon className="w-4 h-4 text-foreground" />
+                )}
+              </button>
+            )}
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 ml-2 transition-colors duration-300 rounded-full hover:bg-foreground/10"
-              aria-label="Toggle Theme"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors p-2"
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-foreground" />
-              ) : (
-                <Moon className="w-4 h-4 text-foreground" />
-              )}
+              <span className="text-[10px] font-medium tracking-widest font-mono">
+                {isMobileMenuOpen ? "CLOSE" : "MENU"}
+              </span>
+              <div className="flex flex-col gap-1">
+                <span
+                  className={`block h-px w-4 bg-current transition-transform duration-300 ${isMobileMenuOpen ? "translate-y-1.5 rotate-45" : ""
+                    }`}
+                />
+                <span
+                  className={`block h-px w-4 bg-current transition-opacity duration-300 ${isMobileMenuOpen ? "opacity-0" : ""
+                    }`}
+                />
+                <span
+                  className={`block h-px w-4 bg-current transition-transform duration-300 ${isMobileMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
+                    }`}
+                />
+              </div>
             </button>
-          )}
-
-          {/* CTA Button */}
-          <a
-            id="nav-cta-lets-talk"
-            href="#portfolio"
-            className="group relative flex items-center gap-1.5 ml-3 px-5 py-2 text-xs font-semibold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
-            style={{
-              backgroundColor: "#39FF14",
-              textDecoration: "none",
-              borderRadius: "0px",
-            }}
-          >
-            <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-            <span className="relative z-10">LET&apos;S TALK</span>
-            <svg
-              className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
-              width="10"
-              height="10"
-              viewBox="0 0 10 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ marginLeft: "2px" }}
-            >
-              <path
-                d="M1 9L9 1M9 1H3M9 1V7"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+          </div>
         </div>
+      </nav>
 
-        {/* Mobile: Hamburger Button & Theme Toggle */}
-        <div className="lg:hidden flex items-center gap-3">
-          {mounted && (
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 transition-colors duration-300 rounded-full hover:bg-white/10"
-              aria-label="Toggle Theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-foreground" />
-              ) : (
-                <Moon className="w-4 h-4 text-foreground" />
-              )}
-            </button>
-          )}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors p-2"
-          >
-            <span className="text-[10px] font-medium tracking-widest font-mono">
-              {isMobileMenuOpen ? "CLOSE" : "MENU"}
-            </span>
-            <div className="flex flex-col gap-1">
-              <span
-                className={`block h-px w-4 bg-current transition-transform duration-300 ${
-                  isMobileMenuOpen ? "translate-y-1.5 rotate-45" : ""
-                }`}
-              />
-              <span
-                className={`block h-px w-4 bg-current transition-opacity duration-300 ${
-                  isMobileMenuOpen ? "opacity-0" : ""
-                }`}
-              />
-              <span
-                className={`block h-px w-4 bg-current transition-transform duration-300 ${
-                  isMobileMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
-                }`}
-              />
-            </div>
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${
-          isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div className="flex flex-col items-center h-full gap-6 px-6 pt-32 pb-12 overflow-y-auto">
           {navLinks.map((link) => {
@@ -392,10 +397,16 @@ export default function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${
-                  isActive ? "text-[#39FF14] neon-text bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
-                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(false);
+                  setTimeout(() => {
+                    const targetId = link.href.replace('#', '');
+                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${isActive ? "text-[#39FF14] neon-text bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
+                  }`}
                 style={{
                   textDecoration: "none",
                   borderRadius: "8px",
@@ -421,8 +432,14 @@ export default function Navbar() {
           ))}
 
           <a
-            href="#portfolio"
-            onClick={() => setIsMobileMenuOpen(false)}
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsMobileMenuOpen(false);
+              setTimeout(() => {
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
             className="mt-8 px-8 py-3 text-sm font-semibold tracking-widest bg-[#39FF14] text-[#121212] transition-colors hover:bg-foreground hover:text-background text-center"
           >
             LET&apos;S TALK

@@ -216,6 +216,14 @@ const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { ac
 export default function ProjectsGallery() {
   const projects = portfolioData.projects;
   const [hoveredIdx, setHoveredIdx] = useState<number>(0);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = (idx: number) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredIdx(idx);
+    }, 150); // Delay allows fast scrolls to pass without triggering layout shifts
+  };
 
   const activeProject = projects[hoveredIdx];
   const activeAccent = cardAccents[hoveredIdx % cardAccents.length];
@@ -315,8 +323,11 @@ export default function ProjectsGallery() {
                   }}
                 >
                   <div
-                    onMouseEnter={() => setHoveredIdx(idx)}
-                    onClick={() => setHoveredIdx(idx)}
+                    onMouseEnter={() => handleMouseEnter(idx)}
+                    onClick={() => {
+                      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+                      setHoveredIdx(idx);
+                    }}
                     className={`group relative flex flex-col py-8 border-b border-card-border transition-all duration-500 cursor-pointer ${
                       isActive ? "pl-4 md:pl-8" : "hover:pl-2"
                     }`}

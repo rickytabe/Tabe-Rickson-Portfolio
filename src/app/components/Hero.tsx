@@ -95,6 +95,10 @@ export default function Hero() {
             >
               <a
                 href="#portfolio"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
                 style={{ backgroundColor: "#39FF14" }}
               >
@@ -105,7 +109,11 @@ export default function Hero() {
                 </svg>
               </a>
               <a
-                href="#contact"
+                href="#contact-form"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-foreground/20 hover:border-foreground/60 transition-all duration-300 font-mono"
               >
                 <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
@@ -130,18 +138,18 @@ export default function Hero() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <rect 
-                x="4" 
-                y="4" 
-                width="392" 
-                height="392" 
-                rx="24" 
+              <rect
+                x="4"
+                y="4"
+                width="392"
+                height="392"
+                rx="24"
                 ry="24"
-                stroke="#39FF14" 
-                strokeWidth="3" 
-                opacity="0.8" 
-                strokeDasharray="8 16" 
-                strokeLinecap="round" 
+                stroke="#39FF14"
+                strokeWidth="3"
+                opacity="0.8"
+                strokeDasharray="8 16"
+                strokeLinecap="round"
               />
             </svg>
 
