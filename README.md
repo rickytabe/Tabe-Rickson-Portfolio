@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ Tabe Rickson — Digital Portfolio
 
-## Getting Started
+Welcome to the source code of my personal portfolio. I am a **Full-Stack Web & Mobile Software Engineer**, Tech Architect, and AI Integration Specialist based in Cameroon. My work focuses on building fast, scalable, and user-friendly digital experiences that bridge the gap between design and architecture.
 
-First, run the development server:
+[**Visit the Live Portfolio**](https://tabe-rickson-portfolio.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌌 The Philosophy
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*"Design is not just what it looks like and feels like. Design is how it works."*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+My engineering philosophy revolves around three core pillars:
+1. **Resilient Architecture**: Systems built to scale and endure.
+2. **Defense-in-Depth Security**: Protecting users at every layer.
+3. **Visual Excellence**: Delivering premium, interactive, and highly optimized user interfaces.
 
-## Learn More
+## 🛠️ Tech Stack & Technologies
 
-To learn more about Next.js, take a look at the following resources:
+This portfolio itself is a testament to my technical stack and design principles:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) (for complex physics-based UI) & Custom `IntersectionObserver` native CSS (for performant scroll reveals)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Icons**: Lucide React & React Icons
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+My broader professional toolkit includes:
+- **Frontend**: React, Next.js, Tailwind CSS
+- **Backend**: Node.js, Supabase, Firebase, MongoDB, PostgreSQL, FastAPI
+- **Mobile**: React Native, Expo
+- **AI / Automation**: OpenAI, Gemini, Python, LangChain
 
-## Deploy on Vercel
+## ✨ Key Features of This Repository
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Performance-First Animations**: Balanced use of `framer-motion` for complex physics (like 3D card tilt and spring staggers) and highly optimized native CSS `@keyframes` with `IntersectionObserver` for simple scroll-reveals to minimize main-thread blocking.
+- **Modern UI/UX**: Dark mode by default, utilizing glassmorphism, dynamic gradients, and custom `#39FF14` neon accents for a premium, futuristic aesthetic.
+- **Centralized Data Management**: All project data, links, and content are driven by a centralized `portfolio-data.json` architecture for rapid maintainability.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Getting Started Locally
+
+Want to run this project on your local machine?
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/rickytabe/tabe-rickson-portfolio.git
+   cd tabe-rickson-portfolio
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📫 Connect With Me
+
+I'm always open to new opportunities, collaborations, and discussions on how technology can create a real impact.
+
+- **Email**: [rickytabe2@gmail.com](mailto:rickytabe2@gmail.com)
+- **WhatsApp**: [+237 671 35 33 41](https://wa.me/237671353341)
+- **LinkedIn**: [taberickson](https://linkedin.com/in/taberickson)
+- **X (Twitter)**: [@TabeRickson](https://x.com/TabeRickson)
+- **GitHub**: [@rickytabe](https://github.com/rickytabe)
+
+---
+
+> *Building digital experiences that matter. Let's create something amazing together.*
