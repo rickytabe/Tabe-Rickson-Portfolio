@@ -11,7 +11,7 @@
     {
       "name": "Tutor-Finder",
       "description": "A full-stack platform connecting learners to tutors with live collaboration tools, API integrations, and an AI model that recommends the best tutor based on learning style and preferences. Developed during my Tech-Chantier internship.",
-      "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
+      "codeUrl": "https://github.com/rickytabe/Tutor-Finder",
       "liveUrl": "https://tutor-finder101.vercel.app",
       "image": "/TutorFinder.png",
       "techIcons": ["React", "TailwindCSS", "Framer", "Node.js", "Git", "GitHub"]
@@ -19,7 +19,7 @@
     {
       "name": "NiaTrust Wallet",
       "description": "A fintech escrow and savings solution enabling secure peer-to-peer transactions, group savings, and conditional fund releases — designed to revolutionize online financial trust and collaboration.",
-      "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
+      "codeUrl": "https://github.com/rickytabe/NiaTrust-Wallet",
       "liveUrl": "https://niatrust-walet.vercel.app",
       "image": "/NiaTrust.png",
       "techIcons": ["Next.js", "TailwindCSS", "Supabase", "Git", "GitHub"]
