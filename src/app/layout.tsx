@@ -23,14 +23,9 @@ const inter = Inter({
 });
 
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  "http://localhost:3000";
+const siteUrl = "https://taberickson.com";
 const title = "Tabe Rickson - Website & Mobile App Developer";
-const description =
-  "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
-const previewImageAlt = "Tabe Rickson portfolio preview";
-const previewImage = `${siteUrl}/Tabe-Rickson.png`; 
+const description = "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -59,10 +54,10 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: previewImage,
+        url: "/tabe-rickson-portrait-light-hq.webp",
         width: 1200,
         height: 630,
-        alt: previewImageAlt,
+        alt: "Tabe Rickson's portfolio",
         type: "image/png",
       },
     ],
@@ -71,9 +66,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [previewImage],
+    images: ["/tabe-rickson-portrait-light-hq.webp"],
   },
-  
 };
 
 export default function RootLayout({
@@ -86,10 +80,6 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} h-full antialiased`}
     >
-      <head>
-        <meta name="image" content={previewImage} />
-        <meta name="thumbnail" content={previewImage} />
-      </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-300">
         <ThemeProvider
           attribute="class"
