@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/tabe-rickson-portrait-light-hq.webp",
+        url: "/Tabe-Rickson_light.png",
         width: 1200,
         height: 630,
         alt: "Tabe Rickson's portfolio",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/tabe-rickson-portrait-light-hq.webp"],
+    images: ["/Tabe-Rickson_light.png"],
   },
 };
 
