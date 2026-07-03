@@ -2,6 +2,12 @@ import Navbar from "../components/Navbar";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import { AnimatedText } from "@/components/ui/animated-text";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Thank You | Tabe Rickson",
+  robots: { index: false, follow: false },
+};
 
 export default function ThankYou() {
   return (

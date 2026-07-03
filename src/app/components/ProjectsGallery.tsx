@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { ExternalLink, Plus } from "lucide-react";
+import { ExternalLink, Plus, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
@@ -48,7 +49,8 @@ const TechIcon = ({ name, className = "w-4 h-4" }: { name: string; className?: s
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   if (iconMap[name]) {
@@ -81,7 +83,7 @@ const cardAccents = [
 ];
 
 
-const MobileProjectImage = ({ project, imageSrc, accent }: { project: any, imageSrc: string, accent: string }) => {
+const MobileProjectImage = ({ project, imageSrc }: { project: { name: string }, imageSrc: string }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
@@ -103,7 +105,7 @@ const MobileProjectImage = ({ project, imageSrc, accent }: { project: any, image
   );
 };
 
-const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { activeProject: any, activeAccent: string, hoveredIdx: number }) => {
+const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { activeProject: { name: string, image: string } | undefined, activeAccent: string, hoveredIdx: number }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -204,7 +206,7 @@ const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { ac
 };
 
 export default function ProjectsGallery() {
-  const projects = portfolioData.projects;
+  const projects = portfolioData.projects.slice(0, 4);
   const [hoveredIdx, setHoveredIdx] = useState<number>(0);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -291,7 +293,7 @@ export default function ProjectsGallery() {
                   whileInView="visible"
                   viewport={{ once: true, margin: "-50px" }}
                   variants={{
-                    hidden: (i: number) => ({
+                    hidden: () => ({
                       opacity: 0,
                       x: -60,
                       y: 60,
@@ -389,24 +391,25 @@ export default function ProjectsGallery() {
                             {project.description}
                           </p>
                           
-                          <div className="flex gap-6">
+                          <div className="flex flex-wrap gap-4 md:gap-6 mt-4">
+                            <Link href={`/projects/${project.slug}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase transition-colors hover:opacity-70" style={{ color: accent }}>
+                              <ExternalLink size={16} /> See More
+                            </Link>
                             {project.liveUrl && (
-                              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase transition-colors hover:opacity-70" style={{ color: accent }}>
+                              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase transition-colors hover:opacity-70" style={{ color: accent }}>
                                 <ExternalLink size={16} /> Live Project
                               </a>
                             )}
                             {project.codeUrl && (
-                              <a href={project.codeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase text-foreground/50 hover:text-foreground transition-colors">
+                              <a href={project.codeUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase text-foreground/50 hover:text-foreground transition-colors">
                                 <GithubIcon size={16} /> Source Code
                               </a>
                             )}
                           </div>
 
-                          {/* Mobile Inline Image Display with Parallax */}
                           <MobileProjectImage 
                             project={project} 
                             imageSrc={project.image} 
-                            accent={accent} 
                           />
                         </div>
                       </motion.div>
@@ -425,6 +428,17 @@ export default function ProjectsGallery() {
             hoveredIdx={hoveredIdx} 
           />
           
+        </div>
+
+        {/* View All Projects Button */}
+        <div className="flex justify-center mt-20">
+          <Link href="/projects" className="group relative py-4 px-8 text-xs md:text-sm font-mono font-bold tracking-[0.2em] uppercase text-foreground border border-foreground/30 hover:border-[#39FF14]/50 transition-all duration-300 overflow-hidden bg-card-bg/50 backdrop-blur-sm shadow-lg">
+            <div className="absolute inset-0 bg-[#39FF14]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
+            <span className="relative z-10 flex items-center gap-3 group-hover:text-[#39FF14] transition-colors duration-300">
+              See All Projects
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </span>
+          </Link>
         </div>
       </div>
     </section>

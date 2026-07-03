@@ -44,7 +44,7 @@ export default function Beliefs() {
             />
           </div>
           <p className="text-lg text-foreground/60 leading-relaxed font-light mb-8 font-inter">
-            "Design is not just what it looks like and feels like. Design is how it works."
+            &quot;Design is not just what it looks like and feels like. Design is how it works.&quot;
           </p>
           <p className="text-sm text-foreground/40 leading-relaxed font-light font-inter">
             My philosophy revolves around building resilient architecture, defense-in-depth security, and prioritizing visual excellence. Whether developing platforms for local businesses in Cameroon or scalable cloud infrastructures, I ensure technology remains a force for good.

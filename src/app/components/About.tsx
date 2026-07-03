@@ -32,7 +32,8 @@ export default function About() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -86,9 +87,9 @@ export default function About() {
 
 
           <div className="relative z-10">
-            <h4 className={SECTION_STYLES.subtitle}>
+            <h2 className={SECTION_STYLES.subtitle}>
               Who am I?
-            </h4>
+            </h2>
             <div className="mb-6 relative z-20">
               <TextRevealByWord 
                 text="I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer" 

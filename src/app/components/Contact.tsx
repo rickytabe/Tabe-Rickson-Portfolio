@@ -286,7 +286,7 @@ export default function Contact() {
                           onClick={() => router.push('/lets-work')}
                           className="px-5 py-2 text-[10px] font-mono tracking-widest uppercase border border-[#39FF14] text-[#39FF14] bg-background hover:bg-[#39FF14] hover:text-[#121212] transition-colors duration-300"
                         >
-                          Let's Work
+                          Let&apos;s Work
                         </button>
                       </div>
                     </div>

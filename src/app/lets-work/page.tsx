@@ -125,7 +125,7 @@ export default function LetsWorkPage() {
             underlineClassName="text-[#39FF14]"
           />
           <p className="text-foreground/60 font-inter max-w-2xl mt-6 text-lg">
-            Ready to start your next project? Fill out the form below with your details and I'll get back to you as soon as possible.
+            Ready to start your next project? Fill out the form below with your details and I&apos;ll get back to you as soon as possible.
           </p>
         </motion.div>
 
@@ -235,7 +235,7 @@ export default function LetsWorkPage() {
                     </div>
                     <h3 className="text-3xl font-bold font-sans text-foreground mb-4">Inquiry Sent</h3>
                     <p className="text-foreground/60 font-inter text-base max-w-sm">
-                      Thank you for reaching out! I've received your project details and will be in touch shortly.
+                      Thank you for reaching out! I&apos;ve received your project details and will be in touch shortly.
                     </p>
                   </motion.div>
                 ) : (

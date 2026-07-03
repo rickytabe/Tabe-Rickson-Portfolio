@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatedText } from "@/components/ui/animated-text";
 
 export default function NotFound() {
   return (
@@ -32,8 +31,8 @@ export default function NotFound() {
           <h2 className="text-2xl md:text-3xl font-bold font-sans mb-4">
             Page Not Found
           </h2>
-          <p className="text-foreground/60 font-inter max-w-md mx-auto">
-            The page you are looking for doesn't exist, has been moved, or is temporarily unavailable.
+          <p className="text-foreground/70 mb-8 font-inter">
+            Can&apos;t find the page you&apos;re looking for. It might have been moved or deleted.
           </p>
         </div>
 

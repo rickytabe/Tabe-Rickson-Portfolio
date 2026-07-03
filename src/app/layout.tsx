@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
 import Navbar from "./components/Navbar";
+import portfolioData from "../../portfolio-data.json";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -25,7 +26,7 @@ const inter = Inter({
 
 
 const siteUrl = "https://taberickson.com";
-const title = "Tabe Rickson - Website & Mobile App Developer";
+const title = "Tabe Rickson - Full-Stack & AI Developer";
 const description = "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 
 export const metadata: Metadata = {
@@ -53,21 +54,11 @@ export const metadata: Metadata = {
     siteName: "Tabe Rickson Portfolio",
     type: "website",
     locale: "en_US",
-    images: [
-      {
-        url: "/Tabe-Rickson_light.png",
-        width: 1200,
-        height: 630,
-        alt: "Tabe Rickson's portfolio",
-        type: "image/png",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/Tabe-Rickson_light.png"],
   },
 };
 
@@ -81,6 +72,25 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Tabe Rickson",
+              "jobTitle": "Full-Stack Web & Mobile Software Engineer",
+              "url": "https://taberickson.com",
+              "sameAs": [
+                portfolioData.socials.github,
+                portfolioData.socials.linkedin,
+                portfolioData.socials.twitter
+              ].filter(Boolean)
+            })
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-300">
         <ThemeProvider
           attribute="class"

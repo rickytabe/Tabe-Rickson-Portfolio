@@ -2,7 +2,9 @@
   "projects": [
     {
       "name": "Mobi-Rent",
+      "slug": "mobi-rent",
       "description": "A secure and intelligent car rental platform built to transform the underdeveloped rental infrastructure in my country. Empowers rental services and customers with seamless online booking, fleet management, and fraud prevention.",
+      "content": "### The Challenge\nIn my country, the car rental infrastructure has historically been underdeveloped, relying heavily on manual processes and lacking secure, streamlined booking systems. This led to inefficiencies, increased fraud risk, and a poor customer experience.\n\n### The Solution\nI engineered Mobi-Rent to bridge this gap. The platform provides a full-stack, secure, and intelligent environment for both rental services and customers. Built with Next.js and Supabase, it offers real-time fleet management, seamless online booking workflows, and integrated fraud prevention mechanisms. The UI is designed with TailwindCSS to ensure a responsive and premium experience across devices.\n\n### The Outcome\nMobi-Rent empowers local rental businesses by digitizing their operations, significantly reducing administrative overhead, and providing a reliable, trustworthy platform for customers to rent vehicles.",
       "codeUrl": "https://github.com/rickytabe/mobirent-cameroon",
       "liveUrl": "http://mobirent-cameroon.vercel.app/",
       "image": "/MobiRent.png",
@@ -10,7 +12,9 @@
     },
     {
       "name": "Tutor-Finder",
+      "slug": "tutor-finder",
       "description": "A full-stack platform connecting learners to tutors with live collaboration tools, API integrations, and an AI model that recommends the best tutor based on learning style and preferences. Developed during my Tech-Chantier internship.",
+      "content": "### The Challenge\nStudents often struggle to find tutors who match their specific learning styles and academic needs. Traditional tutoring platforms lack intelligent matching and integrated collaboration environments, leading to friction in the learning process.\n\n### The Solution\nDeveloped during my Tech-Chantier internship, Tutor-Finder is a comprehensive full-stack platform that connects learners to the right educators. I implemented an AI-driven recommendation engine that analyzes student preferences to suggest optimal matches. The platform also features live collaboration tools and robust API integrations to facilitate a seamless online learning environment, built using React and Node.js.\n\n### The Outcome\nThe platform significantly reduces the time it takes for students to find suitable help, fostering better educational outcomes and creating a centralized hub for interactive learning.",
       "codeUrl": "https://github.com/rickytabe/Tutor-Finder",
       "liveUrl": "https://tutor-finder101.vercel.app",
       "image": "/TutorFinder.png",
@@ -18,7 +22,9 @@
     },
     {
       "name": "NiaTrust Wallet",
+      "slug": "niatrust-wallet",
       "description": "A fintech escrow and savings solution enabling secure peer-to-peer transactions, group savings, and conditional fund releases — designed to revolutionize online financial trust and collaboration.",
+      "content": "### The Challenge\nOnline transactions often suffer from a lack of trust between parties. Existing solutions are either too rigid or lack support for collaborative financial activities like group savings and conditional escrow, hindering e-commerce and peer-to-peer exchanges.\n\n### The Solution\nNiaTrust Wallet was built to revolutionize financial trust. Engineered with Next.js and Supabase, this fintech application serves as a robust escrow and savings platform. It allows users to execute secure peer-to-peer transactions where funds are only released upon mutually agreed conditions. Additionally, it supports group savings features, making it highly versatile for communal financial goals.\n\n### The Outcome\nBy providing a transparent and secure financial layer, NiaTrust Wallet mitigates the risk of online fraud and encourages collaborative financial growth among its user base.",
       "codeUrl": "https://github.com/rickytabe/NiaTrust-Wallet",
       "liveUrl": "https://niatrust-walet.vercel.app",
       "image": "/NiaTrust.png",
@@ -26,8 +32,10 @@
     },
     {
       "name": "StartWise",
+      "slug": "startwise",
       "badge": "Hackathon Winner - Code4Change 2025",
       "description": "Hackathon-winning platform (Code4Change 2025) guiding aspiring tech professionals with real-time mentorship, AI-powered career navigation, and access to local and remote job or internship opportunities.",
+      "content": "### The Challenge\nAspiring tech professionals frequently face overwhelming challenges when trying to break into the industry. A lack of mentorship, unclear career paths, and difficulty finding initial opportunities create significant barriers to entry.\n\n### The Solution\nStartWise was developed and won the Code4Change 2025 Hackathon by directly addressing this issue. It is a comprehensive guidance platform built with React, Firebase, and Gemini AI. The core feature is an AI-powered career navigator that provides personalized roadmaps. It also facilitates real-time mentorship connections and aggregates local and remote internship opportunities to help juniors land their first roles.\n\n### The Outcome\nThe platform provides a clear, actionable pathway for new developers, earning top honors at the hackathon for its potential to democratize tech career entry.",
       "codeUrl": "https://github.com/rickytabe/StartWise",
       "liveUrl": "https://start-wise-five.vercel.app",
       "image": "/StartWise.png",
@@ -35,7 +43,9 @@
     },
     {
       "name": "Cambrilia",
+      "slug": "cambrilia",
       "description": "A multimodal AI assistant (text, image, and audio) designed for dynamic and natural interaction. Currently in development as an advanced alternative to traditional AI chat platforms.",
+      "content": "### The Challenge\nMany traditional AI chat platforms restrict users to text-only interfaces, limiting the natural flow of human-computer interaction and preventing the seamless processing of complex, multi-format queries.\n\n### The Solution\nCambrilia is being developed as a next-generation, multimodal AI assistant. Leveraging React, Firebase, and OpenAI's APIs, the platform supports dynamic interactions across text, image, and audio formats. The architecture is designed to handle context-heavy, complex queries in a natural, conversational manner, providing a superior alternative to standard chat interfaces.\n\n### The Outcome\nWhile currently in active development, Cambrilia aims to significantly enhance productivity by allowing users to interact with AI in whatever modality best suits their current task.",
       "codeUrl": "https://github.com/rickytabe/cam-brillia",
       "liveUrl": "https://cam-brillia.vercel.app",
       "image": "/Cambrillia.png",
@@ -43,7 +53,9 @@
     },
     {
       "name": "KMC Restaurant",
+      "slug": "kmc-restaurant",
       "description": "A restaurant management and e-commerce site that boosted daily sales by 10×, enabling customers to order online, reserve tables, and make secure payments seamlessly.",
+      "content": "### The Challenge\nKMC Restaurant was struggling with manual ordering processes and limited reach, relying entirely on foot traffic and phone calls. They needed a digital transformation to scale their operations and improve customer convenience.\n\n### The Solution\nI designed and deployed a full-stack e-commerce and management platform using Next.js and MongoDB. The system features a highly optimized, mobile-first ordering interface, secure online payments, and a streamlined table reservation system. On the backend, an intuitive dashboard allows staff to manage inventory and incoming orders efficiently.\n\n### The Outcome\nThe digital overhaul transformed their business model, resulting in a 10× boost in daily sales by opening up entirely new revenue streams and dramatically improving operational efficiency.",
       "codeUrl": "https://github.com/rickytabe/KMC-WESITE",
       "liveUrl": "https://kmc-restaurant.vercel.app",
       "image": "/kmc-restaurant.png",
@@ -51,7 +63,9 @@
     },
     {
       "name": "stepUp",
+      "slug": "stepup",
       "description": "A high-speed mini e-commerce site for selling footwear online, focused on lightning-fast transactions and efficient online payment processing.",
+      "content": "### The Challenge\nE-commerce platforms often suffer from bloated codebases, resulting in slow load times that directly impact conversion rates—especially on mobile devices.\n\n### The Solution\nstepUp was engineered as a high-speed, lightweight mini e-commerce solution dedicated to selling footwear. By utilizing HTML5, TailwindCSS, and vanilla JavaScript, I stripped away unnecessary abstractions to focus entirely on performance. The site features an optimized checkout flow and highly efficient payment processing integrations to ensure users can purchase with zero friction.\n\n### The Outcome\nThe result is a blazing-fast shopping experience that maximizes conversion rates and provides an extremely smooth, app-like feel on the web.",
       "codeUrl": "https://github.com/rickytabe/shoe-shop",
       "liveUrl": "https://shoe-shop-ten.vercel.app",
       "image": "/stepup.png",
@@ -59,7 +73,9 @@
     },
     {
       "name": "Evogym",
+      "slug": "evogym",
       "description": "A fitness membership platform for Evogym, streamlining subscriptions, payments, and class bookings to grow their customer base and retention rates.",
+      "content": "### The Challenge\nEvogym needed a centralized digital platform to manage their expanding member base. Their existing system for handling subscriptions, payments, and class bookings was fragmented, leading to administrative bottlenecks and a poor member experience.\n\n### The Solution\nI developed a comprehensive fitness membership portal using React and Node.js. The platform provides members with a self-service dashboard to manage their subscriptions, seamlessly book classes, and process payments securely. The administrative side offers tools for tracking attendance, managing schedules, and analyzing retention metrics.\n\n### The Outcome\nThe streamlined digital experience significantly reduced administrative workload while improving member satisfaction, directly contributing to increased customer acquisition and higher retention rates.",
       "codeUrl": "https://github.com/example/evogym",
       "liveUrl": "https://letsgymify.web.app",
       "image": "/evo-gym.png",

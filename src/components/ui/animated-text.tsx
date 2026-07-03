@@ -44,6 +44,7 @@ const AnimatedText = React.forwardRef<HTMLDivElement, AnimatedTextProps>(
     };
 
     // Memoize the custom motion component so it doesn't get recreated on every render, which causes remounting
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const MotionComponent = React.useMemo(() => motion(Component as any), [Component]);
 
     return (
