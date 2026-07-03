@@ -1,4 +1,3 @@
-import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import Services from "./components/Services";
@@ -13,7 +12,6 @@ export default function Home() {
       {/* Interactive Fixed Background & Main Content wrapper */}
       <InteractiveBackground>
         <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
-          <Navbar />
           <Hero />
           <About />
           <Services />

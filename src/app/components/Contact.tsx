@@ -317,7 +317,7 @@ export default function Contact() {
                             type="text"
                             name="name"
                             required
-                            placeholder="Your name"
+                            placeholder="Tabe Rickson"
                             className={inputClasses}
                           />
                         </div>
@@ -327,7 +327,7 @@ export default function Contact() {
                             type="email"
                             name="email"
                             required
-                            placeholder="you@example.com"
+                            placeholder="tabe@example.com"
                             className={inputClasses}
                           />
                         </div>

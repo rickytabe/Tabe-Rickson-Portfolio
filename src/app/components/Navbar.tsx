@@ -5,19 +5,20 @@ import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 import { AnimatedText } from "@/components/ui/animated-text";
+import { usePathname, useRouter } from "next/navigation";
 
 const navLinks = [
-  { label: "Home", href: "#hero", sectionId: "hero" },
-  { label: "About", href: "#about", sectionId: "about" },
-  { label: "Services", href: "#services", sectionId: "services" },
-  { label: "Portfolio", href: "#portfolio", sectionId: "portfolio" },
-  { label: "Experience", href: "#experience", sectionId: "experience" },
-  { label: "Contact", href: "#contact", sectionId: "contact" },
+  { label: "Home", href: "/#hero", sectionId: "hero" },
+  { label: "About", href: "/#about", sectionId: "about" },
+  { label: "Services", href: "/#services", sectionId: "services" },
+  { label: "Portfolio", href: "/#portfolio", sectionId: "portfolio" },
+  { label: "Experience", href: "/#experience", sectionId: "experience" },
+  { label: "Contact", href: "/#contact", sectionId: "contact" },
 ];
 
 const tagLinks = [
-  { label: "WRITING", href: "#writing" },
-  { label: "WEBINAR", href: "#webinar" },
+  { label: "WRITING", href: "/#writing" },
+  { label: "WEBINAR", href: "/#webinar" },
 ];
 
 export default function Navbar() {
@@ -28,6 +29,8 @@ export default function Navbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -244,8 +247,11 @@ export default function Navbar() {
                   href={link.href}
                   onClick={(e) => {
                     e.preventDefault();
-                    const targetId = link.href.replace('#', '');
-                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                    if (pathname === '/') {
+                      document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      router.push(link.href);
+                    }
                   }}
                   className="relative px-3.5 py-1.5 text-[12px] font-medium tracking-widest transition-colors duration-300 z-10 font-mono"
                   style={{
@@ -309,10 +315,10 @@ export default function Navbar() {
             {/* CTA Button */}
             <a
               id="nav-cta-lets-talk"
-              href="#contact"
+              href="/lets-work"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                router.push('/lets-work');
               }}
               className="group relative flex items-center gap-1.5 ml-3 px-5 py-2 text-xs font-semibold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
               style={{
@@ -322,7 +328,7 @@ export default function Navbar() {
               }}
             >
               <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-              <span className="relative z-10">LET&apos;S TALK</span>
+              <span className="relative z-10">LET&apos;S WORK</span>
               <svg
                 className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
                 width="10"
@@ -400,10 +406,13 @@ export default function Navbar() {
                 onClick={(e) => {
                   e.preventDefault();
                   setIsMobileMenuOpen(false);
-                  setTimeout(() => {
-                    const targetId = link.href.replace('#', '');
-                    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
+                  if (pathname === '/') {
+                    setTimeout(() => {
+                      document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  } else {
+                    router.push(link.href);
+                  }
                 }}
                 className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${isActive ? "text-[#39FF14] neon-text bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
                   }`}
@@ -432,17 +441,15 @@ export default function Navbar() {
           ))}
 
           <a
-            href="#contact"
+            href="/lets-work"
             onClick={(e) => {
               e.preventDefault();
               setIsMobileMenuOpen(false);
-              setTimeout(() => {
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
+              router.push('/lets-work');
             }}
             className="mt-8 px-8 py-3 text-sm font-semibold tracking-widest bg-[#39FF14] text-[#121212] transition-colors hover:bg-foreground hover:text-background text-center"
           >
-            LET&apos;S TALK
+            LET&apos;S WORK
           </a>
         </div>
       </div>

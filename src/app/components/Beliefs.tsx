@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { AnimatedText } from "@/components/ui/animated-text";
 
 export default function Beliefs() {
@@ -25,11 +25,9 @@ export default function Beliefs() {
       className="min-h-dvh flex flex-col justify-center pt-24 pb-12 px-8 lg:px-16 border-t border-card-border relative"
     >
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <ScrollReveal
+          direction="left"
+          margin="-100px"
         >
           <div className="flex items-center gap-4 mb-6 font-mono text-xs tracking-[0.2em] text-[#39FF14] neon-text">
             <span className="font-bold text-sm">04</span>
@@ -51,16 +49,15 @@ export default function Beliefs() {
           <p className="text-sm text-foreground/40 leading-relaxed font-light font-inter">
             My philosophy revolves around building resilient architecture, defense-in-depth security, and prioritizing visual excellence. Whether developing platforms for local businesses in Cameroon or scalable cloud infrastructures, I ensure technology remains a force for good.
           </p>
-        </motion.div>
+        </ScrollReveal>
 
         <div className="flex flex-col gap-8">
           {expertise.map((item, index) => (
-            <motion.div 
+            <ScrollReveal 
               key={index}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              direction="right"
+              delay={index * 0.15}
+              margin="-50px"
               className="flex gap-6 liquid-glass-pill p-6 transition-transform hover:-translate-x-2 duration-300"
             >
               <div className="text-[#39FF14] neon-text font-mono text-sm mt-1 relative z-10">0{index + 1}</div>
@@ -68,7 +65,7 @@ export default function Beliefs() {
                 <h3 className="text-lg font-bold text-foreground mb-2 tracking-wide font-sans">{item.title}</h3>
                 <p className="text-sm text-foreground/50 leading-relaxed font-inter">{item.description}</p>
               </div>
-            </motion.div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

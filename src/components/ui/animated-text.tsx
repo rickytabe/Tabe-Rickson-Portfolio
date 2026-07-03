@@ -43,8 +43,8 @@ const AnimatedText = React.forwardRef<HTMLDivElement, AnimatedTextProps>(
       },
     };
 
-    // Use a custom motion component based on the 'as' prop
-    const MotionComponent = motion(Component as any);
+    // Memoize the custom motion component so it doesn't get recreated on every render, which causes remounting
+    const MotionComponent = React.useMemo(() => motion(Component as any), [Component]);
 
     return (
       <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import Image from "next/image";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
@@ -48,27 +48,23 @@ export default function About() {
           </span>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <ScrollReveal
+          direction="up"
+          margin="-100px"
           className={SECTION_STYLES.headerBadgeWrapper}
         >
           <span className={SECTION_STYLES.headerBadgeNumber}>01</span>
           <span className={SECTION_STYLES.headerBadgeLine}></span>
           <span className={SECTION_STYLES.headerBadgeText}>About Me</span>
-        </motion.div>
+        </ScrollReveal>
       </div>
 
       <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
 
         {/* Left Column: Image */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <ScrollReveal
+          direction="left"
+          margin="-100px"
           className="relative w-full aspect-square md:aspect-4/5 "
         >
           <Image
@@ -79,14 +75,12 @@ export default function About() {
             sizes="(max-width: 767px) calc(100vw - 4rem), 45vw"
             className="w-full h-full md:h-4/5 object-cover shadow-2xl  hover:grayscale-0 transition-all duration-700 relative z-10 mt-20"
           />
-        </motion.div>
+        </ScrollReveal>
 
         {/* Right Column: Text & Info */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <ScrollReveal
+          direction="right"
+          margin="-100px"
           className="flex flex-col justify-center relative"
         >
 
@@ -174,7 +168,7 @@ export default function About() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </ScrollReveal>
 
       </div>
 

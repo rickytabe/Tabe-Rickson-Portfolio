@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
+import Navbar from "./components/Navbar";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -87,6 +88,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
+          <Navbar />
           {children}
           <Analytics />
         </ThemeProvider>
