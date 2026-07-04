@@ -18,12 +18,18 @@ export default function NewsletterForm() {
 
     setIsSubmitting(true);
     try {
-      // Add to Firestore
-      await addDoc(collection(db, "subscribers"), {
+      // Add to Firestore with a timeout to prevent infinite loading if DB doesn't exist
+      const addDocPromise = addDoc(collection(db, "subscribers"), {
         email,
         firstName,
         createdAt: serverTimestamp(),
       });
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Request timed out. Please check your Firebase Database.")), 5000);
+      });
+
+      await Promise.race([addDocPromise, timeoutPromise]);
       
       setIsSuccess(true);
       toast.success("Subscribed successfully!");
@@ -47,7 +53,7 @@ export default function NewsletterForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
-      className="mt-20 lg:mt-32 w-full border border-[#39FF14]/30 bg-[#39FF14]/5 relative overflow-hidden"
+      className="mt-20 lg:mt-32 w-full border border-[#39FF14]/30 bg-[#39FF14]/1 relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-card-bg/20 backdrop-blur-sm z-0"></div>
       
@@ -60,7 +66,7 @@ export default function NewsletterForm() {
       <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row gap-10 items-center justify-between">
         <div className="md:w-1/2">
           <h3 className="text-2xl md:text-3xl font-bold font-sans text-foreground mb-4 tracking-tight">
-            Join the <span className="text-[#39FF14]">Inner Circle</span>
+            Join Our <span className="text-[#39FF14]">Community</span>
           </h3>
           <p className="text-foreground/70 font-inter text-sm md:text-base max-w-md leading-relaxed">
             Get notified when I drop a new tech deep-dive or ship a new product. No spam, just high-signal updates straight to your inbox.
