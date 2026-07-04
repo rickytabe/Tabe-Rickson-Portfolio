@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
 import portfolioData from "../../../portfolio-data.json";
+import NewsletterForm from "./NewsletterForm";
 
 /* ── Icons ── */
 const GithubIcon = ({ size = 20 }: { size?: number }) => (
@@ -388,6 +389,9 @@ export default function Contact() {
             </div>
           </motion.div>
         </div>
+
+        {/* ── Newsletter Form ── */}
+        <NewsletterForm />
 
         {/* ── Footer ── */}
         <motion.div

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sanity/image-url": ["./node_modules/@sanity/image-url/lib/index.d.ts"]
     }
   },
   "include": [

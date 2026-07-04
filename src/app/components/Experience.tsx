@@ -116,7 +116,7 @@ function TimelineEntry({ item, index }: { item: typeof timelineData[0]; index: n
             </h3>
 
             {/* Accent line */}
-            <div className={`h-[2px] bg-gradient-to-r ${isEven ? 'from-transparent via-[#39FF14]/40 to-[#39FF14]' : 'from-[#39FF14] via-[#39FF14]/40 to-transparent'} mb-5 w-0 group-hover:w-full transition-all duration-700 ease-out`} />
+            <div className={`h-[2px] bg-linear-to-r ${isEven ? 'from-transparent via-[#39FF14]/40 to-[#39FF14]' : 'from-[#39FF14] via-[#39FF14]/40 to-transparent'} mb-5 w-0 group-hover:w-full transition-all duration-700 ease-out`} />
 
             {/* Description */}
             <p className="text-foreground/55 font-inter text-sm leading-relaxed">
@@ -306,7 +306,7 @@ export default function Experience() {
           <div className="md:hidden absolute left-0 top-0 bottom-0">
             <div className="w-[1px] h-full bg-card-border" />
             <motion.div
-              className="absolute top-0 left-0 w-[1px] bg-gradient-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
+              className="absolute top-0 left-0 w-[1px] bg-linear-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
               style={{ height: lineHeight }}
             />
           </div>

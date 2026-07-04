@@ -17,8 +17,8 @@ const navLinks = [
 ];
 
 const tagLinks = [
-  { label: "WRITING", href: "/#writing" },
-  { label: "WEBINAR", href: "/#webinar" },
+  { label: "BLOGS", href: "/blog" },
+  { label: "EVENTS", href: "/events" },
 ];
 
 export default function Navbar() {
@@ -286,6 +286,10 @@ export default function Navbar() {
                     textDecoration: "none",
                     borderRadius: "2px",
                   }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(link.href);
+                  }}
                   onMouseEnter={() => setHoveredLink(link.label)}
                   onMouseLeave={() => setHoveredLink(null)}
                 >
@@ -433,7 +437,11 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsMobileMenuOpen(false);
+                router.push(link.href);
+              }}
               className="text-sm tracking-widest text-[#39FF14] neon-text hover:text-[#4dff33] transition-colors flex items-center gap-2"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current" />
