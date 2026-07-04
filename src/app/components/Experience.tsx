@@ -297,7 +297,7 @@ export default function Experience() {
             <div className="w-[1px] h-full bg-card-border" />
             {/* Animated fill */}
             <motion.div
-              className="absolute top-0 left-0 w-[1px] bg-gradient-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
+              className="absolute top-0 left-0 w-[1px] bg-linear-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
               style={{ height: lineHeight }}
             />
           </div>

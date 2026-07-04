@@ -46,22 +46,44 @@ export async function POST(req: Request) {
       const batch = emails.slice(i, i + BATCH_SIZE);
       await resend.emails.send({
         // NOTE: You MUST verify the domain taberickson.com in Resend to send from it.
-        // Otherwise, it will fail, or you must use onboarding@resend.dev
         from: 'Tabe Rickson <hello@taberickson.com>',
         to: ['hello@taberickson.com'], // Primary receiver
         bcc: batch,
         subject: `New ${typeName}: ${title}`,
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #121212; padding: 20px;">
-            <h2 style="color: #121212;">I just published a new ${typeName}!</h2>
-            <h3 style="font-size: 24px; margin-bottom: 10px;">${title}</h3>
-            <p style="font-size: 16px; line-height: 1.6; color: #444;">${snippet}</p>
-            <br/>
-            <a href="${linkUrl}" style="display:inline-block;padding:12px 24px;background-color:#39FF14;color:#121212;text-decoration:none;font-weight:bold;border-radius:4px;text-transform:uppercase;letter-spacing:1px;">
-              View ${typeName}
-            </a>
-            <hr style="margin-top: 40px; border: none; border-top: 1px solid #eee;" />
-            <p style="font-size: 12px; color: #999;">You are receiving this because you subscribed to updates at taberickson.com.</p>
+          <div style="background-color: #121212; padding: 40px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e5e5e5; line-height: 1.6;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #1a1a1a; padding: 40px; border-radius: 8px; border-top: 4px solid #39FF14;">
+              
+              <p style="font-size: 16px; margin-bottom: 24px;">
+                Hey there,
+              </p>
+
+              <p style="font-size: 16px; margin-bottom: 12px;">
+                I just published a new ${typeName} that I thought you might find interesting.
+              </p>
+              
+              <h3 style="font-size: 22px; color: #ffffff; margin-bottom: 12px;">${title}</h3>
+              <p style="font-size: 15px; color: #a0a0a0; margin-bottom: 32px; border-left: 3px solid #333; padding-left: 16px;">
+                ${snippet}
+              </p>
+              
+              <a href="${linkUrl}" style="display: inline-block; padding: 12px 24px; background-color: #39FF14; color: #121212; text-decoration: none; font-weight: bold; font-family: monospace; letter-spacing: 1px; border-radius: 4px; text-transform: uppercase;">
+                Read More
+              </a>
+              
+              <hr style="border: none; border-top: 1px solid #333333; margin-top: 40px; margin-bottom: 24px;" />
+              
+              <p style="font-size: 14px; color: #888888; margin: 0;">
+                Best,<br/>
+                <strong style="color: #ffffff; font-size: 16px;">Tabe Rickson</strong>
+              </p>
+              
+              <p style="font-size: 11px; color: #555; margin-top: 32px;">
+                You are receiving this because you connected with me at taberickson.com. 
+                If you prefer not to receive these updates, just reply to this email and let me know.
+              </p>
+              
+            </div>
           </div>
         `
       });

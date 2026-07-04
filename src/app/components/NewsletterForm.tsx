@@ -31,6 +31,17 @@ export default function NewsletterForm() {
 
       await Promise.race([addDocPromise, timeoutPromise]);
       
+      // 2. Trigger the Welcome Email and Notification via Backend API
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, firstName }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send emails');
+      }
+
       setIsSuccess(true);
       toast.success("Subscribed successfully!");
       setEmail("");
