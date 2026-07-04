@@ -31,6 +31,9 @@ const description = "I'm Tabe Rickson, and I build web and mobile apps that solv
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   applicationName: "Tabe Rickson Portfolio",
   title,
   description,

@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "tabe-rickson.vercel.app"
+        }
+      ],
+      "destination": "https://taberickson.com/$1",
+      "permanent": true
+    }
+  ]
+}

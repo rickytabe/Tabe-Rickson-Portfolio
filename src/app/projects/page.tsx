@@ -6,6 +6,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Projects | Tabe Rickson",
   description: "A collection of my full-stack web and mobile applications.",
+  alternates: {
+    canonical: "/projects",
+  },
 };
 
 export default function ProjectsIndex() {

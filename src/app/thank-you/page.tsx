@@ -6,6 +6,9 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Thank You | Tabe Rickson",
+  alternates: {
+    canonical: "/thank-you",
+  },
   robots: { index: false, follow: false },
 };
 
