@@ -9,16 +9,18 @@ if (!getApps().length) {
       privateKey = privateKey.replace(/\\n/g, '\n');
     }
 
-    initializeApp({
-      credential: cert({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    });
+    if (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL) {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: privateKey,
+        }),
+      });
+    }
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
 }
 
-export const adminDb = getFirestore();
+export const adminDb = getApps().length > 0 ? getFirestore() : ({} as any);
