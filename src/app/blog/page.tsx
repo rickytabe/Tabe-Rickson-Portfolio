@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import Navbar from "../components/Navbar";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import BlogListClient from "../components/BlogListClient";
+import { getPageViews } from "@/lib/vercel/analytics";
 
 export const metadata: Metadata = {
   title: "Blog | Tabe Rickson",
@@ -18,6 +19,17 @@ export const revalidate = 60; // revalidate every minute
 
 export default async function BlogIndex() {
   const posts = await client.fetch(POSTS_QUERY);
+
+  // Attach views
+  const postsWithViews = await Promise.all(
+    posts.map(async (post: any) => {
+      const views = await getPageViews(post.slug.current);
+      return {
+        ...post,
+        views: views !== null ? Math.max(views, 1) : 1
+      };
+    })
+  );
 
   return (
     <InteractiveBackground>
@@ -34,7 +46,7 @@ export default async function BlogIndex() {
             </p>
           </div>
 
-          <BlogListClient initialPosts={posts} />
+          <BlogListClient initialPosts={postsWithViews} />
         </main>
       </div>
     </InteractiveBackground>

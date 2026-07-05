@@ -8,6 +8,7 @@ import PortableTextRenderer from "../../components/PortableTextRenderer";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { createImageUrlBuilder } from "@sanity/image-url";
+import { getPageViews } from "@/lib/vercel/analytics";
 import Image from "next/image";
 
 const builder = createImageUrlBuilder(client);
@@ -28,22 +29,31 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await client.fetch(POST_QUERY, { slug });
+  
+  // Fetch post and views in parallel for metadata
+  const [post, rawViews] = await Promise.all([
+    client.fetch(POST_QUERY, { slug }),
+    getPageViews(slug)
+  ]);
 
   if (!post) {
     return { title: "Post Not Found" };
   }
 
+  const views = rawViews !== null ? Math.max(rawViews, 1) : 1;
+  const viewText = `${views.toLocaleString()} ${views === 1 ? 'View' : 'Views'}`;
+  const fullTitle = `(${viewText}) ${post.title} | Tabe Rickson`;
+
   const imageUrl = post.mainImage ? urlFor(post.mainImage).width(1200).height(630).url() : undefined;
 
   return {
-    title: `${post.title} | Tabe Rickson Blog`,
+    title: fullTitle,
     description: post.excerpt || "Read this post on Tabe Rickson's Tech Blog",
     alternates: {
       canonical: `/blog/${slug}`,
     },
     openGraph: {
-      title: post.title,
+      title: `(${viewText}) ${post.title}`,
       description: post.excerpt,
       images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630 }] : [],
     },
@@ -54,7 +64,12 @@ export const revalidate = 60;
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await client.fetch(POST_QUERY, { slug });
+  
+  // Fetch post and views in parallel
+  const [post, views] = await Promise.all([
+    client.fetch(POST_QUERY, { slug }),
+    getPageViews(slug)
+  ]);
 
   if (!post) {
     notFound();
@@ -71,8 +86,14 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
           
           <header className="mb-10">
-            <div className="text-[#39FF14] font-mono text-sm mb-4">
-              {new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+            <div className="flex items-center gap-2 text-[#39FF14] font-mono text-sm mb-4">
+              <span>{new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              {views !== null && (
+                <>
+                  <span className="text-foreground/30">•</span>
+                  <span>{Math.max(views, 1).toLocaleString()} {Math.max(views, 1) === 1 ? 'view' : 'views'}</span>
+                </>
+              )}
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tight mb-6">
               {post.title}

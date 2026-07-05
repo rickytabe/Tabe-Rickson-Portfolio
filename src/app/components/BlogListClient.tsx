@@ -73,8 +73,16 @@ export default function BlogListClient({ initialPosts }: { initialPosts: any[] }
               <div className="p-6 flex flex-col flex-grow">
                 {/* Meta */}
                 <div className="flex items-center gap-2 mb-4 text-xs font-mono text-foreground/50">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </span>
+                  {post.views !== undefined && (
+                    <>
+                      <span className="text-foreground/30">•</span>
+                      <span>{post.views.toLocaleString()} {post.views === 1 ? 'view' : 'views'}</span>
+                    </>
+                  )}
                 </div>
 
                 {/* Title */}
