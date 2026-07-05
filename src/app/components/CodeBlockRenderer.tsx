@@ -36,7 +36,7 @@ export default function CodeBlockRenderer({ value }: { value: any }) {
         </div>
         <button
           onClick={handleCopy}
-          className="p-1.5 rounded-md hover:bg-foreground/10 text-foreground/50 hover:text-[#39FF14] transition-colors"
+          className="p-1.5 rounded-md hover:bg-foreground/10 text-foreground/80 hover:text-[#39FF14] transition-colors"
           aria-label="Copy code"
         >
           {copied ? <Check className="w-4 h-4 text-[#39FF14]" /> : <Copy className="w-4 h-4" />}
