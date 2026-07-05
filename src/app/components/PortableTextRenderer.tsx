@@ -2,6 +2,7 @@ import { PortableText } from "@portabletext/react";
 import { createImageUrlBuilder } from "@sanity/image-url";
 import { client } from "@/lib/sanity/client";
 import Image from "next/image";
+import CodeBlockRenderer from "./CodeBlockRenderer";
 
 const builder = createImageUrlBuilder(client);
 function urlFor(source: any) {
@@ -25,6 +26,7 @@ const components = {
         </div>
       );
     },
+    code: ({ value }: any) => <CodeBlockRenderer value={value} />,
   },
   marks: {
     link: ({ children, value }: any) => {
