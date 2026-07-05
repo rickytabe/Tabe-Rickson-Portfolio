@@ -8,8 +8,8 @@ import BlogListClient from "../components/BlogListClient";
 import { getPageViews } from "@/lib/vercel/analytics";
 
 export const metadata: Metadata = {
-  title: "Blog | Tabe Rickson",
-  description: "FAQ-style posts answering common tech questions and deep dives into software engineering.",
+  title: "The Blog | Tabe Rickson",
+  description: "Exploring questions and sharing insights on life, nature, science, and technology.",
   alternates: {
     canonical: "/blog",
   },
@@ -39,10 +39,10 @@ export default async function BlogIndex() {
         <main className="flex-1 pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto w-full">
           <div className="mb-16">
             <h1 className="text-4xl md:text-6xl font-black font-sans tracking-tighter uppercase mb-4 text-foreground">
-              Tech <span className="text-[#39FF14]">Blog</span>
+              The <span className="text-[#39FF14]">Blog</span>
             </h1>
             <p className="text-foreground/60 text-lg max-w-2xl font-inter">
-              Thoughts, tutorials, and deep-dives into full-stack web and mobile development, AI integration, and systems architecture.
+              Exploring the intersections of life, nature, science, and technology. Answering curious questions and documenting the journey.
             </p>
           </div>
 

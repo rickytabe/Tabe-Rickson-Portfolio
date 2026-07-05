@@ -18,7 +18,7 @@ export async function getPageViews(slug: string): Promise<number | null> {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 3600 }, // Cache the result for 1 hour
+      next: { revalidate: 60 }, // Cache the result for 60 seconds
     });
 
     console.log("Response status:", response.status);
