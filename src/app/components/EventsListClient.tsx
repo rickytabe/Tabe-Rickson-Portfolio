@@ -28,9 +28,9 @@ export default function EventsListClient({ initialEvents }: { initialEvents: any
     <div>
       {/* Controls Bar */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-        <div className="relative w-full md:w-96">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground/40">
-            <Search size={18} />
+        <div className="relative group w-full md:w-96">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+            <Search size={18} className="text-foreground/40 group-focus-within:text-[#39FF14] transition-colors" />
           </div>
           <input
             type="text"

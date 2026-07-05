@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import { AnimatedText } from "@/components/ui/animated-text";
 import portfolioData from "../../../portfolio-data.json";
@@ -110,16 +110,6 @@ export default function Contact() {
 
   return (
     <section id="contact" className={SECTION_STYLES.wrapper}>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            fontSize: '16px',
-            padding: '16px 24px',
-            maxWidth: '500px',
-          }
-        }}
-      />
       <div className={SECTION_STYLES.container}>
         {/* Backdrop text */}
         <div className={SECTION_STYLES.backdropWrapper}>

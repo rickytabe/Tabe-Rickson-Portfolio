@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { AnimatedText } from "@/components/ui/animated-text";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import portfolioData from "../../../portfolio-data.json";
@@ -98,16 +98,6 @@ export default function LetsWorkPage() {
   return (
     <InteractiveBackground>
       <main className="relative min-h-screen bg-transparent text-foreground pt-20 pb-24 px-6 md:px-12 overflow-hidden">
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            fontSize: '16px',
-            padding: '16px 24px',
-            maxWidth: '500px',
-          }
-        }}
-      />
       <div className="relative z-10 max-w-[1400px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

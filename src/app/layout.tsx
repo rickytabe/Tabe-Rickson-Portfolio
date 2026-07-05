@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
 import Navbar from "./components/Navbar";
+import { Toaster } from "react-hot-toast";
 import portfolioData from "../../portfolio-data.json";
 
 const spaceGrotesk = Space_Grotesk({
@@ -113,6 +114,17 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Analytics />
+          <Toaster 
+            position="top-center" 
+            toastOptions={{
+              style: {
+                fontSize: '16px',
+                padding: '16px 24px',
+                maxWidth: '500px',
+              }
+            }}
+            containerStyle={{ zIndex: 999999 }}
+          />
         </ThemeProvider>
       </body>
     </html>
