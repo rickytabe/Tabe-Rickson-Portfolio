@@ -21,6 +21,12 @@ const tagLinks = [
   { label: "EVENTS", href: "/events" },
 ];
 
+const mobileContentLinks = [
+  { label: "BLOGS", href: "/blog" },
+  { label: "EVENTS", href: "/events" },
+  { label: "PROJECTS", href: "/projects" },
+];
+
 export default function Navbar() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("Home");
@@ -31,6 +37,11 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Detect if we're on the home page or a sub-page
+  const isOnHomePage = pathname === '/';
+  // Check if current path matches a tag/content link
+  const activeTagPath = tagLinks.find(l => pathname.startsWith(l.href))?.href ?? null;
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 0);
@@ -76,7 +87,24 @@ export default function Navbar() {
     }
   }, []);
 
+  // Handle scrolling to hash when navigating from another page
   useEffect(() => {
+    if (isOnHomePage && window.location.hash) {
+      const hash = window.location.hash.substring(1); // Remove the #
+      // Add a slight delay to ensure the page has rendered
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 300);
+    }
+  }, [isOnHomePage, pathname]);
+
+  useEffect(() => {
+    // Only track scroll sections when on the home page
+    if (!isOnHomePage) return;
+
     const updateActiveSection = () => {
       setHasScrolled(window.scrollY > 0);
 
@@ -113,7 +141,14 @@ export default function Navbar() {
       window.removeEventListener("scroll", updateActiveSection);
       window.removeEventListener("resize", updateActiveSection);
     };
-  }, []);
+  }, [isOnHomePage]);
+
+  // On non-home pages, clear the section active state so no pill highlights a section
+  useEffect(() => {
+    if (!isOnHomePage) {
+      setActiveSection("");
+    }
+  }, [isOnHomePage]);
 
   // Update sliding pill position
   useEffect(() => {
@@ -165,13 +200,13 @@ export default function Navbar() {
     <>
       <nav
         id="main-navbar"
-        className="fixed top-0 left-0 w-full z-50"
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 lg:opacity-100 lg:pointer-events-auto ${isMobileMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"}`}
         style={{
           background: hasScrolled ? "color-mix(in srgb, var(--background) 75%, transparent)" : "transparent",
           backdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
           WebkitBackdropFilter: hasScrolled ? "blur(12px) saturate(160%)" : "none",
           borderBottom: hasScrolled ? "1px solid var(--card-border)" : "1px solid transparent",
-          transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease",
+          transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease, opacity 250ms ease",
         }}
       >
         <div className="mx-auto flex items-center justify-between px-6 py-3 max-w-[1400px]">
@@ -196,7 +231,7 @@ export default function Navbar() {
               underlineClassName="text-[#39FF14]"
             />
             <span
-              className="hidden sm:inline text-base lg:text-2xl font-light font-sans text-foreground/40"
+              className="text-base lg:text-2xl font-light font-sans text-foreground/40"
             >
               / 2026
             </span>
@@ -275,6 +310,7 @@ export default function Navbar() {
             {/* Tag Links with liquid-glass styling */}
             {tagLinks.map((link) => {
               const isHovered = hoveredLink === link.label;
+              const isActiveTag = pathname.startsWith(link.href);
               return (
                 <a
                   key={link.label}
@@ -282,9 +318,11 @@ export default function Navbar() {
                   href={link.href}
                   className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono"
                   style={{
-                    color: isHovered ? "var(--foreground)" : "var(--muted)",
+                    color: isActiveTag || isHovered ? "var(--neon-green)" : "var(--muted)",
                     textDecoration: "none",
                     borderRadius: "2px",
+                    border: isActiveTag ? "1px solid rgba(57,255,20,0.4)" : undefined,
+                    background: isActiveTag ? "rgba(57,255,20,0.08)" : undefined,
                   }}
                   onClick={(e) => {
                     e.preventDefault();
@@ -295,7 +333,7 @@ export default function Navbar() {
                 >
                   <span
                     className="inline-block w-1 h-1 rounded-full"
-                    style={{ backgroundColor: "#39FF14", position: "relative", zIndex: 2 }}
+                    style={{ backgroundColor: isActiveTag ? "#39FF14" : "#39FF14", position: "relative", zIndex: 2, boxShadow: isActiveTag ? "0 0 4px rgba(57,255,20,0.8)" : "none" }}
                   />
                   <span>{link.label}</span>
                 </a>
@@ -390,18 +428,21 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-500 ease-in-out lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-50 transition-all duration-500 ease-in-out lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         style={{ background: "color-mix(in srgb, var(--background) 97%, transparent)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)" }}
       >
-        {/* Menu Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-card-border" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 1rem)" }}>
+        {/* Menu Header - acts as the navbar when menu is open */}
+        <div
+          className="flex items-center justify-between px-6 border-b border-card-border"
+          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 0.75rem)", paddingBottom: "0.75rem" }}
+        >
           <div>
             <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/40 uppercase mb-0.5">Navigation</p>
             <h2 className="text-2xl font-black font-sans tracking-tight text-foreground">MENU</h2>
           </div>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="w-10 h-10 flex items-center justify-center rounded-xl border border-card-border bg-card-bg text-foreground/60 hover:text-[#39FF14] hover:border-[#39FF14]/40 transition-all duration-300 font-mono text-xs tracking-widest"
+            className="w-12 h-12 flex items-center justify-center rounded-xl border border-card-border bg-card-bg text-foreground/60 hover:text-[#39FF14] hover:border-[#39FF14]/40 transition-all duration-300 text-2xl"
             aria-label="Close menu"
           >
             ✕
@@ -413,7 +454,8 @@ export default function Navbar() {
           {/* 2-Column Nav Grid */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             {navLinks.map((link) => {
-              const isActive = activeSection === link.label;
+              // On home page, use scroll-based active section. On other pages, nothing is active.
+              const isActive = isOnHomePage && activeSection === link.label;
               return (
                 <a
                   key={link.label}
@@ -421,11 +463,12 @@ export default function Navbar() {
                   onClick={(e) => {
                     e.preventDefault();
                     setIsMobileMenuOpen(false);
-                    if (pathname === '/') {
+                    if (isOnHomePage) {
                       setTimeout(() => {
                         document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
                       }, 100);
                     } else {
+                      // Navigate to home page then scroll to section
                       router.push(link.href);
                     }
                   }}
@@ -446,26 +489,39 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Divider + Tag Links */}
+          {/* Content Links (mobile only) - includes Projects */}
           <div className="mb-6">
             <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/30 uppercase mb-3">Content</p>
             <div className="grid grid-cols-2 gap-3">
-              {tagLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsMobileMenuOpen(false);
-                    router.push(link.href);
-                  }}
-                  className="flex items-center gap-2.5 px-5 py-4 rounded-2xl border border-card-border bg-card-bg text-[#39FF14] hover:border-[#39FF14]/40 transition-all duration-300 font-mono"
-                  style={{ textDecoration: "none" }}
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#39FF14] shrink-0" style={{ boxShadow: "0 0 6px rgba(57,255,20,0.6)" }} />
-                  <span className="text-sm font-bold tracking-widest">{link.label}</span>
-                </a>
-              ))}
+              {mobileContentLinks.map((link) => {
+                const isActiveContent = pathname.startsWith(link.href);
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      router.push(link.href);
+                    }}
+                    className={`flex items-center gap-2.5 px-5 py-4 rounded-2xl border transition-all duration-300 font-mono ${
+                      isActiveContent
+                        ? "border-[#39FF14]/50 bg-[#39FF14]/10 text-[#39FF14]"
+                        : "border-card-border bg-card-bg text-foreground/60 hover:border-[#39FF14]/30 hover:text-[#39FF14]"
+                    }`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{
+                        backgroundColor: "#39FF14",
+                        boxShadow: isActiveContent ? "0 0 6px rgba(57,255,20,0.8)" : "0 0 4px rgba(57,255,20,0.4)"
+                      }}
+                    />
+                    <span className="text-sm font-bold tracking-widest">{link.label}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
 
