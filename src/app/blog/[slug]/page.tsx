@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import { createImageUrlBuilder } from "@sanity/image-url";
 import { getPageViews } from "@/lib/vercel/analytics";
 import Image from "next/image";
+import ShareWidget from "../../components/ShareWidget";
 
 const builder = createImageUrlBuilder(client);
 function urlFor(source: any) {
@@ -80,46 +81,55 @@ export default async function BlogPostPage({ params }: Props) {
       <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
         <Navbar />
         
-        <article className="flex-1 pt-32 pb-20 px-6 md:px-12 max-w-4xl mx-auto w-full">
-          <Link href="/blog" className="inline-flex items-center gap-2 text-foreground/60 hover:text-[#39FF14] transition-colors mb-8 font-mono text-sm uppercase tracking-widest">
-            <ArrowLeft size={16} /> Back to Blog
-          </Link>
-          
-          <header className="mb-10">
-            <div className="flex items-center gap-2 text-[#39FF14] font-mono text-sm mb-4">
-              <span>{new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-              {views !== null && (
-                <>
-                  <span className="text-foreground/30">•</span>
-                  <span>{Math.max(views, 1).toLocaleString()} {Math.max(views, 1) === 1 ? 'view' : 'views'}</span>
-                </>
+        <div className="flex-1 pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto w-full">
+          <article className="bg-background/80 backdrop-blur-2xl border border-card-border rounded-3xl p-6 md:p-12 shadow-2xl">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-foreground/60 hover:text-[#39FF14] transition-colors mb-8 font-mono text-sm uppercase tracking-widest">
+              <ArrowLeft size={16} /> Back to Blog
+            </Link>
+            
+            <header className="mb-10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <div className="flex items-center gap-2 text-[#39FF14] font-mono text-sm mb-4">
+                    <span>{new Date(post.publishedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    {views !== null && (
+                      <>
+                        <span className="text-foreground/30">•</span>
+                        <span>{Math.max(views, 1).toLocaleString()} {Math.max(views, 1) === 1 ? 'view' : 'views'}</span>
+                      </>
+                    )}
+                  </div>
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tight mb-6">
+                    {post.title}
+                  </h1>
+                </div>
+              </div>
+              <div className="shrink-0">
+                  <ShareWidget url={`/blog/${slug}`} title={post.title} />
+                </div>
+            </header>
+
+            {post.mainImage && (
+              <div className="relative w-full aspect-video bg-card-bg border border-card-border rounded-2xl overflow-hidden mb-12 shadow-xl">
+                <Image 
+                  src={urlFor(post.mainImage).url()}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            )}
+
+            <div className="prose prose-invert max-w-none">
+              {post.body ? (
+                <PortableTextRenderer value={post.body} />
+              ) : (
+                <p className="text-foreground/50 italic">Content is missing.</p>
               )}
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tight mb-6">
-              {post.title}
-            </h1>
-          </header>
-
-          {post.mainImage && (
-            <div className="relative w-full aspect-video bg-card-bg border border-card-border rounded-2xl overflow-hidden mb-12 shadow-xl">
-              <Image 
-                src={urlFor(post.mainImage).url()}
-                alt={post.title}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-          )}
-
-          <div className="prose prose-invert max-w-none">
-            {post.body ? (
-              <PortableTextRenderer value={post.body} />
-            ) : (
-              <p className="text-foreground/50 italic">Content is missing.</p>
-            )}
-          </div>
-        </article>
+          </article>
+        </div>
       </div>
     </InteractiveBackground>
   );
