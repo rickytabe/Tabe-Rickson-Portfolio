@@ -192,11 +192,11 @@ export default function Navbar() {
             />
             <AnimatedText
               text="Tabe Rickson"
-              textClassName="text-2xl font-bold font-sans text-foreground"
+              textClassName="text-base lg:text-2xl font-bold font-sans text-foreground"
               underlineClassName="text-[#39FF14]"
             />
             <span
-              className="text-2xl font-light font-sans text-foreground/40"
+              className="hidden sm:inline text-base lg:text-2xl font-light font-sans text-foreground/40"
             >
               / 2026
             </span>
@@ -355,41 +355,34 @@ export default function Navbar() {
           </div>
 
           {/* Mobile: Hamburger Button & Theme Toggle */}
-          <div className="lg:hidden flex items-center gap-3">
+          <div className="lg:hidden flex items-center gap-2">
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 transition-colors duration-300 rounded-full hover:bg-white/10"
+                className="p-2.5 transition-colors duration-300 rounded-full hover:bg-foreground/10"
                 aria-label="Toggle Theme"
               >
                 {theme === "dark" ? (
-                  <Sun className="w-4 h-4 text-foreground" />
+                  <Sun className="w-5 h-5 text-foreground" />
                 ) : (
-                  <Moon className="w-4 h-4 text-foreground" />
+                  <Moon className="w-5 h-5 text-foreground" />
                 )}
               </button>
             )}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors p-2"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              className="relative flex flex-col justify-center items-center w-11 h-11 rounded-xl border border-card-border bg-card-bg hover:border-[#39FF14]/40 transition-all duration-300"
             >
-              <span className="text-[10px] font-medium tracking-widest font-mono">
-                {isMobileMenuOpen ? "CLOSE" : "MENU"}
-              </span>
-              <div className="flex flex-col gap-1">
-                <span
-                  className={`block h-px w-4 bg-current transition-transform duration-300 ${isMobileMenuOpen ? "translate-y-1.5 rotate-45" : ""
-                    }`}
-                />
-                <span
-                  className={`block h-px w-4 bg-current transition-opacity duration-300 ${isMobileMenuOpen ? "opacity-0" : ""
-                    }`}
-                />
-                <span
-                  className={`block h-px w-4 bg-current transition-transform duration-300 ${isMobileMenuOpen ? "-translate-y-1.5 -rotate-45" : ""
-                    }`}
-                />
-              </div>
+              <span
+                className={`block h-[2px] w-6 bg-foreground rounded-full transition-all duration-300 ${isMobileMenuOpen ? "translate-y-[7px] rotate-45" : ""}`}
+              />
+              <span
+                className={`block h-[2px] w-6 bg-foreground rounded-full transition-all duration-300 mt-[5px] ${isMobileMenuOpen ? "opacity-0 scale-x-0" : ""}`}
+              />
+              <span
+                className={`block h-[2px] w-6 bg-foreground rounded-full transition-all duration-300 mt-[5px] ${isMobileMenuOpen ? "-translate-y-[7px] -rotate-45" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -397,58 +390,89 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-xl transition-all duration-500 ease-in-out lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 z-40 transition-all duration-500 ease-in-out lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        style={{ background: "color-mix(in srgb, var(--background) 97%, transparent)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)" }}
       >
-        <div className="flex flex-col items-center h-full gap-6 px-6 pt-32 pb-12 overflow-y-auto">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.label;
+        {/* Menu Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-card-border" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 1rem)" }}>
+          <div>
+            <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/40 uppercase mb-0.5">Navigation</p>
+            <h2 className="text-2xl font-black font-sans tracking-tight text-foreground">MENU</h2>
+          </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-10 h-10 flex items-center justify-center rounded-xl border border-card-border bg-card-bg text-foreground/60 hover:text-[#39FF14] hover:border-[#39FF14]/40 transition-all duration-300 font-mono text-xs tracking-widest"
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+        </div>
 
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMobileMenuOpen(false);
-                  if (pathname === '/') {
-                    setTimeout(() => {
-                      document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  } else {
-                    router.push(link.href);
-                  }
-                }}
-                className={`relative w-full max-w-[280px] px-6 py-3 text-center text-2xl font-bold tracking-widest transition-all duration-300 font-mono ${isActive ? "text-[#39FF14] neon-text bg-[#39FF14]/10" : "text-foreground/60 hover:text-foreground"
+        <div className="flex flex-col h-[calc(100%-73px)] px-6 pt-6 pb-8 overflow-y-auto">
+
+          {/* 2-Column Nav Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.label;
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMobileMenuOpen(false);
+                    if (pathname === '/') {
+                      setTimeout(() => {
+                        document.getElementById(link.sectionId)?.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                    } else {
+                      router.push(link.href);
+                    }
+                  }}
+                  className={`relative flex flex-col justify-between px-5 py-4 rounded-2xl border transition-all duration-300 font-mono group ${
+                    isActive
+                      ? "border-[#39FF14]/50 bg-[#39FF14]/10 text-[#39FF14]"
+                      : "border-card-border bg-card-bg text-foreground/70 hover:border-[#39FF14]/30 hover:text-foreground hover:bg-card-bg"
                   }`}
-                style={{
-                  textDecoration: "none",
-                  borderRadius: "8px",
-                }}
-              >
-                <span>{link.label}</span>
-              </a>
-            );
-          })}
+                  style={{ textDecoration: "none", minHeight: "80px" }}
+                >
+                  {isActive && (
+                    <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-[#39FF14]" />
+                  )}
+                  <span className="text-[10px] tracking-widest opacity-50 uppercase">0{navLinks.indexOf(navLinks.find(l => l.label === link.label)!) + 1}</span>
+                  <span className="text-lg font-bold tracking-tight">{link.label}</span>
+                </a>
+              );
+            })}
+          </div>
 
-          <div className="w-12 h-px bg-white/10 my-4" />
+          {/* Divider + Tag Links */}
+          <div className="mb-6">
+            <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/30 uppercase mb-3">Content</p>
+            <div className="grid grid-cols-2 gap-3">
+              {tagLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMobileMenuOpen(false);
+                    router.push(link.href);
+                  }}
+                  className="flex items-center gap-2.5 px-5 py-4 rounded-2xl border border-card-border bg-card-bg text-[#39FF14] hover:border-[#39FF14]/40 transition-all duration-300 font-mono"
+                  style={{ textDecoration: "none" }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#39FF14] shrink-0" style={{ boxShadow: "0 0 6px rgba(57,255,20,0.6)" }} />
+                  <span className="text-sm font-bold tracking-widest">{link.label}</span>
+                </a>
+              ))}
+            </div>
+          </div>
 
-          {tagLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                setIsMobileMenuOpen(false);
-                router.push(link.href);
-              }}
-              className="text-sm tracking-widest text-[#39FF14] neon-text hover:text-[#4dff33] transition-colors flex items-center gap-2"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-current" />
-              {link.label}
-            </a>
-          ))}
+          {/* Spacer */}
+          <div className="flex-1" />
 
+          {/* CTA */}
           <a
             href="/lets-work"
             onClick={(e) => {
@@ -456,9 +480,14 @@ export default function Navbar() {
               setIsMobileMenuOpen(false);
               router.push('/lets-work');
             }}
-            className="mt-8 px-8 py-3 text-sm font-semibold tracking-widest bg-[#39FF14] text-[#121212] transition-colors hover:bg-foreground hover:text-background text-center"
+            className="group relative flex items-center justify-center gap-3 w-full py-4 text-sm font-bold tracking-widest text-[#121212] overflow-hidden transition-all duration-300 font-mono rounded-2xl"
+            style={{ backgroundColor: "#39FF14", textDecoration: "none" }}
           >
-            LET&apos;S WORK
+            <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+            <span className="relative z-10">LET&apos;S WORK TOGETHER</span>
+            <svg className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" width="14" height="14" viewBox="0 0 10 10" fill="none">
+              <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </a>
         </div>
       </div>
