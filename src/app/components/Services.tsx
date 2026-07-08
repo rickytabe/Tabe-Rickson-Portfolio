@@ -204,7 +204,7 @@ function ServiceCard({ service, idx }: { service: Service; idx: number }) {
                 src={tech.src}
                 width={size}
                 height={size}
-                alt=""
+                alt={`${tech.name} technology icon`}
                 className={mounted && resolvedTheme === "dark" ? "invert" : ""}
                 style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
               />

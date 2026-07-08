@@ -178,7 +178,7 @@ export default function About() {
         {mounted && (
           <Image
             src={resolvedTheme === 'light' ? "/globe.png" : "/globe-light.png"}
-            alt=""
+            alt="Decorative globe illustration"
             width={350}
             height={350}
             sizes="(max-width: 767px) 200px, (max-width: 1023px) 300px, 350px"

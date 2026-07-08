@@ -230,7 +230,7 @@ export default function ProjectsGallery() {
         <div className="sticky top-[30vh] mt-[15vh] md:mt-[20vh] left-0 right-0 mx-auto w-[250px] md:w-[400px] lg:w-[500px] opacity-[0.12] animate-float" style={{ animationDuration: '10s' }}>
           <Image
             src="/code-symbol.png"
-            alt=""
+            alt="Decorative code symbol"
             width={500}
             height={500}
             sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"
@@ -238,7 +238,7 @@ export default function ProjectsGallery() {
           />
           <Image
             src="/code-symbol-light.png"
-            alt=""
+            alt="Decorative code symbol"
             width={500}
             height={500}
             sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"

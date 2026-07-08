@@ -118,14 +118,14 @@ export default async function ProjectPage({ params }: Props) {
                 {project.description}
               </p>
             </div>
-            <div className="flex-shrink-0 md:pt-2">
+            <div className="shrink-0 md:pt-2">
               <ShareWidget url={`/projects/${project.slug}`} title={project.name} />
             </div>
           </div>
         </header>
 
         {/* Main Image */}
-        <div className="relative w-full aspect-video md:aspect-[21/9] bg-card-bg border border-card-border rounded-3xl overflow-hidden mb-16 shadow-2xl">
+        <div className="relative w-full aspect-video md:aspect-21/9 bg-card-bg border border-card-border rounded-3xl overflow-hidden mb-16 shadow-2xl">
           <Image 
             src={project.image} 
             alt={project.name} 
