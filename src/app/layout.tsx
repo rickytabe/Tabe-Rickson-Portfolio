@@ -92,14 +92,26 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
+              "@id": "https://taberickson.com/#person",
               "name": "Tabe Rickson",
               "jobTitle": "Full-Stack Web & Mobile Software Engineer",
               "url": "https://taberickson.com",
+              "image": "https://taberickson.com/my-pic1.png",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Buea",
+                "addressCountry": "Cameroon"
+              },
+              "worksFor": {
+                "@type": "Organization",
+                "name": "NestBridge"
+              },
               "sameAs": [
                 portfolioData.socials.github,
                 portfolioData.socials.linkedin,
                 portfolioData.socials.twitter
-              ].filter(Boolean)
+              ].filter(Boolean),
+              "knowsAbout": Array.from(new Set(portfolioData.projects.flatMap(p => p.techIcons)))
             })
           }}
         />

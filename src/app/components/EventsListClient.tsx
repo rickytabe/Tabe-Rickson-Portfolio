@@ -41,22 +41,6 @@ export default function EventsListClient({ initialEvents }: { initialEvents: any
           />
         </div>
 
-        <div className="flex items-center gap-2 bg-card-bg/50 border border-card-border p-1 rounded-lg">
-          <button
-            onClick={() => setViewMode('list')}
-            className={`p-2 rounded transition-colors ${viewMode === 'list' ? 'bg-[#39FF14]/10 text-[#39FF14]' : 'text-foreground/40 hover:text-foreground/80'}`}
-            title="List View"
-          >
-            <List size={20} />
-          </button>
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-2 rounded transition-colors ${viewMode === 'grid' ? 'bg-[#39FF14]/10 text-[#39FF14]' : 'text-foreground/40 hover:text-foreground/80'}`}
-            title="Grid View"
-          >
-            <LayoutGrid size={20} />
-          </button>
-        </div>
       </div>
 
       {/* Events Display */}

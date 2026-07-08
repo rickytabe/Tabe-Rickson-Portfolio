@@ -82,15 +82,12 @@ export default async function ProjectPage({ params }: Props) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
+              "@type": "CreativeWork",
               "name": project.name,
               "description": project.description,
-              "applicationCategory": "WebApplication",
               "url": project.liveUrl || `https://taberickson.com/projects/${project.slug}`,
               "author": {
-                "@type": "Person",
-                "name": "Tabe Rickson",
-                "url": "https://taberickson.com"
+                "@id": "https://taberickson.com/#person"
               },
               "image": `https://taberickson.com${project.image}`
             })

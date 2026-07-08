@@ -83,6 +83,23 @@ export default async function BlogPostPage({ params }: Props) {
         
         <div className="flex-1 pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto w-full">
           <article className="bg-background/80 backdrop-blur-2xl border border-card-border rounded-3xl p-6 md:p-12 shadow-2xl">
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BlogPosting",
+                  "headline": post.title,
+                  "description": post.excerpt,
+                  "image": post.mainImage ? urlFor(post.mainImage).url() : "https://taberickson.com/opengraph-image.png",
+                  "datePublished": post.publishedAt,
+                  "url": `https://taberickson.com/blog/${slug}`,
+                  "author": {
+                    "@id": "https://taberickson.com/#person"
+                  }
+                })
+              }}
+            />
             <Link href="/blog" className="inline-flex items-center gap-2 text-foreground/60 hover:text-[#39FF14] transition-colors mb-8 font-mono text-sm uppercase tracking-widest">
               <ArrowLeft size={16} /> Back to Blog
             </Link>
