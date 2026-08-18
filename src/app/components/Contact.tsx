@@ -272,13 +272,23 @@ export default function Contact() {
                       <div className="relative z-10">
                         <h4 className="text-foreground font-sans font-bold text-lg mb-2">Want to hire me or start a project?</h4>
                         <p className="text-foreground/70 font-inter text-xs mb-5 max-w-sm">I have a dedicated short-form to collect your requirements quickly and get back to you.</p>
-                        <button
-                          type="button"
-                          onClick={() => router.push('/lets-work')}
-                          className="px-5 py-2 text-[10px] font-mono tracking-widest uppercase border border-[#39FF14] text-[#39FF14] bg-background hover:bg-[#39FF14] hover:text-[#121212] transition-colors duration-300"
-                        >
-                          Let&apos;s Work
-                        </button>
+                        <div className="flex gap-4">
+                          <button
+                            type="button"
+                            onClick={() => router.push('/lets-work')}
+                            className="px-5 py-2 text-[10px] font-mono tracking-widest uppercase border border-[#39FF14] text-[#39FF14] bg-background hover:bg-[#39FF14] hover:text-[#121212] transition-colors duration-300"
+                          >
+                            Let&apos;s Work
+                          </button>
+                          <a
+                            href={portfolioData.socials.fiverr}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-5 py-2 text-[10px] font-mono tracking-widest uppercase border border-[#1dbf73] text-[#1dbf73] bg-background hover:bg-[#1dbf73] hover:text-white transition-colors duration-300 flex items-center justify-center"
+                          >
+                            Hire on Fiverr
+                          </a>
+                        </div>
                       </div>
                     </div>
 

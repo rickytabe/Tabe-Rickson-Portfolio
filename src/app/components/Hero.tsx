@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
+import portfolioData from "../../../portfolio-data.json";
 
 const DotLottieReact = dynamic(
   () => import("@lottiefiles/dotlottie-react").then((mod) => mod.DotLottieReact),
@@ -114,6 +115,15 @@ export default function Hero() {
               >
                 <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
                 <span className="relative z-10">LET&apos;S WORK</span>
+              </a>
+              <a
+                href={portfolioData.socials.fiverr}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-[#1dbf73]/50 hover:border-[#1dbf73] transition-all duration-300 font-mono"
+              >
+                <div className="absolute inset-0 bg-[#1dbf73]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
+                <span className="relative z-10 text-[#1dbf73] font-bold">FIVERR</span>
               </a>
             </div>
           </div>

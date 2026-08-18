@@ -18,18 +18,22 @@ export default function NewsletterForm() {
 
     setIsSubmitting(true);
     try {
-      // Add to Firestore with a timeout to prevent infinite loading if DB doesn't exist
-      const addDocPromise = addDoc(collection(db, "subscribers"), {
-        email,
-        firstName,
-        createdAt: serverTimestamp(),
-      });
+      try {
+        // Add to Firestore with a timeout to prevent infinite loading if DB doesn't exist
+        const addDocPromise = addDoc(collection(db, "subscribers"), {
+          email,
+          firstName,
+          createdAt: serverTimestamp(),
+        });
 
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timed out. Please check your Firebase Database.")), 5000);
-      });
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Request timed out. Please check your Firebase Database.")), 5000);
+        });
 
-      await Promise.race([addDocPromise, timeoutPromise]);
+        await Promise.race([addDocPromise, timeoutPromise]);
+      } catch (fbError) {
+        console.warn("Firebase save failed or timed out, proceeding to backend API...", fbError);
+      }
       
       // 2. Trigger the Welcome Email and Notification via Backend API
       const response = await fetch('/api/subscribe', {
