@@ -103,19 +103,19 @@ export default function LetsWorkPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16"
+          className="mb-16 flex flex-col items-center text-center"
         >
         
           
           <AnimatedText
             as="h1"
-            text={<>Let&apos;s Build<br />Something.</>}
-            className="items-start"
-            textClassName="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight font-sans text-left"
+            text={<>I Build Tech That<br />Solves Real Digital Problems.</>}
+            className="items-center"
+            textClassName="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight font-sans text-center"
             underlineClassName="text-[#39FF14]"
           />
-          <p className="text-foreground/60 font-inter max-w-2xl mt-6 text-lg">
-            Ready to start your next project? Fill out the form below with your details and I&apos;ll get back to you as soon as possible.
+          <p className="text-foreground/60 font-inter max-w-2xl mx-auto mt-6 text-lg text-center">
+            Stop wasting money on code that doesn&apos;t convert. I engineer high-performance web and mobile applications designed to scale your business and multiply your ROI. Let&apos;s talk about your next project.
           </p>
         </motion.div>
 
@@ -125,8 +125,45 @@ export default function LetsWorkPage() {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="space-y-10"
+            className="space-y-12"
           >
+            {/* ── Impact Metrics ── */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-5 border border-foreground/10 bg-card-bg/50 backdrop-blur-md relative overflow-hidden group hover:border-[#39FF14]/50 transition-colors duration-300">
+                <div className="text-3xl lg:text-4xl font-bold font-sans text-[#39FF14] mb-2 group-hover:scale-105 transition-transform duration-300">15+</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-foreground/50 group-hover:text-foreground/80 transition-colors">Projects Delivered</div>
+              </div>
+              <div className="p-5 border border-foreground/10 bg-card-bg/50 backdrop-blur-md relative overflow-hidden group hover:border-[#39FF14]/50 transition-colors duration-300">
+                <div className="text-3xl lg:text-4xl font-bold font-sans text-[#39FF14] mb-2 group-hover:scale-105 transition-transform duration-300">10x</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-foreground/50 group-hover:text-foreground/80 transition-colors">Sales Boost (Avg)</div>
+              </div>
+              <div className="p-5 border border-foreground/10 bg-card-bg/50 backdrop-blur-md relative overflow-hidden group hover:border-[#39FF14]/50 transition-colors duration-300 col-span-2">
+                <div className="text-3xl lg:text-4xl font-bold font-sans text-[#39FF14] mb-2 group-hover:scale-105 transition-transform duration-300">$5k+</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-foreground/50 group-hover:text-foreground/80 transition-colors">Generated For Clients</div>
+              </div>
+            </div>
+
+            {/* ── Success Story ── */}
+            <div className="p-6 md:p-8 border border-[#39FF14]/30 bg-[#39FF14]/5 relative overflow-hidden group backdrop-blur-md">
+               <div className="absolute inset-0 bg-[#39FF14]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0"></div>
+               <div className="relative z-10">
+                 <div className="flex items-center gap-2 mb-4">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                   <span className="text-xs font-mono tracking-widest uppercase text-[#39FF14]">Success Story</span>
+                 </div>
+                 <h4 className="text-foreground font-sans font-bold text-xl mb-3">How KMC Restaurant 10x&apos;d Daily Sales</h4>
+                 <p className="text-foreground/70 font-inter text-sm leading-relaxed mb-4">
+                   By digitizing their ordering process and building a high-speed mobile-first platform, we completely transformed their business model, drastically improved operational efficiency, and opened up entirely new revenue streams.
+                 </p>
+                 <a href="/projects/kmc-restaurant" className="inline-flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-[#39FF14] hover:text-foreground transition-colors group/link">
+                   Read Case Study
+                   <svg className="transition-transform duration-300 group-hover/link:translate-x-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                 </a>
+               </div>
+            </div>
+
+            {/* ── Divider ── */}
+            <div className="h-px w-full bg-foreground/10"></div>
             <div>
               <h3 className={`${labelClasses} !text-sm !text-foreground/80 mb-6`}>Direct Contact</h3>
               <div className="space-y-4">
@@ -328,7 +365,7 @@ export default function LetsWorkPage() {
                           </>
                         ) : (
                           <>
-                            Send Inquiry
+                            Start Your Transformation
                             <SendIcon size={16} />
                           </>
                         )}
