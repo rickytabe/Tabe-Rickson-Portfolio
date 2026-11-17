@@ -1,8 +1,15 @@
-import { readFileSync } from "fs";
-import path from "path";
 import type { Metadata } from "next";
 import { Fraunces } from "next/font/google";
 import BookReader, { type BookPart } from "./BookReader";
+import {
+  BOOK_AUTHOR,
+  BOOK_AUTHOR_AVATAR,
+  BOOK_CHAPTERS,
+  BOOK_PATH,
+  formatReadTime,
+  readBookHtml,
+  readingMinutes,
+} from "./book-meta";
 import "./book.css";
 
 // The illustrations' SVG text is set in Fraunces; the rest of the book uses the site fonts.
@@ -14,7 +21,8 @@ const fraunces = Fraunces({
 });
 
 const siteUrl = "https://taberickson.com";
-const pageUrl = `${siteUrl}/algorithms-made-easy-csc207`;
+const pageUrl = `${siteUrl}${BOOK_PATH}`;
+const minutes = readingMinutes(readBookHtml());
 const pdfPath = "/algorithms-made-easy-csc207/csc207-made-easy.pdf";
 const ogImage = "/algorithms-made-easy-csc207/og.png";
 
@@ -86,6 +94,7 @@ const jsonLd = {
       isAccessibleForFree: true,
       bookFormat: "https://schema.org/EBook",
       numberOfPages: 68,
+      timeRequired: `PT${minutes}M`,
       genre: "Computer science",
       educationalLevel: "Undergraduate",
       learningResourceType: "Textbook",
@@ -185,6 +194,22 @@ function addSubheadingIds(html: string): string {
   });
 }
 
+const icon = (d: string) =>
+  `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+
+// Author, read time and chapters are part of the page HTML; the view count is filled in by the reader.
+function statsHtml(): string {
+  return `<div class="book-stats">
+    <a class="bs-author" href="/" rel="author">
+      <img class="bs-avatar" src="${BOOK_AUTHOR_AVATAR}" alt="" width="34" height="34" />
+      <span><span class="bs-label">Written by</span><span class="bs-name">${BOOK_AUTHOR}</span></span>
+    </a>
+    <span class="bs-item">${icon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}${formatReadTime(minutes)}</span>
+    <span class="bs-item">${icon('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/>')}${BOOK_CHAPTERS} chapters</span>
+    <span class="bs-item bs-views" data-book-views></span>
+  </div>`;
+}
+
 // The sidebar's order and parts come from the book's own "What is inside" list.
 function parseContents(html: string): BookPart[] {
   const toc = html.slice(html.indexOf('<div class="toc"'), html.indexOf('<div class="box note">'));
@@ -206,9 +231,7 @@ function parseContents(html: string): BookPart[] {
 }
 
 export default function AlgorithmsBook() {
-  const html = addSubheadingIds(
-    readFileSync(path.join(process.cwd(), "src/app/algorithms-made-easy-csc207/content.html"), "utf8")
-  );
+  const html = addSubheadingIds(readBookHtml()).replace("<!--book-stats-->", statsHtml());
   const parts = parseContents(html);
 
   return (

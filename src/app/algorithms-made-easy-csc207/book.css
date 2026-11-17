@@ -71,9 +71,8 @@ html:not(.dark) .book {
   top: var(--nav-h);
   z-index: 40;
   margin-top: var(--nav-h);
-  background: color-mix(in srgb, var(--background) 98%, transparent);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  /* Solid: a translucent bar let the text scrolling underneath show through. */
+  background: var(--background);
   border-bottom: 1px solid var(--card-border);
 }
 /* The site navbar is transparent off the home page, so back it while reading */
@@ -527,6 +526,85 @@ a.is-active .book-toc-num {
   max-width: 600px;
   margin: 0;
 }
+/* stats row under the subtitle: author, read time, chapters, views */
+.book-content .book-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  margin: 26px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--b-line);
+  border-bottom: 1px solid var(--b-line);
+}
+.book-content .bs-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 4px;
+  text-decoration: none;
+  color: inherit;
+}
+.book-content .bs-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 3px color-mix(in srgb, var(--b-accent) 55%, transparent);
+}
+.book-content .bs-author > span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.book-content .bs-label {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--b-faint);
+}
+.book-content .bs-name {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  transition: color 0.15s;
+}
+.book-content .bs-author:hover .bs-name {
+  color: var(--b-accent);
+}
+.book-content .bs-item,
+.book-content .bs-views-in {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--b-soft);
+  white-space: nowrap;
+}
+.book-content .bs-item svg,
+.book-content .bs-views-in svg {
+  color: var(--b-accent);
+  flex: 0 0 auto;
+}
+@media (max-width: 560px) {
+  .book-content .bs-author {
+    flex-basis: 100%;
+  }
+}
+.book-content .bs-views:empty {
+  display: none;
+}
+.book-content .bs-views-in {
+  animation: bs-fade 0.4s ease both;
+}
+@keyframes bs-fade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
 .book-content .coverart {
   margin: 34px 0 0;
   padding: 18px;

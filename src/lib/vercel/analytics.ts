@@ -1,4 +1,10 @@
+/** Page views for a blog post (production, from Vercel Web Analytics). */
 export async function getPageViews(slug: string): Promise<number | null> {
+  return getPathViews(`/blog/${slug}`);
+}
+
+/** Page views for any site path, e.g. "/algorithms-made-easy-csc207". */
+export async function getPathViews(path: string): Promise<number | null> {
   const projectId = process.env.VERCEL_PROJECT_ID;
   const token = process.env.VERCEL_API_TOKEN;
 
@@ -8,7 +14,7 @@ export async function getPageViews(slug: string): Promise<number | null> {
   }
 
   // Constructing OData filter for the specific path
-  const filter = encodeURIComponent(`requestPath eq '/blog/${slug}'`);
+  const filter = encodeURIComponent(`requestPath eq '${path}'`);
   const url = `https://api.vercel.com/v1/query/web-analytics/visits/count?projectId=${projectId}&filter=${filter}&environment=production`;
 
   try {
@@ -24,7 +30,7 @@ export async function getPageViews(slug: string): Promise<number | null> {
     console.log("Response status:", response.status);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch page views for ${slug}: ${response.statusText}`);
+      console.warn(`Failed to fetch page views for ${path}: ${response.statusText}`);
       const errText = await response.text();
       console.log("Error body:", errText);
       return null;
