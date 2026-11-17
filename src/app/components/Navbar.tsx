@@ -17,12 +17,12 @@ const navLinks = [
 ];
 
 const tagLinks = [
-  { label: "BLOGS", href: "/blog" },
+  { label: "BOOKS", href: "/books" },
   { label: "EVENTS", href: "/events" },
 ];
 
 const mobileContentLinks = [
-  { label: "BLOGS", href: "/blog" },
+  { label: "BOOKS", href: "/books" },
   { label: "EVENTS", href: "/events" },
   { label: "PROJECTS", href: "/projects" },
 ];
