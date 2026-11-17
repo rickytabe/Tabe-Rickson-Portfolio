@@ -1,0 +1,245 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUp, Download, List, X } from "lucide-react";
+
+export type BookChapter = { id: string; num: number; title: string };
+export type BookPart = { name: string; chapters: BookChapter[] };
+
+type Props = {
+  parts: BookPart[];
+  pdf: string;
+  className?: string;
+  children: React.ReactNode;
+};
+
+export default function BookReader({ parts, pdf, className = "", children }: Props) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const sideRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+
+  const chapters = parts.flatMap((p) => p.chapters);
+  const activeChapter = chapters.find((c) => c.id === active);
+
+  // Track the site navbar's height so the reading bar and sidebar sit right under it.
+  useEffect(() => {
+    const nav = document.getElementById("main-navbar");
+    const root = rootRef.current;
+    if (!nav || !root) return;
+    const set = () => root.style.setProperty("--nav-h", `${nav.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
+
+  // Reading progress, back-to-top, and which chapter is being read.
+  useEffect(() => {
+    const sections = chapters
+      .map((c) => document.getElementById(c.id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setProgress(max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0);
+      setShowTop(h.scrollTop > 800);
+
+      const line = (barRef.current?.getBoundingClientRect().bottom ?? 120) + 80;
+      let current: string | null = null;
+      for (const sec of sections) {
+        if (sec.getBoundingClientRect().top <= line) current = sec.id;
+        else break;
+      }
+      setActive(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+    // chapters come from static props; recomputing on every render is unnecessary
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the active chapter visible inside the sidebar list without scrolling the page.
+  const reveal = useCallback((container: HTMLElement | null) => {
+    if (!container || !active) return;
+    const link = container.querySelector<HTMLElement>(`a[href="#${active}"]`);
+    if (!link) return;
+    const top = link.offsetTop;
+    const bottom = top + link.offsetHeight;
+    if (top < container.scrollTop + 48) container.scrollTop = top - 48;
+    else if (bottom > container.scrollTop + container.clientHeight - 48)
+      container.scrollTop = bottom - container.clientHeight + 48;
+  }, [active]);
+
+  useEffect(() => reveal(sideRef.current), [reveal]);
+
+  // Drawer: lock page scroll, close on Escape, focus the current chapter.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    reveal(drawerRef.current);
+    const current = drawerRef.current?.querySelector<HTMLElement>('a[aria-current="true"]')
+      ?? drawerRef.current?.querySelector<HTMLElement>("a");
+    current?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [drawerOpen, reveal]);
+
+  // Close the drawer if the window grows to the sidebar layout.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => mq.matches && setDrawerOpen(false);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const contents = (onPick?: () => void) => (
+    <>
+      {parts.map((part) => (
+        <div key={part.name} className="book-toc-part">
+          <p className="book-toc-label">{part.name}</p>
+          <ol>
+            {part.chapters.map((c) => {
+              const isActive = c.id === active;
+              return (
+                <li key={c.id}>
+                  <a
+                    href={`#${c.id}`}
+                    onClick={onPick}
+                    aria-current={isActive ? "true" : undefined}
+                    className={isActive ? "is-active" : undefined}
+                  >
+                    <span className="book-toc-num">{String(c.num).padStart(2, "0")}</span>
+                    <span>{c.title}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ))}
+      <a href={pdf} download className="book-toc-pdf">
+        <Download className="w-3.5 h-3.5" aria-hidden />
+        Download the PDF
+      </a>
+    </>
+  );
+
+  return (
+    <div ref={rootRef} className={`book ${className}`}>
+      {/* Reading bar: sits under the site navbar */}
+      <div ref={barRef} className="book-bar">
+        <div className="book-bar-in">
+          <button
+            type="button"
+            className="book-bar-btn"
+            onClick={() => setDrawerOpen((o) => !o)}
+            aria-expanded={drawerOpen}
+            aria-controls="book-drawer"
+          >
+            {drawerOpen ? <X className="w-4 h-4" aria-hidden /> : <List className="w-4 h-4" aria-hidden />}
+            Contents
+          </button>
+          <nav className="book-crumbs" aria-label="Breadcrumb">
+            <Link href="/books">Books</Link>
+            <span aria-hidden>/</span>
+            <a href="#top">CSC207 Made Easy</a>
+          </nav>
+          <p className="book-bar-chapter" aria-live="polite">
+            {activeChapter ? (
+              <>
+                <span className="book-bar-num">{String(activeChapter.num).padStart(2, "0")}</span>
+                <span className="book-bar-title">{activeChapter.title}</span>
+              </>
+            ) : null}
+          </p>
+          <span className="book-bar-pct">{Math.round(progress)}%</span>
+        </div>
+        <div className="book-progress" aria-hidden>
+          <i style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+
+      <div className="book-layout" id="top">
+        <aside ref={sideRef} className="book-side" aria-label="Contents">
+          <p className="book-side-head">Contents</p>
+          {contents()}
+        </aside>
+
+        <div className="book-main">
+          {children}
+          <footer className="book-foot">
+            <h2>CSC207 Made Easy</h2>
+            <p>
+              A plain English rewrite of the CSC207 Introduction to Algorithms course, 2023/2024 academic year.
+              Every definition, pseudocode listing, code sample and complexity rule has been kept in full. What has
+              been added is the explanation around them.
+            </p>
+            <div className="book-foot-links">
+              <a href={pdf} download>
+                <Download className="w-4 h-4" aria-hidden /> Download the PDF
+              </a>
+              <Link href="/books">More free books &rarr;</Link>
+            </div>
+            <p className="book-foot-credit">
+              Original course material by Drs. Nyanga B., Achenkeng P. and Fotsing C. Definitions quoted in chapter 1
+              are from Dromey, <i>How to Solve it by Computer</i> (1982) and Woodhouse et al, <i>Computer Science</i>{" "}
+              (1984).
+            </p>
+          </footer>
+        </div>
+      </div>
+
+      {/* Drawer, below the sidebar breakpoint */}
+      <div
+        className={`book-scrim lg:hidden ${drawerOpen ? "is-on" : ""}`}
+        onClick={() => setDrawerOpen(false)}
+        aria-hidden
+      />
+      <nav
+        ref={drawerRef}
+        id="book-drawer"
+        className={`book-drawer lg:hidden ${drawerOpen ? "is-open" : ""}`}
+        aria-label="Contents"
+        aria-hidden={!drawerOpen}
+        inert={!drawerOpen}
+      >
+        <p className="book-side-head">Contents</p>
+        {contents(() => setDrawerOpen(false))}
+      </nav>
+
+      <button
+        type="button"
+        className={`book-top ${showTop && !drawerOpen ? "is-on" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Back to top"
+      >
+        <ArrowUp className="w-4 h-4" aria-hidden />
+      </button>
+    </div>
+  );
+}

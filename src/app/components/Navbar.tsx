@@ -16,13 +16,14 @@ const navLinks = [
   { label: "Contact", href: "/#contact", sectionId: "contact" },
 ];
 
+// `match` lists extra paths that count as this section (a book lives at its own URL)
 const tagLinks = [
-  { label: "BOOKS", href: "/books" },
+  { label: "BOOKS", href: "/books", match: ["/algorithms"] },
   { label: "EVENTS", href: "/events" },
 ];
 
 const mobileContentLinks = [
-  { label: "BOOKS", href: "/books" },
+  { label: "BOOKS", href: "/books", match: ["/algorithms"] },
   { label: "EVENTS", href: "/events" },
   { label: "PROJECTS", href: "/projects" },
 ];
@@ -41,7 +42,9 @@ export default function Navbar() {
   // Detect if we're on the home page or a sub-page
   const isOnHomePage = pathname === '/';
   // Check if current path matches a tag/content link
-  const activeTagPath = tagLinks.find(l => pathname.startsWith(l.href))?.href ?? null;
+  const isUnder = (link: { href: string; match?: string[] }) =>
+    [link.href, ...(link.match ?? [])].some((p) => pathname.startsWith(p));
+  const activeTagPath = tagLinks.find(isUnder)?.href ?? null;
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 0);
@@ -310,7 +313,7 @@ export default function Navbar() {
             {/* Tag Links with liquid-glass styling */}
             {tagLinks.map((link) => {
               const isHovered = hoveredLink === link.label;
-              const isActiveTag = pathname.startsWith(link.href);
+              const isActiveTag = isUnder(link);
               return (
                 <a
                   key={link.label}
@@ -494,7 +497,7 @@ export default function Navbar() {
             <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/30 uppercase mb-3">Content</p>
             <div className="grid grid-cols-2 gap-3">
               {mobileContentLinks.map((link) => {
-                const isActiveContent = pathname.startsWith(link.href);
+                const isActiveContent = isUnder(link);
                 return (
                   <a
                     key={link.label}
