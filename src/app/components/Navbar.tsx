@@ -16,15 +16,22 @@ const navLinks = [
   { label: "Contact", href: "/#contact", sectionId: "contact" },
 ];
 
-const tagLinks = [
+// staticPage: served from /public (not an App Router page), so it needs a
+// full page load instead of client-side router.push. On desktop it only shows
+// from 1440px up, where the bar has room for a third tag pill.
+type ContentLink = { label: string; href: string; staticPage?: boolean };
+
+const tagLinks: ContentLink[] = [
   { label: "BLOGS", href: "/blog" },
   { label: "EVENTS", href: "/events" },
+  { label: "CSC207", href: "/algorithms", staticPage: true },
 ];
 
-const mobileContentLinks = [
+const mobileContentLinks: ContentLink[] = [
   { label: "BLOGS", href: "/blog" },
   { label: "EVENTS", href: "/events" },
   { label: "PROJECTS", href: "/projects" },
+  { label: "CSC207", href: "/algorithms", staticPage: true },
 ];
 
 export default function Navbar() {
@@ -316,7 +323,7 @@ export default function Navbar() {
                   key={link.label}
                   id={`nav-tag-${link.label.toLowerCase()}`}
                   href={link.href}
-                  className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono"
+                  className={`liquid-glass-pill ${link.staticPage ? "hidden min-[1440px]:flex" : "flex"} items-center gap-1.5 px-3.5 py-2 text-[10px] font-medium tracking-widest transition-all duration-300 font-mono`}
                   style={{
                     color: isActiveTag || isHovered ? "var(--neon-green)" : "var(--muted)",
                     textDecoration: "none",
@@ -325,6 +332,7 @@ export default function Navbar() {
                     background: isActiveTag ? "rgba(57,255,20,0.08)" : undefined,
                   }}
                   onClick={(e) => {
+                    if (link.staticPage) return;
                     e.preventDefault();
                     router.push(link.href);
                   }}
@@ -500,8 +508,9 @@ export default function Navbar() {
                     key={link.label}
                     href={link.href}
                     onClick={(e) => {
-                      e.preventDefault();
                       setIsMobileMenuOpen(false);
+                      if (link.staticPage) return;
+                      e.preventDefault();
                       router.push(link.href);
                     }}
                     className={`flex items-center gap-2.5 px-5 py-4 rounded-2xl border transition-all duration-300 font-mono ${
