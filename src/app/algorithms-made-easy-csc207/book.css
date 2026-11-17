@@ -88,8 +88,7 @@ html:not(.dark) .book {
   pointer-events: none;
 }
 .book-bar-in {
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0;
   padding: 10px 24px;
   display: flex;
   align-items: center;
@@ -190,9 +189,9 @@ html:not(.dark) .book {
 }
 
 /* ---------- layout ---------- */
+/* The sidebar hugs the left edge at every width. The text sits right after it, and on
+   wide screens a matching empty column on the right centres the text on the screen. */
 .book-layout {
-  max-width: 1400px;
-  margin: 0 auto;
   padding: 0 24px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -206,8 +205,19 @@ html:not(.dark) .book {
 }
 @media (min-width: 1024px) {
   .book-layout {
-    grid-template-columns: 270px minmax(0, 1fr);
-    gap: 56px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 48px;
+  }
+  .book-main {
+    margin: 0;
+  }
+}
+@media (min-width: 1500px) {
+  .book-layout {
+    grid-template-columns: 260px minmax(0, 1fr) 260px;
+  }
+  .book-main {
+    margin: 0 auto;
   }
 }
 @media (max-width: 767px) {
