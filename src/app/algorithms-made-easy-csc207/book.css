@@ -33,6 +33,25 @@
   min-height: 100vh;
 }
 
+/* Light mode: a warm paper page instead of the site's pure white, with near-black ink and
+   a deeper green for accent text. Overrides apply inside the book only. */
+html:not(.dark) .book {
+  --background: #f6f3ec;
+  --card-bg: #fbf9f4;
+  --card-border: rgba(40, 34, 24, 0.1);
+  --foreground: #1d1f23;
+  --b-text: #2b2d31;
+  --b-soft: #52555b;
+  --b-faint: #6b6e74;
+  --b-line: rgba(40, 34, 24, 0.13);
+  --b-wash: rgba(40, 34, 24, 0.045);
+  --b-accent: #137a35;
+  --b-plate: #fffdf8;
+  --b-plate-line: rgba(40, 34, 24, 0.1);
+  --b-code: #1d1f23;
+  --neon-text-shadow: none;
+}
+
 .dark .book {
   --b-plate: #f3f0e9;
   --b-plate-line: transparent;
@@ -52,7 +71,7 @@
   top: var(--nav-h);
   z-index: 40;
   margin-top: var(--nav-h);
-  background: color-mix(in srgb, var(--background) 94%, transparent);
+  background: color-mix(in srgb, var(--background) 98%, transparent);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
   border-bottom: 1px solid var(--card-border);
@@ -438,7 +457,7 @@ a.is-active .book-toc-num {
   align-items: center;
   gap: 10px;
   padding: 13px 22px;
-  background: var(--b-accent);
+  background: var(--neon-green);
   color: #121212;
   text-decoration: none;
   font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;

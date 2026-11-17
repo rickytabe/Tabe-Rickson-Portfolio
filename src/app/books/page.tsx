@@ -24,9 +24,9 @@ const books: Book[] = [
     subtitle: "Introduction to Algorithms in plain English",
     description:
       "The full CSC207 Introduction to Algorithms syllabus, rewritten in plain English. Every hard idea is explained with an example from ordinary life, and every chapter is illustrated. Covers pseudocode, flowcharts, Euclid's algorithm, greedy methods, divide and conquer, dynamic programming and Big O notation.",
-    href: "/algorithms",
-    pdf: "/algorithms/csc207-made-easy.pdf",
-    cover: "/algorithms/og.png",
+    href: "/algorithms-made-easy-csc207",
+    pdf: "/algorithms-made-easy-csc207/csc207-made-easy.pdf",
+    cover: "/algorithms-made-easy-csc207/og.png",
     pages: 68,
     chapters: 24,
     topics: ["Algorithms", "Pseudocode", "Flowcharts", "Dynamic programming", "Big O notation"],
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/algorithms/og.png",
+        url: "/algorithms-made-easy-csc207/og.png",
         width: 1200,
         height: 630,
         alt: "CSC207 Made Easy. Introduction to Algorithms in plain English, free to read.",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/algorithms/og.png"],
+    images: ["/algorithms-made-easy-csc207/og.png"],
   },
 };
 

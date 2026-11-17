@@ -14,9 +14,9 @@ const fraunces = Fraunces({
 });
 
 const siteUrl = "https://taberickson.com";
-const pageUrl = `${siteUrl}/algorithms`;
-const pdfPath = "/algorithms/csc207-made-easy.pdf";
-const ogImage = "/algorithms/og.png";
+const pageUrl = `${siteUrl}/algorithms-made-easy-csc207`;
+const pdfPath = "/algorithms-made-easy-csc207/csc207-made-easy.pdf";
+const ogImage = "/algorithms-made-easy-csc207/og.png";
 
 const title = "CSC207 Made Easy: Introduction to Algorithms in Plain English";
 const description =
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     "dynamic programming",
     "Big O notation",
   ],
-  alternates: { canonical: "/algorithms" },
+  alternates: { canonical: "/algorithms-made-easy-csc207" },
   robots: { index: true, follow: true, "max-image-preview": "large" },
   openGraph: {
     title: "CSC207 Made Easy",
@@ -142,7 +142,7 @@ function parseContents(html: string): BookPart[] {
 }
 
 export default function AlgorithmsBook() {
-  const html = readFileSync(path.join(process.cwd(), "src/app/algorithms/content.html"), "utf8");
+  const html = readFileSync(path.join(process.cwd(), "src/app/algorithms-made-easy-csc207/content.html"), "utf8");
   const parts = parseContents(html);
 
   return (
