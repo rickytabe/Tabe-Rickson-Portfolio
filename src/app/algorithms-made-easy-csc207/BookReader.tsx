@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Download, List, X } from "lucide-react";
+import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
+import SupportModal, { mayAutoPrompt } from "./SupportModal";
 
-export type BookChapter = { id: string; num: number; title: string };
+export type BookSubtopic = { id: string; title: string };
+export type BookChapter = { id: string; num: number; title: string; subs: BookSubtopic[] };
 export type BookPart = { name: string; chapters: BookChapter[] };
 
 type Props = {
@@ -23,6 +25,10 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [progress, setProgress] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const [supportOpen, setSupportOpen] = useState(false);
+  const autoPrompted = useRef(false);
+  const promptTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -117,7 +123,29 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const contents = (onPick?: () => void) => (
+  // Ask for support once, after the reader is about a third of the way in (never on arrival).
+  // The timer lives in a ref: progress keeps changing while the reader scrolls, and re-running
+  // this effect must not cancel the pending prompt.
+  useEffect(() => {
+    if (autoPrompted.current || progress < 33 || drawerOpen || supportOpen) return;
+    autoPrompted.current = true;
+    if (!mayAutoPrompt()) return;
+    promptTimer.current = setTimeout(() => setSupportOpen(true), 700);
+  }, [progress, drawerOpen, supportOpen]);
+
+  useEffect(() => () => {
+    if (promptTimer.current) clearTimeout(promptTimer.current);
+  }, []);
+
+  const toggle = (id: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const contents = (where: "side" | "drawer", onPick?: () => void) => (
     <>
       {parts.map((part) => (
         <div key={part.name} className="book-toc-part">
@@ -125,27 +153,71 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
           <ol>
             {part.chapters.map((c) => {
               const isActive = c.id === active;
+              const hasSubs = c.subs.length > 0;
+              // Subtopics show for the chapter being read, or when opened with the chevron.
+              const isOpen = hasSubs && (isActive || expanded.has(c.id));
+              const subsId = `${where}-${c.id}-subs`;
               return (
-                <li key={c.id}>
-                  <a
-                    href={`#${c.id}`}
-                    onClick={onPick}
-                    aria-current={isActive ? "true" : undefined}
-                    className={isActive ? "is-active" : undefined}
-                  >
-                    <span className="book-toc-num">{String(c.num).padStart(2, "0")}</span>
-                    <span>{c.title}</span>
-                  </a>
+                <li key={c.id} className={hasSubs ? "has-subs" : undefined}>
+                  <div className="book-toc-row">
+                    <a
+                      href={`#${c.id}`}
+                      onClick={onPick}
+                      aria-current={isActive ? "true" : undefined}
+                      className={isActive ? "is-active" : undefined}
+                    >
+                      <span className="book-toc-num">{String(c.num).padStart(2, "0")}</span>
+                      <span>{c.title}</span>
+                    </a>
+                    {hasSubs ? (
+                      <button
+                        type="button"
+                        className={`book-toc-toggle ${isOpen ? "is-open" : ""}`}
+                        onClick={() => toggle(c.id)}
+                        aria-expanded={isOpen}
+                        aria-controls={subsId}
+                        aria-label={`${isOpen ? "Hide" : "Show"} topics in ${c.title}`}
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" aria-hidden />
+                      </button>
+                    ) : null}
+                  </div>
+                  {hasSubs ? (
+                    <div className={`book-toc-subs ${isOpen ? "is-open" : ""}`} id={subsId}>
+                      <ul inert={!isOpen}>
+                        {c.subs.map((sub) => (
+                          <li key={sub.id}>
+                            <a href={`#${sub.id}`} onClick={onPick}>
+                              {sub.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </li>
               );
             })}
           </ol>
         </div>
       ))}
-      <a href={pdf} download className="book-toc-pdf">
-        <Download className="w-3.5 h-3.5" aria-hidden />
-        Download the PDF
-      </a>
+      <div className="book-toc-extra">
+        <a href={pdf} download className="book-toc-pdf">
+          <Download className="w-3.5 h-3.5" aria-hidden />
+          Download the PDF
+        </a>
+        <button
+          type="button"
+          className="book-toc-support"
+          onClick={() => {
+            onPick?.();
+            setSupportOpen(true);
+          }}
+        >
+          <Smile className="w-3.5 h-3.5" aria-hidden />
+          Support this book
+        </button>
+      </div>
     </>
   );
 
@@ -187,7 +259,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       <div className="book-layout" id="top">
         <aside ref={sideRef} className="book-side" aria-label="Contents">
           <p className="book-side-head">Contents</p>
-          {contents()}
+          {contents("side")}
         </aside>
 
         <div className="book-main">
@@ -203,6 +275,9 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               <a href={pdf} download>
                 <Download className="w-4 h-4" aria-hidden /> Download the PDF
               </a>
+              <button type="button" onClick={() => setSupportOpen(true)}>
+                <Smile className="w-4 h-4" aria-hidden /> Support this book
+              </button>
               <Link href="/books">More free books &rarr;</Link>
             </div>
             <p className="book-foot-credit">
@@ -229,17 +304,19 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         inert={!drawerOpen}
       >
         <p className="book-side-head">Contents</p>
-        {contents(() => setDrawerOpen(false))}
+        {contents("drawer", () => setDrawerOpen(false))}
       </nav>
 
       <button
         type="button"
-        className={`book-top ${showTop && !drawerOpen ? "is-on" : ""}`}
+        className={`book-top ${showTop && !drawerOpen && !supportOpen ? "is-on" : ""}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Back to top"
       >
         <ArrowUp className="w-4 h-4" aria-hidden />
       </button>
+
+      {supportOpen ? <SupportModal onClose={() => setSupportOpen(false)} /> : null}
     </div>
   );
 }
