@@ -1,0 +1,956 @@
+/* CSC207 Made Easy: reading styles, scoped to .book and built on the site's theme tokens
+   (--background, --foreground, --neon-green, --card-bg, --card-border) so light and dark
+   follow the site toggle. Illustrations keep their own paper palette on a light plate. */
+
+.book {
+  --b-text: color-mix(in srgb, var(--foreground) 84%, transparent);
+  --b-soft: color-mix(in srgb, var(--foreground) 62%, transparent);
+  --b-faint: color-mix(in srgb, var(--foreground) 45%, transparent);
+  --b-line: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --b-wash: color-mix(in srgb, var(--foreground) 4%, transparent);
+  --b-accent: var(--neon-green);
+  --b-plate: #ffffff;
+  --b-plate-line: rgba(18, 18, 18, 0.1);
+  --b-code: #0f0f0f;
+
+  /* callout hues */
+  --b-real: #3f7a32;
+  --b-stick: #9a7310;
+  --b-stick-edge: #e0a91f;
+  --b-trap: #c2415a;
+  --b-note: #2e5fb0;
+  --b-try: #6a4a8c;
+  --b-term: #2e5fb0;
+
+  --nav-h: 64px;
+  --bar-h: 49px;
+  --b-top: calc(var(--nav-h) + var(--bar-h));
+
+  position: relative;
+  z-index: 10;
+  background: var(--background);
+  color: var(--b-text);
+  min-height: 100vh;
+}
+
+.dark .book {
+  --b-plate: #f3f0e9;
+  --b-plate-line: transparent;
+  --b-code: #0a0a0a;
+  --b-real: #79c968;
+  --b-stick: #f3bf3f;
+  --b-stick-edge: #f3bf3f;
+  --b-trap: #f27089;
+  --b-note: #86aaf2;
+  --b-try: #b99be9;
+  --b-term: #93b6f6;
+}
+
+/* ---------- reading bar ---------- */
+.book-bar {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 40;
+  margin-top: var(--nav-h);
+  background: color-mix(in srgb, var(--background) 94%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-bottom: 1px solid var(--card-border);
+}
+/* The site navbar is transparent off the home page, so back it while reading */
+.book-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--nav-h);
+  background: var(--background);
+  pointer-events: none;
+}
+.book-bar-in {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 46px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.book-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid var(--b-line);
+  border-radius: 4px;
+  color: var(--foreground);
+  font: inherit;
+  letter-spacing: inherit;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+@media (min-width: 1024px) {
+  .book-bar-btn {
+    display: none;
+  }
+}
+.book-bar-btn:hover,
+.book-bar-btn[aria-expanded="true"] {
+  border-color: color-mix(in srgb, var(--b-accent) 50%, transparent);
+  color: var(--b-accent);
+}
+.book-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--b-faint);
+  white-space: nowrap;
+}
+.book-crumbs a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.book-crumbs a:hover {
+  color: var(--b-accent);
+}
+.book-crumbs a:last-child {
+  color: var(--foreground);
+}
+.book-bar-chapter {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  color: var(--b-soft);
+  overflow: hidden;
+}
+.book-bar-num {
+  color: var(--b-accent);
+}
+.book-bar-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.book-bar-pct {
+  color: var(--b-faint);
+  font-variant-numeric: tabular-nums;
+  min-width: 4ch;
+  text-align: right;
+}
+.book-progress {
+  height: 2px;
+  background: transparent;
+}
+.book-progress i {
+  display: block;
+  height: 100%;
+  background: var(--b-accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--b-accent) 60%, transparent);
+  transition: width 0.1s linear;
+}
+@media (max-width: 767px) {
+  .book-crumbs {
+    display: none;
+  }
+  .book-bar-in {
+    padding: 8px 16px;
+    gap: 12px;
+  }
+}
+
+/* ---------- layout ---------- */
+.book-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.book-main {
+  min-width: 0;
+  max-width: 740px;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+@media (min-width: 1024px) {
+  .book-layout {
+    grid-template-columns: 270px minmax(0, 1fr);
+    gap: 56px;
+  }
+}
+@media (max-width: 767px) {
+  .book-layout {
+    padding: 0 18px;
+  }
+}
+
+/* ---------- contents: sidebar + drawer ---------- */
+.book-side,
+.book-drawer {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+.book-side {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .book-side {
+    display: block;
+    position: sticky;
+    top: var(--b-top);
+    height: calc(100vh - var(--b-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 28px 12px 40px 0;
+    scrollbar-width: thin;
+  }
+}
+.book-side-head {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--b-faint);
+  margin: 0 0 6px;
+}
+.book-toc-part {
+  margin-top: 20px;
+}
+.book-toc-label {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--b-accent);
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+.book-side ol,
+.book-drawer ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.book-side li a,
+.book-drawer li a {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 10px;
+  margin: 1px 0;
+  border-radius: 4px;
+  border-left: 2px solid transparent;
+  color: var(--b-soft);
+  text-decoration: none;
+  font-size: 13.5px;
+  line-height: 1.4;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.book-side li a:hover,
+.book-drawer li a:hover {
+  color: var(--foreground);
+  background: var(--b-wash);
+}
+.book-side li a.is-active,
+.book-drawer li a.is-active {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--b-accent) 9%, transparent);
+  border-left-color: var(--b-accent);
+  font-weight: 600;
+}
+.book-toc-num {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--b-faint);
+  font-variant-numeric: tabular-nums;
+}
+a.is-active .book-toc-num {
+  color: var(--b-accent);
+}
+.book-toc-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--b-line);
+  width: 100%;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--b-soft);
+  text-decoration: none;
+}
+.book-toc-pdf:hover {
+  color: var(--b-accent);
+}
+
+.book-drawer {
+  position: fixed;
+  top: var(--b-top);
+  left: 0;
+  bottom: 0;
+  z-index: 46;
+  width: min(330px, 86vw);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 20px 32px;
+  background: var(--background);
+  border-right: 1px solid var(--card-border);
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0.25s;
+}
+.book-drawer.is-open {
+  transform: none;
+  visibility: visible;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.35);
+}
+.book-scrim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--b-top);
+  z-index: 45;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.book-scrim.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.book-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 44;
+  width: 44px;
+  height: 44px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--b-line);
+  background: var(--card-bg);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.book-top.is-on {
+  display: inline-flex;
+}
+.book-top:hover {
+  border-color: color-mix(in srgb, var(--b-accent) 50%, transparent);
+  color: var(--b-accent);
+}
+
+/* ---------- book content ---------- */
+.book-content {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 17px;
+  line-height: 1.75;
+}
+.book-content strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+.book-content p {
+  margin: 16px 0;
+}
+
+/* cover */
+.book-content .cover {
+  padding: 56px 0 24px;
+}
+.book-content .kicker {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--b-accent);
+}
+.book-content h1.title {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-weight: 800;
+  font-size: clamp(40px, 7.5vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin: 14px 0 18px;
+}
+.book-content h1.title em {
+  font-style: normal;
+  color: var(--b-accent);
+  text-shadow: var(--neon-text-shadow);
+}
+.book-content .sub {
+  font-size: clamp(16px, 2.2vw, 19px);
+  color: var(--b-soft);
+  max-width: 600px;
+  margin: 0;
+}
+.book-content .coverart {
+  margin: 34px 0 0;
+  padding: 18px;
+  background: var(--b-plate);
+  border: 1px solid var(--b-plate-line);
+  border-radius: 12px;
+}
+.book-content .coverart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.book-content .byline,
+.book-content .dlnote {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--b-faint);
+}
+.book-content .byline {
+  margin: 22px 0 0;
+}
+.book-content .dlwrap {
+  margin: 24px 0 0;
+}
+.book-content .dl {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  background: var(--b-accent);
+  color: #121212;
+  text-decoration: none;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.2s, color 0.2s;
+}
+.book-content .dl:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+.book-content .dl svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+.book-content .dlnote {
+  margin: 10px 0 0;
+}
+@media (max-width: 480px) {
+  .book-content .dl {
+    padding: 13px 16px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* in-page contents ("What is inside") */
+.book-content .toc {
+  margin: 44px 0 10px;
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--b-line);
+  border-radius: 12px;
+}
+.book-content .toc h2 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin: 0 0 6px;
+}
+.book-content .toc .part {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--b-accent);
+  margin: 18px 0 6px;
+}
+.book-content .toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.book-content .toc li {
+  margin: 0;
+}
+.book-content .toc li a {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 0;
+  color: var(--b-text);
+  text-decoration: none;
+  font-size: 15px;
+  border-bottom: 1px dashed var(--b-line);
+  transition: color 0.15s;
+}
+.book-content .toc li a:hover {
+  color: var(--b-accent);
+}
+.book-content .toc li a b {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--b-faint);
+  min-width: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* parts and chapters */
+.book-content .partdiv {
+  margin: 88px 0 28px;
+  padding-top: 32px;
+  border-top: 1px solid var(--b-line);
+  scroll-margin-top: calc(var(--b-top) + 16px);
+}
+.book-content .partdiv .pnum {
+  display: inline-block;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--b-accent);
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--b-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--b-accent) 8%, transparent);
+  border-radius: 2px;
+}
+.book-content .partdiv h2 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-weight: 800;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin: 16px 0 10px;
+}
+.book-content .partdiv p {
+  color: var(--b-soft);
+  margin: 0;
+  max-width: 560px;
+}
+.book-content .rule {
+  display: none;
+}
+
+.book-content .ch {
+  padding: 44px 0 12px;
+  scroll-margin-top: calc(var(--b-top) + 8px);
+}
+.book-content .ch-head {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+.book-content .ch-num {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--b-accent);
+  border: 1px solid color-mix(in srgb, var(--b-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--b-accent) 8%, transparent);
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.book-content .ch h3 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: clamp(25px, 4.2vw, 34px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+  margin: 2px 0 0;
+}
+.book-content .ch .oneline {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--b-accent);
+  margin: 8px 0 0;
+}
+.book-content .ch h4 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin: 34px 0 -4px;
+}
+.book-content .ch ul,
+.book-content .ch ol {
+  padding-left: 22px;
+  margin: 16px 0;
+}
+.book-content .ch ul {
+  list-style: disc;
+}
+.book-content .ch ol {
+  list-style: decimal;
+}
+.book-content .ch li {
+  margin: 7px 0;
+}
+.book-content .ch li::marker {
+  color: var(--b-faint);
+}
+.book-content .ch a {
+  color: var(--b-accent);
+  text-underline-offset: 3px;
+}
+.book-content .term {
+  font-weight: 700;
+  color: var(--b-term);
+}
+.book-content mark {
+  color: inherit;
+  background: linear-gradient(
+    180deg,
+    transparent 60%,
+    color-mix(in srgb, var(--b-accent) 32%, transparent) 60%
+  );
+  padding: 0 1px;
+}
+.book-content .cite {
+  font-size: 14px;
+  color: var(--b-faint);
+  margin-top: 8px;
+}
+.book-content .equation {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--foreground);
+  margin: 6px 0;
+}
+
+/* callout boxes */
+.book-content .box {
+  --hue: var(--b-note);
+  margin: 26px 0;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--hue) 30%, transparent);
+  border-left: 3px solid var(--hue);
+  border-radius: 4px 10px 10px 4px;
+  background: color-mix(in srgb, var(--hue) 7%, var(--card-bg));
+}
+.book-content .box .lab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hue);
+}
+.book-content .box p:first-of-type {
+  margin-top: 0;
+}
+.book-content .box p:last-child {
+  margin-bottom: 0;
+}
+.book-content .box ul {
+  margin: 10px 0 0;
+}
+.book-content .real {
+  --hue: var(--b-real);
+}
+.book-content .stick {
+  --hue: var(--b-stick);
+  border-color: color-mix(in srgb, var(--b-stick-edge) 40%, transparent);
+  border-left-color: var(--b-stick-edge);
+  background: color-mix(in srgb, var(--b-stick-edge) 9%, var(--card-bg));
+}
+.book-content .trap {
+  --hue: var(--b-trap);
+}
+.book-content .note {
+  --hue: var(--b-note);
+}
+.book-content .try {
+  --hue: var(--b-try);
+}
+
+/* code */
+.book-content pre {
+  margin: 22px 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  background: var(--b-code);
+  color: #ececec;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.book-content pre .c {
+  color: #8ea3b8;
+  font-style: italic;
+}
+.book-content pre .k {
+  color: #39ff14;
+  font-weight: 600;
+}
+.book-content pre .s {
+  color: #f3bf3f;
+}
+.book-content pre b {
+  color: #ffb38a;
+  font-weight: 600;
+}
+.book-content code {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--b-wash);
+  border: 1px solid var(--b-line);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.book-content pre.pseudo {
+  background: var(--card-bg);
+  color: var(--foreground);
+  border: 1px dashed color-mix(in srgb, var(--foreground) 25%, transparent);
+}
+.book-content pre.pseudo .k {
+  color: var(--b-accent);
+}
+.book-content pre.pseudo .c {
+  color: var(--b-faint);
+}
+
+/* figures: the illustrations keep their paper palette on a light plate */
+.book-content figure {
+  margin: 32px 0;
+  padding: 18px 16px 12px;
+  background: var(--b-plate);
+  border: 1px solid var(--b-plate-line);
+  border-radius: 12px;
+}
+.book-content figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.book-content figcaption {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #4a525e;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px dotted #d8cfbf;
+}
+.book-content figcaption b {
+  color: #20242b;
+  font-weight: 700;
+}
+/* next/font renames families, so map the names the SVG text asks for */
+.book-content svg [font-family^="Fraunces"] {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+.book-content svg [font-family^="Inter"] {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+.book-content svg [font-family^="JetBrains"] {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+}
+
+/* tables and cards */
+.book-content .tbl {
+  width: 100%;
+  margin: 22px 0;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  font-size: 15px;
+}
+.book-content .tbl th,
+.book-content .tbl td {
+  border: 1px solid var(--b-line);
+  padding: 9px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.book-content .tbl th {
+  background: var(--b-wash);
+  color: var(--foreground);
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.book-content .tbl tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+.book-content .two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 22px 0;
+}
+@media (max-width: 620px) {
+  .book-content .two {
+    grid-template-columns: 1fr;
+  }
+}
+.book-content .card {
+  background: var(--card-bg);
+  border: 1px solid var(--b-line);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.book-content .card h5 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 6px;
+}
+.book-content .card p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--b-soft);
+}
+
+/* closing line */
+.book-content .closing {
+  margin: 72px 0 10px;
+  padding-top: 32px;
+  border-top: 1px solid var(--b-line);
+}
+.book-content .closing-quote {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  max-width: 600px;
+  margin: 0;
+}
+
+/* ---------- footer ---------- */
+.book-foot {
+  margin-top: 56px;
+  padding: 28px;
+  border: 1px solid var(--b-line);
+  border-radius: 12px;
+  background: var(--card-bg);
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+.book-foot h2 {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin: 0 0 10px;
+}
+.book-foot p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--b-soft);
+  margin: 0;
+}
+.book-foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  margin: 20px 0;
+}
+.book-foot-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.book-foot-links a:hover {
+  color: var(--b-accent);
+}
+.book-foot .book-foot-credit {
+  font-size: 13px;
+  color: var(--b-faint);
+  padding-top: 16px;
+  border-top: 1px solid var(--b-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-drawer,
+  .book-scrim,
+  .book-progress i {
+    transition: none;
+  }
+}
+
+/* ---------- print ---------- */
+@media print {
+  .book-bar,
+  .book-side,
+  .book-drawer,
+  .book-scrim,
+  .book-top,
+  .book-content .dlwrap,
+  .book-content .dlnote {
+    display: none !important;
+  }
+  .book-layout {
+    display: block;
+  }
+  .book-content .ch,
+  .book-content .partdiv {
+    break-before: page;
+  }
+  .book-content figure,
+  .book-content .box,
+  .book-content pre {
+    break-inside: avoid;
+  }
+}

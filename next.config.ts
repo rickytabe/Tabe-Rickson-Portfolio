@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      { source: "/algorithms", destination: "/algorithms/index.html" },
-    ];
-  },
 };
 
 export default nextConfig;

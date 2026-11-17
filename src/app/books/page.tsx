@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight, Download } from "lucide-react";
-import Navbar from "../components/Navbar";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -10,7 +10,6 @@ type Book = {
   title: string;
   subtitle: string;
   description: string;
-  // Static pages live in /public, so they are linked with plain <a>, not next/link
   href: string;
   pdf: string;
   cover: string;
@@ -116,8 +115,6 @@ export default function BooksIndex() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
-        <Navbar />
-
         <main className="flex-1 pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto w-full">
           <div className="mb-16">
             <h1 className="text-4xl md:text-6xl font-black font-sans tracking-tighter uppercase mb-4 text-foreground">
@@ -134,7 +131,7 @@ export default function BooksIndex() {
                 key={book.href}
                 className="group flex flex-col bg-card-bg border border-foreground/10 rounded-2xl overflow-hidden hover:border-[#39FF14]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#39FF14]/5"
               >
-                <a href={book.href} className="relative block w-full aspect-[1200/630] bg-foreground/5 overflow-hidden">
+                <Link href={book.href} className="relative block w-full aspect-[1200/630] bg-foreground/5 overflow-hidden">
                   <Image
                     src={book.cover}
                     alt={`${book.title} cover: ${book.subtitle}`}
@@ -144,7 +141,7 @@ export default function BooksIndex() {
                     priority
                   />
                   <div className="absolute inset-0 border-b border-foreground/10 pointer-events-none" />
-                </a>
+                </Link>
 
                 <div className="p-6 md:p-8 flex flex-col flex-grow">
                   <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-mono text-foreground/50">
@@ -156,9 +153,9 @@ export default function BooksIndex() {
                   </div>
 
                   <h2 className="text-2xl font-bold font-sans text-foreground mb-1 leading-snug">
-                    <a href={book.href} className="group-hover:text-[#39FF14] transition-colors">
+                    <Link href={book.href} className="group-hover:text-[#39FF14] transition-colors">
                       {book.title}
-                    </a>
+                    </Link>
                   </h2>
                   <p className="text-sm font-mono text-foreground/50 mb-4">{book.subtitle}</p>
                   <p className="text-sm text-foreground/60 font-inter mb-5">{book.description}</p>
@@ -175,12 +172,12 @@ export default function BooksIndex() {
                   </ul>
 
                   <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-3">
-                    <a
+                    <Link
                       href={book.href}
                       className="inline-flex items-center gap-2 text-sm font-mono font-semibold text-foreground hover:text-[#39FF14] transition-colors"
                     >
                       READ ONLINE <ArrowRight className="w-4 h-4" />
-                    </a>
+                    </Link>
                     <a
                       href={book.pdf}
                       download
