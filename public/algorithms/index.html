@@ -207,9 +207,52 @@ footer p{color:#B9C0CA;font-size:15px}
 .dl svg{width:17px;height:17px;flex:0 0 auto}
 .dlnote{font:500 13px Inter,sans-serif;color:var(--ink3);margin:11px 0 0}
 
+/* ---------- sidebar contents ---------- */
+/* Built by the script from #tocPanel. Fixed on wide screens, a slide-in drawer below 1100px. */
+.side{
+  position:fixed;top:var(--tb,57px);left:0;bottom:0;width:290px;z-index:45;
+  background:var(--paper);border-right:1px solid var(--line);
+  overflow-y:auto;overscroll-behavior:contain;padding:22px 20px 28px;
+  transform:translateX(-100%);visibility:hidden;transition:transform .25s ease,visibility .25s;
+}
+.side.open{transform:none;visibility:visible;box-shadow:8px 0 28px rgba(32,36,43,.16)}
+.side h2{font:700 11px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:0 0 4px}
+.side .part{font:700 10.5px/1.4 Inter,sans-serif;letter-spacing:.13em;text-transform:uppercase;color:var(--mango);margin:18px 0 6px}
+.side ol{list-style:none;margin:0;padding:0}
+.side li a{
+  display:flex;gap:9px;align-items:baseline;padding:5px 10px;margin:0 -10px;border-radius:8px;
+  color:var(--ink2);text-decoration:none;font-size:14px;line-height:1.38;
+}
+.side li a b{font-variant-numeric:tabular-nums;color:var(--ink3);font-weight:600;font-size:12.5px;min-width:20px}
+.side li a:hover{color:var(--ink);background:var(--paper2)}
+.side li a.on{color:var(--ink);background:#fff;box-shadow:inset 3px 0 0 var(--mango);font-weight:600}
+.side li a.on b{color:var(--mango)}
+.side .sidedl{
+  display:block;margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+  font:600 13.5px Inter,sans-serif;color:var(--teal);text-decoration:none;
+}
+.side .sidedl:hover{text-decoration:underline}
+.scrim{
+  position:fixed;left:0;right:0;bottom:0;top:var(--tb,57px);z-index:44;
+  background:rgba(32,36,43,.35);opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+html.side-open{overflow:hidden}
+html.side-open .totop{display:none}
+@media(min-width:1100px){
+  .side{transform:none;visibility:visible;box-shadow:none;transition:none}
+  .scrim,.tocbtn{display:none}
+  .topbar-in{max-width:none}
+  .wrap{margin:0 0 0 290px;max-width:none}
+  footer{padding-left:308px}
+}
+@media(prefers-reduced-motion:reduce){.side,.scrim{transition:none}}
+
 /* ---------- print / PDF ---------- */
 @media print{
-  .topbar,.totop,.dlwrap,.dlnote{display:none !important}
+  .topbar,.totop,.dlwrap,.dlnote,.side,.scrim{display:none !important}
+  .wrap{margin:0 !important}
+  footer{padding-left:0 !important}
   body{
     background:#fff !important;background-image:none !important;
     font-size:10.5pt;line-height:1.55;
@@ -242,10 +285,13 @@ footer p{color:#B9C0CA;font-size:15px}
 <div class="topbar">
   <div class="topbar-in">
     <div class="brand">CSC207 <span>Made Easy</span></div>
-    <button class="tocbtn" id="tocBtn">Contents</button>
+    <button class="tocbtn" id="tocBtn" aria-controls="side" aria-expanded="false">Contents</button>
   </div>
   <div class="progress"><i id="bar"></i></div>
 </div>
+
+<nav class="side" id="side" aria-label="Contents"></nav>
+<div class="scrim" id="scrim"></div>
 
 <div class="wrap">
 <div class="col">
@@ -3111,6 +3157,91 @@ footer p{color:#B9C0CA;font-size:15px}
   var toTop = document.getElementById('toTop');
   var btn = document.getElementById('tocBtn');
   var panel = document.getElementById('tocPanel');
+  var topbar = document.querySelector('.topbar');
+  var side = document.getElementById('side');
+  var scrim = document.getElementById('scrim');
+  var wide = window.matchMedia('(min-width:1100px)');
+
+  // build the sidebar from the "What is inside" list, so there is one list to maintain
+  var head = document.createElement('h2');
+  head.textContent = 'Contents';
+  side.appendChild(head);
+  Array.prototype.forEach.call(panel.children, function(el){
+    if (el.tagName !== 'H2') side.appendChild(el.cloneNode(true));
+  });
+  var pdf = document.querySelector('a.dl');
+  if (pdf) {
+    var dl = document.createElement('a');
+    dl.className = 'sidedl';
+    dl.href = pdf.getAttribute('href');
+    if (pdf.hasAttribute('download')) dl.setAttribute('download', pdf.getAttribute('download'));
+    dl.textContent = 'Download the PDF (68 pages)';
+    side.appendChild(dl);
+  }
+
+  var links = side.querySelectorAll('ol a');
+  var sections = [];
+  Array.prototype.forEach.call(links, function(a){
+    var sec = document.getElementById(a.getAttribute('href').slice(1));
+    if (sec) sections.push({ sec: sec, link: a });
+  });
+
+  function setTopbarHeight(){
+    document.documentElement.style.setProperty('--tb', topbar.offsetHeight + 'px');
+  }
+  setTopbarHeight();
+  window.addEventListener('resize', setTopbarHeight);
+
+  // drawer, for screens narrower than 1100px
+  function openSide(){
+    side.classList.add('open');
+    scrim.classList.add('on');
+    btn.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('side-open');
+    var on = side.querySelector('a.on') || links[0];
+    if (on) { revealInSide(on); on.focus({ preventScroll: true }); }
+  }
+  function closeSide(){
+    side.classList.remove('open');
+    scrim.classList.remove('on');
+    btn.setAttribute('aria-expanded', 'false');
+    document.documentElement.classList.remove('side-open');
+  }
+  btn.addEventListener('click', function(){
+    if (side.classList.contains('open')) { closeSide(); } else { openSide(); }
+  });
+  scrim.addEventListener('click', closeSide);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && side.classList.contains('open')) { closeSide(); btn.focus(); }
+  });
+  side.addEventListener('click', function(e){
+    if (e.target.closest('a') && !wide.matches) closeSide();
+  });
+  wide.addEventListener('change', function(){ if (wide.matches) closeSide(); });
+
+  // keep a link visible inside the sidebar without scrolling the page
+  function revealInSide(a){
+    var top = a.offsetTop, bottom = top + a.offsetHeight;
+    if (top < side.scrollTop + 40) side.scrollTop = top - 40;
+    else if (bottom > side.scrollTop + side.clientHeight - 40) side.scrollTop = bottom - side.clientHeight + 40;
+  }
+
+  // highlight the chapter being read
+  var current = null;
+  function updateActive(){
+    var line = topbar.offsetHeight + 90, hit = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].sec.getBoundingClientRect().top <= line) hit = sections[i]; else break;
+    }
+    if (hit === current) return;
+    if (current) { current.link.classList.remove('on'); current.link.removeAttribute('aria-current'); }
+    current = hit;
+    if (current) {
+      current.link.classList.add('on');
+      current.link.setAttribute('aria-current', 'true');
+      revealInSide(current.link);
+    }
+  }
 
   function onScroll(){
     var h = document.documentElement;
@@ -3118,28 +3249,12 @@ footer p{color:#B9C0CA;font-size:15px}
     var p = max > 0 ? (h.scrollTop / max) * 100 : 0;
     bar.style.width = p + '%';
     if (h.scrollTop > 600) { toTop.classList.add('on'); } else { toTop.classList.remove('on'); }
+    updateActive();
   }
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 
   toTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
-
-  btn.addEventListener('click', function(){
-    var hidden = panel.hasAttribute('hidden');
-    if (hidden) {
-      panel.removeAttribute('hidden');
-      panel.scrollIntoView({behavior:'smooth', block:'start'});
-    } else {
-      panel.setAttribute('hidden','');
-    }
-  });
-
-  // close the contents panel after a chapter is chosen, on small screens
-  panel.addEventListener('click', function(e){
-    if (e.target.closest('a') && window.innerWidth < 760) {
-      setTimeout(function(){ panel.setAttribute('hidden',''); }, 300);
-    }
-  });
 })();
 </script>
 </body>
