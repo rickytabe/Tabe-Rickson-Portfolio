@@ -1,7 +1,17 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Download } from "lucide-react";
+import { ArrowRight, Clock, Download } from "lucide-react";
+import ViewCount from "../algorithms-made-easy-csc207/ViewCount";
+import {
+  BOOK_AUTHOR,
+  BOOK_AUTHOR_AVATAR,
+  BOOK_CHAPTERS,
+  BOOK_PATH,
+  formatReadTime,
+  readBookHtml,
+  readingMinutes,
+} from "../algorithms-made-easy-csc207/book-meta";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -15,6 +25,9 @@ type Book = {
   cover: string;
   pages: number;
   chapters: number;
+  author: string;
+  avatar: string;
+  readTime: string;
   topics: string[];
 };
 
@@ -24,11 +37,14 @@ const books: Book[] = [
     subtitle: "Introduction to Algorithms in plain English",
     description:
       "The full CSC207 Introduction to Algorithms syllabus, rewritten in plain English. Every hard idea is explained with an example from ordinary life, and every chapter is illustrated. Covers pseudocode, flowcharts, Euclid's algorithm, greedy methods, divide and conquer, dynamic programming and Big O notation.",
-    href: "/algorithms-made-easy-csc207",
+    href: BOOK_PATH,
     pdf: "/algorithms-made-easy-csc207/csc207-made-easy.pdf",
     cover: "/algorithms-made-easy-csc207/og.png",
     pages: 68,
-    chapters: 24,
+    chapters: BOOK_CHAPTERS,
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: formatReadTime(readingMinutes(readBookHtml())),
     topics: ["Algorithms", "Pseudocode", "Flowcharts", "Dynamic programming", "Big O notation"],
   },
 ];
@@ -158,6 +174,25 @@ export default function BooksIndex() {
                     </Link>
                   </h2>
                   <p className="text-sm font-mono text-foreground/50 mb-4">{book.subtitle}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 text-xs font-mono text-foreground/60">
+                    <span className="inline-flex items-center gap-2">
+                      <Image
+                        src={book.avatar}
+                        alt=""
+                        width={26}
+                        height={26}
+                        className="rounded-full ring-1 ring-foreground/15"
+                      />
+                      <span>
+                        By <span className="text-foreground font-semibold">{book.author}</span>
+                      </span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="w-[15px] h-[15px]" aria-hidden />
+                      {book.readTime}
+                    </span>
+                    <ViewCount path={book.href} className="inline-flex items-center gap-1.5" />
+                  </div>
                   <p className="text-sm text-foreground/60 font-inter mb-5">{book.description}</p>
 
                   <ul className="flex flex-wrap gap-2 mb-8" aria-label="Topics">

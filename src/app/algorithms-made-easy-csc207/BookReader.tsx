@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
 import SupportModal, { mayAutoPrompt } from "./SupportModal";
+import ViewCount from "./ViewCount";
+import { BOOK_PATH } from "./book-info";
 
 export type BookSubtopic = { id: string; title: string };
 export type BookChapter = { id: string; num: number; title: string; subs: BookSubtopic[] };
@@ -28,7 +31,8 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [supportOpen, setSupportOpen] = useState(false);
   const autoPrompted = useRef(false);
-  const promptTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [minuteRead, setMinuteRead] = useState(false);
+  const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -123,19 +127,36 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Ask for support once, after the reader is about a third of the way in (never on arrival).
-  // The timer lives in a ref: progress keeps changing while the reader scrolls, and re-running
-  // this effect must not cancel the pending prompt.
+  // The view count lives in the stats row inside the book's HTML; render it there with a portal.
   useEffect(() => {
-    if (autoPrompted.current || progress < 33 || drawerOpen || supportOpen) return;
-    autoPrompted.current = true;
-    if (!mayAutoPrompt()) return;
-    promptTimer.current = setTimeout(() => setSupportOpen(true), 700);
-  }, [progress, drawerOpen, supportOpen]);
-
-  useEffect(() => () => {
-    if (promptTimer.current) clearTimeout(promptTimer.current);
+    const frame = requestAnimationFrame(() =>
+      setViewsSlot(document.querySelector<HTMLElement>("[data-book-views]"))
+    );
+    return () => cancelAnimationFrame(frame);
   }, []);
+
+  // Count one minute of actual reading: time only passes while the tab is visible.
+  useEffect(() => {
+    if (!mayAutoPrompt()) return;
+    let seconds = 0;
+    const tick = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      seconds += 1;
+      if (seconds >= 60) {
+        clearInterval(tick);
+        setMinuteRead(true);
+      }
+    }, 1000);
+    return () => clearInterval(tick);
+  }, []);
+
+  // Ask for support once that minute is up (never on arrival). If the contents drawer or the
+  // prompt is already open, wait until it closes.
+  useEffect(() => {
+    if (!minuteRead || autoPrompted.current || drawerOpen || supportOpen) return;
+    autoPrompted.current = true;
+    setSupportOpen(true);
+  }, [minuteRead, drawerOpen, supportOpen]);
 
   const toggle = (id: string) =>
     setExpanded((prev) => {
@@ -317,6 +338,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       </button>
 
       {supportOpen ? <SupportModal onClose={() => setSupportOpen(false)} /> : null}
+      {viewsSlot ? createPortal(<ViewCount path={BOOK_PATH} className="bs-views-in" />, viewsSlot) : null}
     </div>
   );
 }
