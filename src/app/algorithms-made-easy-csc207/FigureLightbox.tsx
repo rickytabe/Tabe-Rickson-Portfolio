@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { X, ZoomIn, ZoomOut } from "lucide-react";
+import { track } from "./insights";
 
 /*
  * Click-to-expand for the book's illustrations. The enlarged copy grows out of the exact spot
@@ -88,6 +89,7 @@ export default function FigureLightbox() {
       const svg = fig.querySelector<SVGSVGElement>("svg");
       if (!svg) return;
       const cap = fig.querySelector("figcaption");
+      track("figure_open");
       setNarrow(window.innerWidth < 700);
       setZoomed(false);
       setClosing(false);

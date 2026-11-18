@@ -190,7 +190,8 @@ function addSubheadingIds(html: string): string {
   return html.replace(/<section class="ch" id="(c\d+)">([\s\S]*?)<\/section>/g, (_, id: string, body: string) => {
     let i = 0;
     const withIds = body.replace(/<h4>/g, () => `<h4 id="${id}-s${i++}">`);
-    return `<section class="ch" id="${id}">${withIds}</section>`;
+    // A slot at the end of each chapter for the "Was this chapter clear?" feedback.
+    return `<section class="ch" id="${id}">${withIds}<div class="ch-feedback" data-chapter="${id}"></div></section>`;
   });
 }
 
