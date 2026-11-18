@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
-import SupportModal, { mayAutoPrompt } from "./SupportModal";
+import SupportModal, { hasSupported, mayAutoPrompt } from "./SupportModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
 import { BOOK_PATH } from "./book-info";
@@ -31,6 +31,8 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [showTop, setShowTop] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [supportOpen, setSupportOpen] = useState(false);
+  const [supportMode, setSupportMode] = useState<"support" | "download">("support");
+  const [showFab, setShowFab] = useState(false);
   const autoPrompted = useRef(false);
   const [minuteRead, setMinuteRead] = useState(false);
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
@@ -64,6 +66,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       const max = h.scrollHeight - h.clientHeight;
       setProgress(max > 0 ? Math.min(100, (h.scrollTop / max) * 100) : 0);
       setShowTop(h.scrollTop > 800);
+      setShowFab(h.scrollTop > 500);
 
       const line = (barRef.current?.getBoundingClientRect().bottom ?? 120) + 80;
       let current: string | null = null;
@@ -158,8 +161,30 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   useEffect(() => {
     if (!minuteRead || autoPrompted.current || drawerOpen || supportOpen) return;
     autoPrompted.current = true;
+    setSupportMode("support");
     setSupportOpen(true);
   }, [minuteRead, drawerOpen, supportOpen]);
+
+  // Opening the prompt by hand also counts as "asked", so the one-minute prompt won't follow.
+  const openSupport = useCallback((mode: "support" | "download") => {
+    autoPrompted.current = true;
+    setDrawerOpen(false);
+    setSupportMode(mode);
+    setSupportOpen(true);
+  }, []);
+
+  // PDF downloads inside the book go through the prompt, which always offers a free download.
+  // Readers who already supported download straight away.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as Element).closest?.<HTMLAnchorElement>('.book a[download][href$=".pdf"]');
+      if (!link || hasSupported() || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      openSupport("download");
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [openSupport]);
 
   const toggle = (id: string) =>
     setExpanded((prev) => {
@@ -235,7 +260,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
           className="book-toc-support"
           onClick={() => {
             onPick?.();
-            setSupportOpen(true);
+            openSupport("support");
           }}
         >
           <Smile className="w-3.5 h-3.5" aria-hidden />
@@ -299,7 +324,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               <a href={pdf} download>
                 <Download className="w-4 h-4" aria-hidden /> Download the PDF
               </a>
-              <button type="button" onClick={() => setSupportOpen(true)}>
+              <button type="button" onClick={() => openSupport("support")}>
                 <Smile className="w-4 h-4" aria-hidden /> Support this book
               </button>
               <Link href="/books">More free books &rarr;</Link>
@@ -340,6 +365,16 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         <ArrowUp className="w-4 h-4" aria-hidden />
       </button>
 
+      <button
+        type="button"
+        className={`book-fab ${showFab && !drawerOpen && !supportOpen ? "is-on" : ""}`}
+        onClick={() => openSupport("support")}
+        aria-label="Support this book"
+      >
+        <Smile className="book-fab-icon" aria-hidden />
+        <span>Support</span>
+      </button>
+
       {/* Overlays render at the top of the page: inside .book they would sit under the site
           navbar, because .book is its own stacking layer. The wrapper carries the book's
           colour tokens and fonts. */}
@@ -347,7 +382,9 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         ? createPortal(
             <div className={`book-portal ${className}`}>
               <FigureLightbox />
-              {supportOpen ? <SupportModal onClose={() => setSupportOpen(false)} /> : null}
+              {supportOpen ? (
+                <SupportModal mode={supportMode} pdf={pdf} onClose={() => setSupportOpen(false)} />
+              ) : null}
             </div>,
             portalTarget
           )

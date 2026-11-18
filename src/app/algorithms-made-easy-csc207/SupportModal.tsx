@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Copy, Phone, X } from "lucide-react";
+import { Check, Copy, Download, Phone, X } from "lucide-react";
 
 // MTN Mobile Money (Cameroon) transfer to Tabe. The last number before # is the amount in FCFA.
 export const SUPPORT_CODE = "*126*1*1*681110631*200#";
@@ -37,12 +37,35 @@ export function mayAutoPrompt(): boolean {
   return Date.now() - s.at > LATER_DAYS * 24 * 60 * 60 * 1000;
 }
 
-type Props = { onClose: () => void };
+/** True once the reader has copied or dialled the code. */
+export function hasSupported(): boolean {
+  return readStore()?.state === "supported";
+}
+
+/** Start a file download from a click handler. */
+export function startDownload(href: string) {
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = "";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+type Props = {
+  onClose: () => void;
+  /** "download": opened from a PDF download link, with a free download path. */
+  mode?: "support" | "download";
+  pdf?: string;
+};
+
+type View = "ask" | "thanks" | "free";
 
 /** Rendered only while open: the reader mounts it, and it plays its own exit before calling onClose. */
-export default function SupportModal({ onClose }: Props) {
+export default function SupportModal({ onClose, mode = "support", pdf }: Props) {
   const [closing, setClosing] = useState(false);
-  const [thanked, setThanked] = useState(false);
+  const [view, setView] = useState<View>("ask");
+  const isDownload = mode === "download";
   const [copied, setCopied] = useState(false);
   const [canDial] = useState(() => window.matchMedia("(pointer: coarse)").matches);
   const [opener] = useState(() => document.activeElement as HTMLElement | null);
@@ -60,13 +83,21 @@ export default function SupportModal({ onClose }: Props) {
   }, [onClose, opener]);
 
   const dismiss = useCallback(() => {
-    if (!thanked) writeStore("later");
+    if (view === "ask") writeStore("later");
     close();
-  }, [thanked, close]);
+  }, [view, close]);
 
   const markSupported = () => {
     writeStore("supported");
-    setThanked(true);
+    setView("thanks");
+  };
+
+  // "I'd love to support, but..." : download straight away, no strings attached, and treat it as
+  // "maybe later" so the timed prompt leaves them alone for a while.
+  const downloadFree = () => {
+    if (pdf) startDownload(pdf);
+    writeStore("later");
+    setView("free");
   };
 
   useEffect(() => () => {
@@ -111,7 +142,7 @@ export default function SupportModal({ onClose }: Props) {
       clearTimeout(focusTimer);
       document.removeEventListener("keydown", onKey);
     };
-  }, [dismiss, thanked]);
+  }, [dismiss, view]);
 
   const copy = async () => {
     let ok = false;
@@ -149,7 +180,7 @@ export default function SupportModal({ onClose }: Props) {
     >
       <div
         ref={cardRef}
-        className={`support-card ${thanked ? "is-thanked" : ""}`}
+        className={`support-card ${view !== "ask" ? "is-thanked" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="support-title"
@@ -159,18 +190,27 @@ export default function SupportModal({ onClose }: Props) {
           <X className="w-4 h-4" aria-hidden />
         </button>
 
-        <Smiley grin={thanked} />
+        <Smiley grin={view !== "ask"} />
 
-        {!thanked ? (
+        {view === "ask" ? (
           <div className="support-body" key="ask">
-            <p className="support-kicker">Free for everyone. Always.</p>
+            <p className="support-kicker">{isDownload ? "Your PDF is ready" : "Free for everyone. Always."}</p>
             <h2 id="support-title" className="support-title">
-              Did this book make algorithms click?
+              {isDownload ? "Before you download, one small ask" : "Did this book make algorithms click?"}
             </h2>
             <p id="support-desc" className="support-text">
-              CSC207 Made Easy is the whole course rewritten in plain English, with an illustration for every
-              chapter. No paywall, no ads. If it helped you, a small tip tells <strong>Tabe</strong> it was worth it
-              and helps the next free book get written.
+              {isDownload ? (
+                <>
+                  The 68-page PDF is yours to keep, print and share, free. If it helps you pass, a small tip tells{" "}
+                  <strong>Tabe</strong> it was worth it and helps the next free book get written.
+                </>
+              ) : (
+                <>
+                  CSC207 Made Easy is the whole course rewritten in plain English, with an illustration for every
+                  chapter. No paywall, no ads. If it helped you, a small tip tells <strong>Tabe</strong> it was worth
+                  it and helps the next free book get written.
+                </>
+              )}
             </p>
 
             <div className="support-code">
@@ -203,12 +243,24 @@ export default function SupportModal({ onClose }: Props) {
 
             <p className="support-hint">Want to give a different amount? Change the 200 before you dial.</p>
 
-            <button type="button" className="support-later" onClick={dismiss}>
-              Maybe later, keep reading
-            </button>
-            <p className="support-fine">Completely optional. The book stays free either way.</p>
+            {isDownload ? (
+              <button type="button" className="support-free" onClick={downloadFree}>
+                <span className="support-free-main">I&apos;d love to support, but I don&apos;t have money right now</span>
+                <span className="support-free-sub">
+                  <Download className="w-3.5 h-3.5" aria-hidden />
+                  Download free
+                </span>
+              </button>
+            ) : (
+              <>
+                <button type="button" className="support-later" onClick={dismiss}>
+                  Maybe later, keep reading
+                </button>
+                <p className="support-fine">Completely optional. The book stays free either way.</p>
+              </>
+            )}
           </div>
-        ) : (
+        ) : view === "thanks" ? (
           <div className="support-body" key="thanks" aria-live="polite">
             <p className="support-kicker">You are a star</p>
             <h2 id="support-title" className="support-title">
@@ -219,13 +271,52 @@ export default function SupportModal({ onClose }: Props) {
               this.
             </p>
             <div className="support-actions">
-              <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
-                Back to reading
-              </button>
+              {isDownload && pdf ? (
+                <button
+                  ref={firstRef}
+                  type="button"
+                  className="support-btn support-btn-primary"
+                  onClick={() => {
+                    startDownload(pdf);
+                    close();
+                  }}
+                >
+                  <Download className="w-4 h-4" aria-hidden />
+                  Download the PDF
+                </button>
+              ) : (
+                <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
+                  Back to reading
+                </button>
+              )}
             </div>
             <p className="support-fine">
               Didn&apos;t get to dial yet? The code is <code>{SUPPORT_CODE}</code>
             </p>
+          </div>
+        ) : (
+          <div className="support-body" key="free" aria-live="polite">
+            <p className="support-kicker">No worries at all</p>
+            <h2 id="support-title" className="support-title">
+              It&apos;s yours. Go ace that CA.
+            </h2>
+            <p id="support-desc" className="support-text">
+              Your download has started. Want to help anyway? Share the book with a classmate who is struggling,
+              that means a lot too.
+            </p>
+            <div className="support-actions">
+              <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
+                Back to reading
+              </button>
+            </div>
+            {pdf ? (
+              <p className="support-fine">
+                Download didn&apos;t start?{" "}
+                <a href={pdf} download className="support-link">
+                  Try again
+                </a>
+              </p>
+            ) : null}
           </div>
         )}
       </div>
