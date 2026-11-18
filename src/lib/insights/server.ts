@@ -78,3 +78,9 @@ export function cleanRef(ref: unknown): string | null {
 export function fieldKey(s: string): string {
   return s.replace(/[^a-z0-9_-]/gi, "_");
 }
+
+/** Today's date in Cameroon (Africa/Douala, UTC+1) as a Firestore-safe key, e.g. "d20261118". */
+export function dayKey(date = new Date()): string {
+  const local = new Date(date.getTime() + 60 * 60 * 1000);
+  return `d${local.toISOString().slice(0, 10).replace(/-/g, "")}`;
+}

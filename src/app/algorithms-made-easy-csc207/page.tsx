@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces } from "next/font/google";
 import BookReader, { type BookPart } from "./BookReader";
+import { TOPIC_LABELS as topicLabels } from "./book-info";
 import {
   BOOK_AUTHOR,
   BOOK_AUTHOR_AVATAR,
@@ -131,34 +132,6 @@ const decode = (s: string) =>
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&quot;/g, '"');
 
-// Sidebar labels: plain topic names, so readers can find a syllabus topic at a glance. The chapters
-// keep their own friendlier headings in the text. Keyed by chapter id.
-const topicLabels: Record<string, string> = {
-  c1: "What is an algorithm?",
-  c2: "Properties of an algorithm",
-  c3: "Problem difficulty",
-  c4: "Variables and assignment",
-  c5: "Data types",
-  c6: "Data structures",
-  c7: "Algorithm vs program vs language",
-  c8: "The programming process",
-  c9: "Pseudocode",
-  c10: "Flowcharts",
-  c11: "Control structures",
-  c12: "Worked examples: sequence and selection",
-  c13: "Factorial (steps, pseudocode, C)",
-  c14: "Euclid's algorithm (GCD)",
-  c15: "Top-down and bottom-up design",
-  c16: "Greedy algorithms",
-  c17: "Divide and conquer",
-  c18: "Dynamic programming",
-  c19: "Other algorithm types",
-  c20: "Time complexity",
-  c21: "Space complexity",
-  c22: "Best, worst and average case",
-  c23: "Big O notation",
-  c24: "Exam revision summary",
-};
 
 // Subtopics shown under a chapter in the sidebar: [index of the chapter's <h4>, sidebar label].
 const subtopics: Record<string, [number, string][]> = {
