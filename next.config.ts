@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/algorithms", destination: "/algorithms-made-easy-csc207", permanent: true },
       { source: "/algorithms/:path*", destination: "/algorithms-made-easy-csc207/:path*", permanent: true },
+      // Short link for sharing, e.g. taberickson.com/csc207?ref=l2 (query strings carry over).
+      // Temporary on purpose, so /csc207 can later become its own page (e.g. book + tutorials).
+      { source: "/csc207", destination: "/algorithms-made-easy-csc207", permanent: false },
     ];
   },
 };
