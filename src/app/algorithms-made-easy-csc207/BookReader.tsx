@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
 import SupportModal, { mayAutoPrompt } from "./SupportModal";
 import ViewCount from "./ViewCount";
+import FigureLightbox from "./FigureLightbox";
 import { BOOK_PATH } from "./book-info";
 
 export type BookSubtopic = { id: string; title: string };
@@ -33,6 +34,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const autoPrompted = useRef(false);
   const [minuteRead, setMinuteRead] = useState(false);
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -129,9 +131,10 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
 
   // The view count lives in the stats row inside the book's HTML; render it there with a portal.
   useEffect(() => {
-    const frame = requestAnimationFrame(() =>
-      setViewsSlot(document.querySelector<HTMLElement>("[data-book-views]"))
-    );
+    const frame = requestAnimationFrame(() => {
+      setViewsSlot(document.querySelector<HTMLElement>("[data-book-views]"));
+      setPortalTarget(document.body);
+    });
     return () => cancelAnimationFrame(frame);
   }, []);
 
@@ -337,7 +340,18 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         <ArrowUp className="w-4 h-4" aria-hidden />
       </button>
 
-      {supportOpen ? <SupportModal onClose={() => setSupportOpen(false)} /> : null}
+      {/* Overlays render at the top of the page: inside .book they would sit under the site
+          navbar, because .book is its own stacking layer. The wrapper carries the book's
+          colour tokens and fonts. */}
+      {portalTarget
+        ? createPortal(
+            <div className={`book-portal ${className}`}>
+              <FigureLightbox />
+              {supportOpen ? <SupportModal onClose={() => setSupportOpen(false)} /> : null}
+            </div>,
+            portalTarget
+          )
+        : null}
       {viewsSlot ? createPortal(<ViewCount path={BOOK_PATH} className="bs-views-in" />, viewsSlot) : null}
     </div>
   );
