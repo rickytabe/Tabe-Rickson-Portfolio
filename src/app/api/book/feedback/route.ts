@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import {
   BOOK_ID,
+  dayKey,
   db,
   insightsEnabled,
   newReaderId,
@@ -63,7 +64,13 @@ export async function POST(request: Request) {
           statsDoc,
           {
             ...(Object.keys(counts).length ? { clarity: counts } : {}),
-            ...(isNew ? { readers: { total: FieldValue.increment(1) }, refs: { direct: FieldValue.increment(1) } } : {}),
+            ...(isNew
+              ? {
+                  readers: { total: FieldValue.increment(1) },
+                  refs: { direct: FieldValue.increment(1) },
+                  daily: { [dayKey()]: FieldValue.increment(1) },
+                }
+              : {}),
             updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true }

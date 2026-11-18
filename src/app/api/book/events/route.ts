@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import {
   BOOK_ID,
   cleanRef,
+  dayKey,
   db,
   fieldKey,
   insightsEnabled,
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
       await reader.set({ book: BOOK_ID, firstSeen: FieldValue.serverTimestamp(), ref: ref ?? null });
       bump("readers", "total");
       bump("refs", ref ?? "direct");
+      bump("daily", dayKey());
     }
 
     // A mark document per reader and event: create() fails if it exists, so each counts once.
