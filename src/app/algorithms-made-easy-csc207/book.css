@@ -1712,6 +1712,125 @@ a.is-active .book-toc-num {
   }
 }
 
+/* ---------- floating support button ---------- */
+.book-fab {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 44;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--b-stick-edge) 45%, var(--b-line));
+  background: var(--card-bg);
+  color: var(--foreground);
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.92);
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3), visibility 0.25s,
+    border-color 0.2s, color 0.2s;
+}
+.book-fab.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.book-fab-icon {
+  width: 20px;
+  height: 20px;
+  color: #20242b;
+  background: #f3bf3f;
+  border-radius: 50%;
+  padding: 1px;
+}
+.book-fab:hover {
+  border-color: var(--b-stick-edge);
+  color: var(--b-accent);
+}
+.book-fab:hover .book-fab-icon {
+  animation: book-fab-wiggle 0.5s ease;
+}
+.book-fab:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: 2px;
+}
+@keyframes book-fab-wiggle {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-14deg); }
+  60% { transform: rotate(10deg); }
+}
+/* desktop: the pill sits at the foot of the sidebar column, so leave room under the list */
+@media (min-width: 1024px) {
+  .book-fab {
+    left: 24px;
+    bottom: 22px;
+  }
+  .book-side {
+    padding-bottom: 96px;
+  }
+}
+
+/* free download path in the prompt */
+.support-free {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px dashed var(--b-line);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.support-free:hover {
+  border-color: color-mix(in srgb, var(--b-accent) 45%, transparent);
+  background: var(--b-wash);
+}
+.support-free:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: 2px;
+}
+.support-free-main {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--b-soft);
+}
+.support-free-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--b-accent);
+}
+.support-link {
+  color: var(--b-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-fab,
+  .book-fab-icon {
+    transition: none;
+    animation: none !important;
+  }
+}
+
 /* ---------- print ---------- */
 @media print {
   .book-bar,
@@ -1721,6 +1840,7 @@ a.is-active .book-toc-num {
   .book-top,
   .support-backdrop,
   .lb-backdrop,
+  .book-fab,
   .book-content .dlwrap,
   .book-content .dlnote {
     display: none !important;
