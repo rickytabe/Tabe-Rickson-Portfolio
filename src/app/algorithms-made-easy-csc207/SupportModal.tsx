@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Copy, Download, Phone, X } from "lucide-react";
+import { track } from "./insights";
 
 // MTN Mobile Money (Cameroon) transfer to Tabe. The last number before # is the amount in FCFA.
 export const SUPPORT_CODE = "*126*1*1*681110631*200#";
@@ -95,6 +96,7 @@ export default function SupportModal({ onClose, mode = "support", pdf }: Props) 
   // "I'd love to support, but..." : download straight away, no strings attached, and treat it as
   // "maybe later" so the timed prompt leaves them alone for a while.
   const downloadFree = () => {
+    track("download_free");
     if (pdf) startDownload(pdf);
     writeStore("later");
     setView("free");
@@ -166,6 +168,7 @@ export default function SupportModal({ onClose, mode = "support", pdf }: Props) 
       ta.remove();
     }
     if (ok) {
+      track("support_copy");
       setCopied(true);
       setTimeout(markSupported, 900);
     }
@@ -225,7 +228,14 @@ export default function SupportModal({ onClose, mode = "support", pdf }: Props) 
 
             <div className="support-actions">
               {canDial ? (
-                <a href={SUPPORT_TEL} className="support-btn support-btn-primary" onClick={markSupported}>
+                <a
+                  href={SUPPORT_TEL}
+                  className="support-btn support-btn-primary"
+                  onClick={() => {
+                    track("support_dial");
+                    markSupported();
+                  }}
+                >
                   <Phone className="w-4 h-4" aria-hidden />
                   Dial now
                 </a>
@@ -277,6 +287,7 @@ export default function SupportModal({ onClose, mode = "support", pdf }: Props) 
                   type="button"
                   className="support-btn support-btn-primary"
                   onClick={() => {
+                    track("download_supported");
                     startDownload(pdf);
                     close();
                   }}

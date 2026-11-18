@@ -7,6 +7,8 @@ import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
 import SupportModal, { hasSupported, mayAutoPrompt } from "./SupportModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
+import ChapterFeedback from "./ChapterFeedback";
+import { track } from "./insights";
 import { BOOK_PATH } from "./book-info";
 
 export type BookSubtopic = { id: string; title: string };
@@ -37,6 +39,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [minuteRead, setMinuteRead] = useState(false);
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  const [feedbackSlots, setFeedbackSlots] = useState<HTMLElement[]>([]);
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -137,6 +140,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     const frame = requestAnimationFrame(() => {
       setViewsSlot(document.querySelector<HTMLElement>("[data-book-views]"));
       setPortalTarget(document.body);
+      setFeedbackSlots(Array.from(document.querySelectorAll<HTMLElement>(".ch-feedback[data-chapter]")));
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -161,13 +165,33 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   useEffect(() => {
     if (!minuteRead || autoPrompted.current || drawerOpen || supportOpen) return;
     autoPrompted.current = true;
+    track("support_shown", "timer");
     setSupportMode("support");
     setSupportOpen(true);
   }, [minuteRead, drawerOpen, supportOpen]);
 
+  // Reading stats: which chapters each reader reaches, and whether they reach the end.
+  useEffect(() => {
+    if (active) track("reach", active);
+  }, [active]);
+
+  useEffect(() => {
+    const foot = document.querySelector(".book-foot");
+    if (!foot) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        track("end");
+        io.disconnect();
+      }
+    });
+    io.observe(foot);
+    return () => io.disconnect();
+  }, []);
+
   // Opening the prompt by hand also counts as "asked", so the one-minute prompt won't follow.
-  const openSupport = useCallback((mode: "support" | "download") => {
+  const openSupport = useCallback((mode: "support" | "download", source: string) => {
     autoPrompted.current = true;
+    track("support_shown", source);
     setDrawerOpen(false);
     setSupportMode(mode);
     setSupportOpen(true);
@@ -178,9 +202,13 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const link = (e.target as Element).closest?.<HTMLAnchorElement>('.book a[download][href$=".pdf"]');
-      if (!link || hasSupported() || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (!link || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (hasSupported()) {
+        track("download_direct");
+        return;
+      }
       e.preventDefault();
-      openSupport("download");
+      openSupport("download", "download");
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
@@ -260,7 +288,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
           className="book-toc-support"
           onClick={() => {
             onPick?.();
-            openSupport("support");
+            openSupport("support", "sidebar");
           }}
         >
           <Smile className="w-3.5 h-3.5" aria-hidden />
@@ -324,11 +352,15 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               <a href={pdf} download>
                 <Download className="w-4 h-4" aria-hidden /> Download the PDF
               </a>
-              <button type="button" onClick={() => openSupport("support")}>
+              <button type="button" onClick={() => openSupport("support", "footer")}>
                 <Smile className="w-4 h-4" aria-hidden /> Support this book
               </button>
               <Link href="/books">More free books &rarr;</Link>
             </div>
+            <p className="book-foot-credit">
+              Anonymous reading stats and chapter feedback help improve this book. No names or personal details
+              are collected.
+            </p>
             <p className="book-foot-credit">
               Original course material by Drs. Nyanga B., Achenkeng P. and Fotsing C. Definitions quoted in chapter 1
               are from Dromey, <i>How to Solve it by Computer</i> (1982) and Woodhouse et al, <i>Computer Science</i>{" "}
@@ -368,7 +400,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       <button
         type="button"
         className={`book-fab ${showFab && !drawerOpen && !supportOpen ? "is-on" : ""}`}
-        onClick={() => openSupport("support")}
+        onClick={() => openSupport("support", "fab")}
         aria-label="Support this book"
       >
         <Smile className="book-fab-icon" aria-hidden />
@@ -389,6 +421,9 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
             portalTarget
           )
         : null}
+      {feedbackSlots.map((slot) =>
+        createPortal(<ChapterFeedback chapter={slot.dataset.chapter!} />, slot, slot.dataset.chapter)
+      )}
       {viewsSlot ? createPortal(<ViewCount path={BOOK_PATH} className="bs-views-in" />, viewsSlot) : null}
     </div>
   );
