@@ -19,8 +19,6 @@ const nextConfig: NextConfig = {
       // Short link for sharing, e.g. taberickson.com/csc207?ref=l2 (query strings carry over).
       // Temporary on purpose, so /csc207 can later become its own page (e.g. book + tutorials).
       { source: "/csc207", destination: "/algorithms-made-easy-csc207", permanent: false },
-      // Opens the book with Algo, the quiz bot, already on screen (e.g. /csc207/quiz?ref=l2).
-      { source: "/csc207/quiz", destination: "/algorithms-made-easy-csc207?quiz=1", permanent: false },
     ];
   },
 };
