@@ -11,7 +11,7 @@ type Profile = { asked: boolean; name: string | null; anonymous: boolean };
 type Question = { id: string; chapter: string; q: string; options: string[]; order: number[] };
 type Feedback = { correct: boolean; answer: number; explain: string };
 type Result = { id: string; chapter: string; correct: boolean };
-type BoardRow = { rank: number; name: string | null; score: number; seconds: number; you: boolean };
+type BoardRow = { rank: number; name: string | null; points: number; quizzes: number; avg: number; you: boolean };
 type Board = { week: string; total: number; top: BoardRow[]; you: BoardRow | null };
 type Phase = "loading" | "name" | "intro" | "q" | "done" | "board" | "error";
 
@@ -30,7 +30,8 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 
 const shuffle = () => [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-const time = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 function verdict(score: number) {
   if (score >= 9) return { title: "CA-ready!", line: "You clearly know this course. Keep it fresh and you'll fly through the CA." };
@@ -60,6 +61,7 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
   const [results, setResults] = useState<Result[]>([]);
   const [ranked, setRanked] = useState(false);
   const [onBoard, setOnBoard] = useState(false);
+  const [weekPoints, setWeekPoints] = useState<{ points: number; quizzes: number } | null>(null);
 
   const [board, setBoard] = useState<Board | null>(null);
   const [boardBack, setBoardBack] = useState<Phase>("intro");
@@ -130,10 +132,17 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
     if (busy) return;
     setBusy(true);
     try {
-      const s = await api<{ sid: string; ranked: boolean; questions: Omit<Question, "order">[] }>("start", {});
+      const s = await api<{
+        sid: string;
+        ranked: boolean;
+        points: number;
+        quizzes: number;
+        questions: Omit<Question, "order">[];
+      }>("start", {});
       setSid(s.sid);
       setRanked(s.ranked);
       setOnBoard(false);
+      setWeekPoints({ points: s.points, quizzes: s.quizzes });
       setQuestions(s.questions.map((q) => ({ ...q, order: shuffle() })));
       setIndex(0);
       setPicked(null);
@@ -156,7 +165,9 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
       setBusy(true);
       setErrorText("");
       try {
-        const r = await api<Feedback & { done: boolean; score: number; ranked: boolean }>("answer", {
+        const r = await api<
+          Feedback & { done: boolean; score: number; ranked: boolean; points: number; quizzes: number }
+        >("answer", {
           sid,
           qid: current.id,
           choice: current.order[pos],
@@ -166,6 +177,7 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
         if (!r.correct) track("quiz_miss", current.id);
         if (r.done) {
           setOnBoard(r.ranked);
+          setWeekPoints({ points: r.points, quizzes: r.quizzes });
           track("quiz_finish", `s${r.score}`);
         }
       } catch (e) {
@@ -366,8 +378,8 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
                 )}
               </p>
               <p className="quiz-bubble">
-                <b>10 quick questions</b>{" "}from across the book. No calculations, just pick A, B, C or D. Your
-                first finished quiz each week goes on the{" "}<b>leaderboard</b>.
+                <b>10 quick questions</b>{" "}from across the book. No calculations, just pick A, B, C or D. Every
+                quiz you finish adds your score to this week&apos;s{" "}<b>leaderboard</b>{" "}(up to 5 a day).
               </p>
               <button ref={primaryRef} type="button" className="quiz-btn" onClick={start} disabled={busy}>
                 {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Start the quiz{" "}
@@ -471,10 +483,14 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
               <p className="quiz-bubble">{verdict(score).line}</p>
               <p className={`quiz-rank-note ${onBoard ? "is-on" : ""}`}>
                 {onBoard
-                  ? "🏆 This score is on this week's leaderboard."
+                  ? `🏆 +${plural(score, "point")}! You have ${plural(weekPoints?.points ?? score, "point")} from ${plural(
+                      weekPoints?.quizzes ?? 1,
+                      "quiz",
+                      "quizzes"
+                    )} this week.`
                   : ranked
-                    ? "This attempt couldn't be added to the leaderboard."
-                    : "Practice round: your first quiz this week is already on the leaderboard."}
+                    ? "This quiz couldn't be added to the leaderboard. Your points are safe."
+                    : "Practice round: 5 quizzes a day count for points, and you've done today's. Come back tomorrow for more!"}
               </p>
               {missedChapters.length ? (
                 <>
@@ -533,7 +549,10 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
               ) : (
                 <p className="quiz-bubble">No scores yet this week. Take the quiz and claim the top spot 🏆</p>
               )}
-              <p className="quiz-hint">Ranked by score, then by speed. Your first finished quiz each week counts.</p>
+              <p className="quiz-hint">
+                Points = correct answers from every quiz you finish this week (up to 5 quizzes a day). Ties go to the
+                better average.
+              </p>
               <div className="quiz-actions">
                 <button
                   ref={primaryRef}
@@ -557,12 +576,16 @@ function BoardItem({ row }: { row: BoardRow }) {
   return (
     <li className={`quiz-board-row ${row.you ? "is-you" : ""}`}>
       <span className="quiz-board-rank">{medal ?? row.rank}</span>
-      <span className="quiz-board-name">
-        {row.name ?? <i>Anonymous</i>}
-        {row.you ? <span className="quiz-board-you">you</span> : null}
+      <span className="quiz-board-who">
+        <span className="quiz-board-name">
+          {row.name ?? <i>Anonymous</i>}
+          {row.you ? <span className="quiz-board-you">you</span> : null}
+        </span>
+        <span className="quiz-board-time">
+          {row.quizzes} {row.quizzes === 1 ? "quiz" : "quizzes"} · avg {row.avg.toFixed(1)}/10
+        </span>
       </span>
-      <span className="quiz-board-score">{row.score}/10</span>
-      <span className="quiz-board-time">{time(row.seconds)}</span>
+      <span className="quiz-board-score">{row.points} pts</span>
     </li>
   );
 }

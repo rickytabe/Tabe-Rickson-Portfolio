@@ -11,8 +11,9 @@ export async function GET(request: Request) {
   const shape = (r: (typeof rows)[number], i: number) => ({
     rank: i + 1,
     name: r.name,
-    score: r.score,
-    seconds: Math.round(r.ms / 1000),
+    points: r.points,
+    quizzes: r.quizzes,
+    avg: Math.round(r.avg * 10) / 10,
     you: !!rid && r.rid === rid,
   });
   const top = rows.slice(0, 20).map(shape);

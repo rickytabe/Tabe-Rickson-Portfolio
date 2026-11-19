@@ -451,7 +451,8 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
       <section className="ins-card" id="leaderboard">
         <h2 className="ins-h2">This week&apos;s leaderboard</h2>
         <p className="ins-note">
-          Week of {weekStartLabel()} · first finished quiz per reader · hidden entries stay off the public board.
+          Week of {weekStartLabel()} · points = correct answers across finished quizzes (up to 5 a day count) ·
+          hidden entries stay off the public board.
         </p>
         {board.length ? (
           <ol className="ins-board">
@@ -459,9 +460,9 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
               <li key={r.id} className={r.hidden ? "is-hidden" : undefined}>
                 <span className="ins-num">{i + 1}</span>
                 <span className="ins-board-name">{r.name ?? <i>Anonymous</i>}</span>
-                <b>{r.score}/10</b>
+                <b>{r.points} pts</b>
                 <span className="ins-muted">
-                  {Math.floor(r.ms / 60000)}:{String(Math.round(r.ms / 1000) % 60).padStart(2, "0")}
+                  {r.quizzes} {r.quizzes === 1 ? "quiz" : "quizzes"} · avg {r.avg.toFixed(1)}
                 </span>
                 <form method="post" action="/api/book/admin/board">
                   <input type="hidden" name="id" value={r.id} />
