@@ -25,6 +25,9 @@ const EVENTS: Record<string, (key: string) => boolean> = {
   download_supported: (k) => k === "", // downloaded from the thank-you screen
   download_direct: (k) => k === "", // returning supporter, no prompt
   figure_open: (k) => k === "",
+  quiz_open: (k) => k === "",
+  quiz_finish: (k) => /^s([0-9]|10)$/.test(k), // first score per reader, out of 10
+  quiz_miss: (k) => /^q\d{1,3}$/.test(k), // a question this reader got wrong
 };
 
 type Incoming = { events?: { type?: unknown; key?: unknown }[]; ref?: unknown };
