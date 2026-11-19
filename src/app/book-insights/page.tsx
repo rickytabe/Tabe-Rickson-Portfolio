@@ -5,6 +5,7 @@ import { ADMIN_COOKIE, dashboardEnabled, validSession } from "@/lib/insights/adm
 import { BOOK_ID, dayKey, db, insightsEnabled } from "@/lib/insights/server";
 import { getPathViews } from "@/lib/vercel/analytics";
 import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
+import { QUIZ_BANK } from "../algorithms-made-easy-csc207/quiz-bank";
 import "./insights.css";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,9 @@ type Stats = {
   download_supported?: Counts;
   download_direct?: Counts;
   figure_open?: Counts;
+  quiz_open?: Counts;
+  quiz_finish?: Counts;
+  quiz_miss?: Counts;
   updatedAt?: { toDate(): Date };
 };
 type Note = { chapter: string; vote: "up" | "down"; text: string; at: Date | null };
@@ -149,6 +153,18 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
     ["sidebar", "Sidebar link"],
     ["footer", "Footer link"],
   ];
+
+  // Quiz: first score per reader (s0..s10) and questions readers got wrong.
+  const quizOpened = n(stats.quiz_open);
+  const scoreRows = Array.from({ length: 11 }, (_, i) => ({ score: i, count: n(stats.quiz_finish, `s${i}`) }));
+  const quizFinished = scoreRows.reduce((a, r) => a + r.count, 0);
+  const avgScore = quizFinished ? scoreRows.reduce((a, r) => a + r.score * r.count, 0) / quizFinished : null;
+  const scoreMax = Math.max(...scoreRows.map((r) => r.count), 1);
+  const missed = Object.entries(stats.quiz_miss ?? {})
+    .map(([id, count]) => ({ q: QUIZ_BANK.find((x) => x.id === id), count: Number(count) }))
+    .filter((m) => m.q)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
 
   const updated = stats.updatedAt?.toDate?.();
 
@@ -369,6 +385,64 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
           </ul>
         </section>
       </div>
+
+      {/* Quiz */}
+      <section className="ins-card">
+        <h2 className="ins-h2">Quiz bot</h2>
+        <p className="ins-note">First attempt per reader. Misses show which ideas need more explaining.</p>
+        <dl className="ins-funnel">
+          <div>
+            <dt>Opened the quiz</dt>
+            <dd>{fmt.format(quizOpened)}</dd>
+          </div>
+          <div>
+            <dt>Finished</dt>
+            <dd>
+              {fmt.format(quizFinished)} <small>{pct(quizFinished, quizOpened)}%</small>
+            </dd>
+          </div>
+          <div>
+            <dt>Average score</dt>
+            <dd>{avgScore === null ? "–" : `${avgScore.toFixed(1)} / 10`}</dd>
+          </div>
+        </dl>
+        {quizFinished ? (
+          <>
+            <h3 className="ins-h3">Scores</h3>
+            <ul className="ins-refs">
+              {scoreRows
+                .filter((r) => r.count)
+                .reverse()
+                .map((r) => (
+                  <li key={r.score}>
+                    <span className="ins-ref-name">{r.score} / 10</span>
+                    <span className="ins-hbar" title={`${r.count} readers`}>
+                      <span className="ins-hbar-fill" style={{ width: `${(r.count / scoreMax) * 100}%` }} />
+                    </span>
+                    <b>{r.count}</b>
+                  </li>
+                ))}
+            </ul>
+          </>
+        ) : null}
+        <h3 className="ins-h3">Most-missed questions</h3>
+        {missed.length ? (
+          <ul className="ins-list">
+            {missed.map(({ q, count }) => (
+              <li key={q!.id}>
+                <span>
+                  <span className="ins-num">{Number(q!.chapter.slice(1))}. {TOPIC_LABELS[q!.chapter]}</span>
+                  <br />
+                  {q!.q}
+                </span>
+                <b>{count}</b>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="ins-muted">No misses recorded yet.</p>
+        )}
+      </section>
 
       {/* Notes */}
       <section className="ins-card">

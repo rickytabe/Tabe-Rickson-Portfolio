@@ -8,6 +8,7 @@ import SupportModal, { hasSupported, mayAutoPrompt } from "./SupportModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
 import ChapterFeedback from "./ChapterFeedback";
+import QuizBot, { Robot } from "./QuizBot";
 import { track } from "./insights";
 import { BOOK_PATH } from "./book-info";
 
@@ -35,6 +36,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportMode, setSupportMode] = useState<"support" | "download">("support");
   const [showFab, setShowFab] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(false);
   const autoPrompted = useRef(false);
   const [minuteRead, setMinuteRead] = useState(false);
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
@@ -390,7 +392,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
 
       <button
         type="button"
-        className={`book-top ${showTop && !drawerOpen && !supportOpen ? "is-on" : ""}`}
+        className={`book-top ${showTop && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Back to top"
       >
@@ -399,12 +401,27 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
 
       <button
         type="button"
-        className={`book-fab ${showFab && !drawerOpen && !supportOpen ? "is-on" : ""}`}
+        className={`book-fab ${showFab && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""}`}
         onClick={() => openSupport("support", "fab")}
         aria-label="Support this book"
       >
         <Smile className="book-fab-icon" aria-hidden />
         <span>Support</span>
+      </button>
+
+      <button
+        type="button"
+        className={`book-quiz-fab ${showFab && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""} ${
+          showTop ? "is-raised" : ""
+        }`}
+        onClick={() => {
+          setDrawerOpen(false);
+          setQuizOpen(true);
+        }}
+        aria-label="Quiz me: test what you've read"
+      >
+        <Robot size={26} />
+        <span>Quiz me</span>
       </button>
 
       {/* Overlays render at the top of the page: inside .book they would sit under the site
@@ -414,6 +431,14 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         ? createPortal(
             <div className={`book-portal ${className}`}>
               <FigureLightbox />
+              {quizOpen ? (
+                <QuizBot
+                  onClose={() => setQuizOpen(false)}
+                  onReadChapter={(id) =>
+                    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+                  }
+                />
+              ) : null}
               {supportOpen ? (
                 <SupportModal mode={supportMode} pdf={pdf} onClose={() => setSupportOpen(false)} />
               ) : null}
