@@ -84,3 +84,29 @@ export function dayKey(date = new Date()): string {
   const local = new Date(date.getTime() + 60 * 60 * 1000);
   return `d${local.toISOString().slice(0, 10).replace(/-/g, "")}`;
 }
+
+/**
+ * The reader behind a request: the signed cookie's id, or a new reader (recorded in Firestore and
+ * counted in the stats). When `isNew` is true, set `readerCookie(rid)` on the response.
+ */
+export async function ensureReader(request: Request): Promise<{ rid: string; isNew: boolean }> {
+  const existing = readerFromRequest(request);
+  if (existing) return { rid: existing, isNew: false };
+  const rid = newReaderId();
+  const { FieldValue } = await import("firebase-admin/firestore");
+  const store = db();
+  await store.collection("bookReaders").doc(rid).set({ book: BOOK_ID, firstSeen: FieldValue.serverTimestamp(), ref: null });
+  await store
+    .collection("bookStats")
+    .doc(BOOK_ID)
+    .set(
+      {
+        readers: { total: FieldValue.increment(1) },
+        refs: { direct: FieldValue.increment(1) },
+        daily: { [dayKey()]: FieldValue.increment(1) },
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  return { rid, isNew: true };
+}

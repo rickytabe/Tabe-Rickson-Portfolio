@@ -503,3 +503,38 @@
     min-width: 0;
   }
 }
+
+/* leaderboard */
+.ins-board {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.ins-board li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--i-line);
+  font-size: 14px;
+}
+.ins-board li.is-hidden {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.ins-board-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+.ins-board b {
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.ins-btn-sm {
+  padding: 6px 10px;
+  font-size: 10.5px;
+  text-decoration: none;
+}

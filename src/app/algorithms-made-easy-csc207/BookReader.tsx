@@ -147,6 +147,18 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     return () => cancelAnimationFrame(frame);
   }, []);
 
+  // ?quiz=1 (from taberickson.com/csc207/quiz) opens Algo straight away. Drop just that parameter
+  // from the address bar so a refresh doesn't reopen it; ?ref= stays for the reading stats.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("quiz")) return;
+    autoPrompted.current = true; // don't stack the support prompt on top of the quiz
+    url.searchParams.delete("quiz");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    const frame = requestAnimationFrame(() => setQuizOpen(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   // Count one minute of actual reading: time only passes while the tab is visible.
   useEffect(() => {
     if (!mayAutoPrompt()) return;

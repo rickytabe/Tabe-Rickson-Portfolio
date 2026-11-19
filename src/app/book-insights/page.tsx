@@ -5,7 +5,9 @@ import { ADMIN_COOKIE, dashboardEnabled, validSession } from "@/lib/insights/adm
 import { BOOK_ID, dayKey, db, insightsEnabled } from "@/lib/insights/server";
 import { getPathViews } from "@/lib/vercel/analytics";
 import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
-import { QUIZ_BANK } from "../algorithms-made-easy-csc207/quiz-bank";
+import { QUIZ_QUESTIONS } from "../algorithms-made-easy-csc207/quiz-questions";
+import { loadBoard } from "@/lib/quiz/board";
+import { weekKey, weekStartLabel } from "@/lib/quiz/server";
 import "./insights.css";
 
 export const dynamic = "force-dynamic";
@@ -50,10 +52,11 @@ const when = new Intl.DateTimeFormat("en-GB", {
 
 async function load() {
   const store = db();
-  const [statsSnap, notesSnap, views] = await Promise.all([
+  const [statsSnap, notesSnap, views, board] = await Promise.all([
     store.collection("bookStats").doc(BOOK_ID).get(),
     store.collection("bookFeedback").orderBy("at", "desc").limit(60).get(),
     Promise.all([getPathViews("/algorithms-made-easy-csc207"), getPathViews("/algorithms")]),
+    loadBoard(weekKey(), { includeHidden: true }),
   ]);
   const stats = (statsSnap.data() ?? {}) as Stats;
   const notes: Note[] = notesSnap.docs
@@ -70,7 +73,7 @@ async function load() {
     return { key: dayKey(d), label: dayLabel.format(d) };
   });
 
-  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays };
+  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays, board };
 }
 
 function Login({ failed }: { failed: boolean }) {
@@ -107,7 +110,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
     );
   }
 
-  const { stats, notes, views, recentDays } = await load();
+  const { stats, notes, views, recentDays, board } = await load();
   const readers = n(stats.readers);
   const finished = n(stats.end);
   const downloads = n(stats.download_free) + n(stats.download_supported) + n(stats.download_direct);
@@ -161,7 +164,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
   const avgScore = quizFinished ? scoreRows.reduce((a, r) => a + r.score * r.count, 0) / quizFinished : null;
   const scoreMax = Math.max(...scoreRows.map((r) => r.count), 1);
   const missed = Object.entries(stats.quiz_miss ?? {})
-    .map(([id, count]) => ({ q: QUIZ_BANK.find((x) => x.id === id), count: Number(count) }))
+    .map(([id, count]) => ({ q: QUIZ_QUESTIONS.find((x) => x.id === id), count: Number(count) }))
     .filter((m) => m.q)
     .sort((a, b) => b.count - a.count)
     .slice(0, 6);
@@ -441,6 +444,37 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
           </ul>
         ) : (
           <p className="ins-muted">No misses recorded yet.</p>
+        )}
+      </section>
+
+      {/* Leaderboard */}
+      <section className="ins-card" id="leaderboard">
+        <h2 className="ins-h2">This week&apos;s leaderboard</h2>
+        <p className="ins-note">
+          Week of {weekStartLabel()} · first finished quiz per reader · hidden entries stay off the public board.
+        </p>
+        {board.length ? (
+          <ol className="ins-board">
+            {board.map((r, i) => (
+              <li key={r.id} className={r.hidden ? "is-hidden" : undefined}>
+                <span className="ins-num">{i + 1}</span>
+                <span className="ins-board-name">{r.name ?? <i>Anonymous</i>}</span>
+                <b>{r.score}/10</b>
+                <span className="ins-muted">
+                  {Math.floor(r.ms / 60000)}:{String(Math.round(r.ms / 1000) % 60).padStart(2, "0")}
+                </span>
+                <form method="post" action="/api/book/admin/board">
+                  <input type="hidden" name="id" value={r.id} />
+                  <input type="hidden" name="hidden" value={r.hidden ? "0" : "1"} />
+                  <button type="submit" className="ins-btn ins-btn-ghost ins-btn-sm">
+                    {r.hidden ? "Show" : "Hide"}
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="ins-muted">No quiz scores yet this week.</p>
         )}
       </section>
 
