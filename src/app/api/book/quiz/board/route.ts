@@ -1,0 +1,29 @@
+import { NextResponse } from "next/server";
+import { insightsEnabled, readerFromRequest } from "@/lib/insights/server";
+import { loadBoard } from "@/lib/quiz/board";
+import { weekKey, weekStartLabel } from "@/lib/quiz/server";
+
+/** This week's leaderboard: top 20, plus the requesting reader's own row if they're further down. */
+export async function GET(request: Request) {
+  if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
+  const rid = readerFromRequest(request);
+  const rows = await loadBoard(weekKey());
+  const shape = (r: (typeof rows)[number], i: number) => ({
+    rank: i + 1,
+    name: r.name,
+    score: r.score,
+    seconds: Math.round(r.ms / 1000),
+    you: !!rid && r.rid === rid,
+  });
+  const top = rows.slice(0, 20).map(shape);
+  const mineIndex = rid ? rows.findIndex((r) => r.rid === rid) : -1;
+  return NextResponse.json(
+    {
+      week: weekStartLabel(),
+      total: rows.length,
+      top,
+      you: mineIndex >= 20 ? shape(rows[mineIndex], mineIndex) : null,
+    },
+    { headers: { "Cache-Control": "no-store" } }
+  );
+}
