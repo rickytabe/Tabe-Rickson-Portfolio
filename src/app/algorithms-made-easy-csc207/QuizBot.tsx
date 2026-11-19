@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, Check, Loader2, RotateCcw, Trophy, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Heart, Loader2, RotateCcw, Share2, Trophy, X } from "lucide-react";
 import { TOPIC_LABELS } from "./book-info";
 import { track } from "./insights";
+import { hasSupported } from "./SupportModal";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -15,7 +16,16 @@ type BoardRow = { rank: number; name: string | null; points: number; quizzes: nu
 type Board = { week: string; total: number; top: BoardRow[]; you: BoardRow | null };
 type Phase = "loading" | "name" | "intro" | "q" | "done" | "board" | "error";
 
-type Props = { onClose: () => void; onReadChapter: (chapterId: string) => void };
+type Props = {
+  onClose: () => void;
+  onReadChapter: (chapterId: string) => void;
+  /** Close the quiz and open the support prompt. */
+  onSupport: () => void;
+  /** Where Algo was opened from, for the stats. */
+  source?: "fab" | "sidebar" | "link";
+};
+
+const QUIZ_LINK = "https://taberickson.com/csc207/quiz?ref=quiz-share";
 
 async function api<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`/api/book/quiz/${path}`, {
@@ -45,7 +55,7 @@ function verdict(score: number) {
  * 10-question quiz graded on the server. The first finished attempt each week goes on the
  * weekly leaderboard.
  */
-export default function QuizBot({ onClose, onReadChapter }: Props) {
+export default function QuizBot({ onClose, onReadChapter, onSupport, source }: Props) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nameInput, setNameInput] = useState("");
@@ -65,6 +75,7 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
 
   const [board, setBoard] = useState<Board | null>(null);
   const [boardBack, setBoardBack] = useState<Phase>("intro");
+  const [supporter] = useState(() => hasSupported());
 
   const [closing, setClosing] = useState(false);
   const [opener] = useState(() => document.activeElement as HTMLElement | null);
@@ -91,7 +102,7 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
 
   // Open: lock page scroll and find out whether Algo already knows this reader.
   useEffect(() => {
-    track("quiz_open");
+    track("quiz_open", source ?? "");
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     let alive = true;
@@ -111,6 +122,8 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
       document.body.style.overflow = prev;
       if (closeTimer.current) clearTimeout(closeTimer.current);
     };
+    // runs once when Algo opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveName = async (anonymous: boolean) => {
@@ -174,11 +187,9 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
         });
         setFeedback({ correct: r.correct, answer: r.answer, explain: r.explain });
         setResults((list) => [...list, { id: current.id, chapter: current.chapter, correct: r.correct }]);
-        if (!r.correct) track("quiz_miss", current.id);
         if (r.done) {
           setOnBoard(r.ranked);
           setWeekPoints({ points: r.points, quizzes: r.quizzes });
-          track("quiz_finish", `s${r.score}`);
         }
       } catch (e) {
         setPicked(null);
@@ -492,6 +503,42 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
                     ? "This quiz couldn't be added to the leaderboard. Your points are safe."
                     : "Practice round: 5 quizzes a day count for points, and you've done today's. Come back tomorrow for more!"}
               </p>
+              <div className="quiz-help">
+                {supporter ? (
+                  <>
+                    <p className="quiz-help-title">Thank you for supporting Algo 💚</p>
+                    <p className="quiz-help-text">
+                      You&apos;re part of why this stays free. Know someone cramming for the CA? Send them Algo.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="quiz-help-title">Algo is free. Help keep it that way 💚</p>
+                    <p className="quiz-help-text">
+                      Every question, explanation and chapter here is free for every student, no ads. Tips from
+                      students like you keep new quizzes and solved tutorials coming before the CA.
+                    </p>
+                  </>
+                )}
+                <div className="quiz-help-actions">
+                  {!supporter ? (
+                    <button type="button" className="quiz-btn quiz-btn-help" onClick={() => close(onSupport)}>
+                      <Heart className="w-4 h-4" aria-hidden /> Support the book
+                    </button>
+                  ) : null}
+                  <a
+                    className="quiz-btn quiz-btn-ghost"
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      `I just scored ${score}/10 on Algo's CSC207 quiz 🤖 Think you can beat me? Free practice before the CA: ${QUIZ_LINK}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track("quiz_share")}
+                  >
+                    <Share2 className="w-4 h-4" aria-hidden /> Challenge a classmate
+                  </a>
+                </div>
+              </div>
               {missedChapters.length ? (
                 <>
                   <p className="quiz-label">Revisit these topics</p>

@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { db, ensureReader, insightsEnabled, readerCookie, readerFromRequest, sameOrigin } from "@/lib/insights/server";
+import {
+  BOOK_ID,
+  db,
+  ensureReader,
+  insightsEnabled,
+  readerCookie,
+  readerFromRequest,
+  sameOrigin,
+} from "@/lib/insights/server";
 import { cleanName } from "@/lib/quiz/server";
 
 /** What Algo should call this reader: { asked, name, anonymous }. */
@@ -31,10 +39,16 @@ export async function POST(request: Request) {
   }
 
   const { rid, isNew } = await ensureReader(request);
-  await db()
-    .collection("bookReaders")
-    .doc(rid)
-    .set({ ...update, quizAskedAt: FieldValue.serverTimestamp() }, { merge: true });
+  const store = db();
+  const readerRef = store.collection("bookReaders").doc(rid);
+  const firstTime = !(await readerRef.get()).data()?.quizAskedAt;
+  await readerRef.set({ ...update, quizAskedAt: FieldValue.serverTimestamp() }, { merge: true });
+  if (firstTime) {
+    await store
+      .collection("bookStats")
+      .doc(BOOK_ID)
+      .set({ quiz: { [update.quizAnon ? "anonymous" : "named"]: FieldValue.increment(1) } }, { merge: true });
+  }
 
   const res = NextResponse.json({ asked: true, name: update.quizName, anonymous: update.quizAnon });
   if (isNew) res.headers.set("Set-Cookie", readerCookie(rid));

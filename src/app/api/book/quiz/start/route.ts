@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
+import { FieldValue } from "firebase-admin/firestore";
+import { BOOK_ID, dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
 import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { drawQuestionIds, weekKey } from "@/lib/quiz/server";
 import { QUIZ_QUESTIONS } from "@/app/algorithms-made-easy-csc207/quiz-questions";
@@ -23,6 +24,10 @@ export async function POST(request: Request) {
 
   const session = store.collection("quizSessions").doc();
   await session.set({ rid, week, ids, startedAt: Date.now(), answered: {}, score: 0, done: false, ranked });
+  await store
+    .collection("bookStats")
+    .doc(BOOK_ID)
+    .set({ quiz: { started: FieldValue.increment(1) }, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
 
   const byId = new Map(QUIZ_QUESTIONS.map((q) => [q.id, q]));
   const res = NextResponse.json(

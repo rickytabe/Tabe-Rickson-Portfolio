@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
+import { FieldValue } from "firebase-admin/firestore";
+import { BOOK_ID, dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
 import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { QUIZ_ANSWERS } from "@/lib/quiz/answers";
 
@@ -83,6 +84,28 @@ export async function POST(request: Request) {
           });
         }
         update.counted = ranked;
+
+        // Attempt-level quiz stats: one write per finished quiz, exact for repeat attempts.
+        const results = { ...s.answered, [qid]: { choice, correct } };
+        const perQuestion: Record<string, FirebaseFirestore.FieldValue> = {};
+        for (const [id, r] of Object.entries(results)) {
+          perQuestion[`${id}_seen`] = FieldValue.increment(1);
+          if (!r.correct) perQuestion[`${id}_wrong`] = FieldValue.increment(1);
+        }
+        tx.set(
+          store.collection("bookStats").doc(BOOK_ID),
+          {
+            quiz: {
+              finished: FieldValue.increment(1),
+              scoreSum: FieldValue.increment(score),
+              counted: FieldValue.increment(ranked ? 1 : 0),
+              byScore: { [`s${score}`]: FieldValue.increment(1) },
+            },
+            quizQ: perQuestion,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
       tx.update(ref, update);
       return { status: 200 as const, correct, done, score, ranked, points, quizzes };
