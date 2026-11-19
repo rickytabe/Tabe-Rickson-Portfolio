@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
+import { dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
+import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { QUIZ_ANSWERS } from "@/lib/quiz/answers";
 
 type Session = {
@@ -16,7 +17,8 @@ type Session = {
 /**
  * Grade one answer: { sid, qid, choice } where choice is the index into the question's original
  * options. Each question can be answered once. After the last one the attempt is timed on the
- * server, and the reader's first finished attempt of the week goes on the leaderboard.
+ * server and its score is added to the reader's points for the week (up to DAILY_COUNTED
+ * finished quizzes a day count; the rest are practice).
  */
 export async function POST(request: Request) {
   if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
@@ -50,23 +52,54 @@ export async function POST(request: Request) {
       const update: Record<string, unknown> = { [`answered.${qid}`]: { choice, correct }, score };
 
       let ranked = false;
+      let points = 0;
+      let quizzes = 0;
       if (done) {
-        const ms = Date.now() - s.startedAt;
+        const now = Date.now();
+        const ms = now - s.startedAt;
         update.done = true;
         update.ms = ms;
         const boardRef = store.collection("quizBoard").doc(`${s.week}_${rid}`);
-        if (s.ranked && !(await tx.get(boardRef)).exists) {
-          tx.set(boardRef, { week: s.week, rid, score, ms, at: Date.now(), hidden: false });
+        const entry = readEntry((await tx.get(boardRef)).data());
+        const today = dayKey();
+        const countedToday = entry.days[today] ?? 0;
+        points = entry.points;
+        quizzes = entry.quizzes;
+        if (countedToday < DAILY_COUNTED) {
+          points += score;
+          quizzes += 1;
           ranked = true;
+          // Written in full (not merged) so entries in the old format are converted in place.
+          tx.set(boardRef, {
+            week: s.week,
+            rid,
+            points,
+            quizzes,
+            best: Math.max(entry.best, score),
+            totalMs: entry.totalMs + ms,
+            lastAt: now,
+            days: { ...entry.days, [today]: countedToday + 1 },
+            hidden: entry.hidden,
+          });
         }
+        update.counted = ranked;
       }
       tx.update(ref, update);
-      return { status: 200 as const, correct, done, score, ranked };
+      return { status: 200 as const, correct, done, score, ranked, points, quizzes };
     });
 
     if (result.status !== 200) return NextResponse.json({ error: "Not allowed" }, { status: result.status });
     return NextResponse.json(
-      { correct: result.correct, answer: key.answer, explain: key.explain, done: result.done, score: result.score, ranked: result.ranked },
+      {
+        correct: result.correct,
+        answer: key.answer,
+        explain: key.explain,
+        done: result.done,
+        score: result.score,
+        ranked: result.ranked,
+        points: result.points,
+        quizzes: result.quizzes,
+      },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

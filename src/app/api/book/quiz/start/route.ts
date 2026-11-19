@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
+import { dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
+import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { drawQuestionIds, weekKey } from "@/lib/quiz/server";
 import { QUIZ_QUESTIONS } from "@/app/algorithms-made-easy-csc207/quiz-questions";
 
@@ -15,7 +16,10 @@ export async function POST(request: Request) {
   const store = db();
   const week = weekKey();
   const ids = drawQuestionIds();
-  const ranked = !(await store.collection("quizBoard").doc(`${week}_${rid}`).get()).exists;
+  const entry = readEntry((await store.collection("quizBoard").doc(`${week}_${rid}`).get()).data());
+  const countedToday = entry.days[dayKey()] ?? 0;
+  // A hint for the intro: whether this quiz will add to the weekly points (decided at the finish).
+  const ranked = countedToday < DAILY_COUNTED;
 
   const session = store.collection("quizSessions").doc();
   await session.set({ rid, week, ids, startedAt: Date.now(), answered: {}, score: 0, done: false, ranked });
@@ -24,8 +28,10 @@ export async function POST(request: Request) {
   const res = NextResponse.json(
     {
       sid: session.id,
-      // Whether this attempt will count for this week's leaderboard (the first finished one does).
+      // Whether finishing this quiz will add to this week's points (up to DAILY_COUNTED a day).
       ranked,
+      points: entry.points,
+      quizzes: entry.quizzes,
       questions: ids.map((id) => {
         const q = byId.get(id)!;
         return { id: q.id, chapter: q.chapter, q: q.q, options: q.options };

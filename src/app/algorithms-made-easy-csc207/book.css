@@ -2638,7 +2638,7 @@ a.is-active .book-toc-num {
 }
 .quiz-board-row {
   display: grid;
-  grid-template-columns: 34px 1fr auto auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
@@ -2691,13 +2691,20 @@ a.is-active .book-toc-num {
 }
 .quiz-board-score {
   font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 17px;
   font-weight: 700;
   color: var(--foreground);
   font-variant-numeric: tabular-nums;
 }
+.quiz-board-who {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .quiz-board-time {
-  min-width: 3.4em;
-  text-align: right;
+  min-width: 0;
+  white-space: nowrap;
   font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
   font-size: 12.5px;
   color: var(--b-faint);
