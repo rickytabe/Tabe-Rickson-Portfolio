@@ -209,10 +209,9 @@ export default function QuizBot({ onClose, onReadChapter }: Props) {
             </div>
           ) : current ? (
             <div className="quiz-step" key={current.id}>
-              <p className="quiz-topic">
-                {Number(current.chapter.slice(1))}. {TOPIC_LABELS[current.chapter] ?? current.chapter}
+              <p className="quiz-bubble quiz-q">
+                <span className="quiz-qnum">{index + 1}.</span>{" "}{current.q}
               </p>
-              <p className="quiz-bubble quiz-q">{current.q}</p>
               <div className="quiz-options" role="group" aria-label="Answers">
                 {current.order.map((optIndex, pos) => {
                   const isAnswer = optIndex === current.answer;

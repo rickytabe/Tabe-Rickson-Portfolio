@@ -2238,8 +2238,12 @@ a.is-active .book-toc-num {
   color: var(--foreground);
 }
 .quiz-q {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--foreground);
+}
+.quiz-qnum {
+  color: var(--b-accent);
+  margin-right: 2px;
 }
 .quiz-topic {
   margin: 0 0 8px;
