@@ -32,8 +32,18 @@ type Stats = {
   download_direct?: Counts;
   figure_open?: Counts;
   quiz_open?: Counts;
-  quiz_finish?: Counts;
-  quiz_miss?: Counts;
+  quiz_share?: Counts;
+  // Counted on the server, per attempt.
+  quiz?: {
+    started?: number;
+    finished?: number;
+    scoreSum?: number;
+    counted?: number;
+    named?: number;
+    anonymous?: number;
+    byScore?: Counts;
+  };
+  quizQ?: Counts; // `${questionId}_seen` and `${questionId}_wrong`
   updatedAt?: { toDate(): Date };
 };
 type Note = { chapter: string; vote: "up" | "down"; text: string; at: Date | null };
@@ -157,16 +167,23 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
     ["footer", "Footer link"],
   ];
 
-  // Quiz: first score per reader (s0..s10) and questions readers got wrong.
-  const quizOpened = n(stats.quiz_open);
-  const scoreRows = Array.from({ length: 11 }, (_, i) => ({ score: i, count: n(stats.quiz_finish, `s${i}`) }));
-  const quizFinished = scoreRows.reduce((a, r) => a + r.count, 0);
-  const avgScore = quizFinished ? scoreRows.reduce((a, r) => a + r.score * r.count, 0) / quizFinished : null;
+  // Quiz: reader-level opens (events) and exact attempt-level numbers (server).
+  const q = stats.quiz ?? {};
+  const openedBy = stats.quiz_open ?? {};
+  const quizOpened = Object.values(openedBy).reduce((a, b) => a + Number(b), 0);
+  const quizStarted = Number(q.started ?? 0);
+  const quizFinished = Number(q.finished ?? 0);
+  const avgScore = quizFinished ? Number(q.scoreSum ?? 0) / quizFinished : null;
+  const scoreRows = Array.from({ length: 11 }, (_, i) => ({ score: i, count: n(q.byScore, `s${i}`) }));
   const scoreMax = Math.max(...scoreRows.map((r) => r.count), 1);
-  const missed = Object.entries(stats.quiz_miss ?? {})
-    .map(([id, count]) => ({ q: QUIZ_QUESTIONS.find((x) => x.id === id), count: Number(count) }))
-    .filter((m) => m.q)
-    .sort((a, b) => b.count - a.count)
+  const qStats = stats.quizQ ?? {};
+  const hardest = QUIZ_QUESTIONS.map((question) => {
+    const seen = n(qStats, `${question.id}_seen`);
+    const wrong = n(qStats, `${question.id}_wrong`);
+    return { q: question, seen, wrong, rate: seen ? wrong / seen : 0 };
+  })
+    .filter((r) => r.seen >= 3)
+    .sort((a, b) => b.rate - a.rate || b.seen - a.seen)
     .slice(0, 6);
 
   const updated = stats.updatedAt?.toDate?.();
@@ -392,16 +409,16 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
       {/* Quiz */}
       <section className="ins-card">
         <h2 className="ins-h2">Quiz bot</h2>
-        <p className="ins-note">First attempt per reader. Misses show which ideas need more explaining.</p>
+        <p className="ins-note">Attempt numbers are counted on the server, so repeat quizzes are included.</p>
         <dl className="ins-funnel">
           <div>
-            <dt>Opened the quiz</dt>
-            <dd>{fmt.format(quizOpened)}</dd>
+            <dt>Quizzes started</dt>
+            <dd>{fmt.format(quizStarted)}</dd>
           </div>
           <div>
             <dt>Finished</dt>
             <dd>
-              {fmt.format(quizFinished)} <small>{pct(quizFinished, quizOpened)}%</small>
+              {fmt.format(quizFinished)} <small>{pct(quizFinished, quizStarted)}%</small>
             </dd>
           </div>
           <div>
@@ -409,9 +426,48 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
             <dd>{avgScore === null ? "–" : `${avgScore.toFixed(1)} / 10`}</dd>
           </div>
         </dl>
+        <ul className="ins-list">
+          <li>
+            <span>Readers who opened Algo</span>
+            <b>{fmt.format(quizOpened)}</b>
+          </li>
+          <li>
+            <span>Players: named / anonymous</span>
+            <b>
+              {fmt.format(Number(q.named ?? 0))} / {fmt.format(Number(q.anonymous ?? 0))}
+            </b>
+          </li>
+          <li>
+            <span>Quizzes that earned leaderboard points</span>
+            <b>{fmt.format(Number(q.counted ?? 0))}</b>
+          </li>
+          <li>
+            <span>&ldquo;Challenge a classmate&rdquo; shares</span>
+            <b>{fmt.format(n(stats.quiz_share))}</b>
+          </li>
+          <li>
+            <span>Support prompt opened from the quiz</span>
+            <b>{fmt.format(n(stats.support_shown, "quiz"))}</b>
+          </li>
+        </ul>
+        <h3 className="ins-h3">Where Algo was opened</h3>
+        <ul className="ins-list">
+          {(
+            [
+              ["fab", "Quiz me button"],
+              ["sidebar", "Sidebar / menu"],
+              ["link", "Direct link (/csc207/quiz)"],
+            ] as const
+          ).map(([k, label]) => (
+            <li key={k}>
+              <span>{label}</span>
+              <b>{fmt.format(n(openedBy, k))}</b>
+            </li>
+          ))}
+        </ul>
         {quizFinished ? (
           <>
-            <h3 className="ins-h3">Scores</h3>
+            <h3 className="ins-h3">Scores (all finished quizzes)</h3>
             <ul className="ins-refs">
               {scoreRows
                 .filter((r) => r.count)
@@ -419,7 +475,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
                 .map((r) => (
                   <li key={r.score}>
                     <span className="ins-ref-name">{r.score} / 10</span>
-                    <span className="ins-hbar" title={`${r.count} readers`}>
+                    <span className="ins-hbar" title={`${r.count} quizzes`}>
                       <span className="ins-hbar-fill" style={{ width: `${(r.count / scoreMax) * 100}%` }} />
                     </span>
                     <b>{r.count}</b>
@@ -428,22 +484,24 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
             </ul>
           </>
         ) : null}
-        <h3 className="ins-h3">Most-missed questions</h3>
-        {missed.length ? (
+        <h3 className="ins-h3">Hardest questions (missed most often)</h3>
+        {hardest.length ? (
           <ul className="ins-list">
-            {missed.map(({ q, count }) => (
-              <li key={q!.id}>
+            {hardest.map((h) => (
+              <li key={h.q.id}>
                 <span>
-                  <span className="ins-num">{Number(q!.chapter.slice(1))}. {TOPIC_LABELS[q!.chapter]}</span>
+                  <span className="ins-num">
+                    {Number(h.q.chapter.slice(1))}. {TOPIC_LABELS[h.q.chapter]}
+                  </span>
                   <br />
-                  {q!.q}
+                  {h.q.q}
                 </span>
-                <b>{count}</b>
+                <b title={`${h.wrong} wrong of ${h.seen}`}>{pct(h.wrong, h.seen)}%</b>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="ins-muted">No misses recorded yet.</p>
+          <p className="ins-muted">Needs a question to be answered at least 3 times.</p>
         )}
       </section>
 

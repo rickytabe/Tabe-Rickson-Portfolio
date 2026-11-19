@@ -37,6 +37,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [supportMode, setSupportMode] = useState<"support" | "download">("support");
   const [showFab, setShowFab] = useState(false);
   const [quizOpen, setQuizOpen] = useState(false);
+  const [quizSource, setQuizSource] = useState<"fab" | "sidebar" | "link">("fab");
   const autoPrompted = useRef(false);
   const [minuteRead, setMinuteRead] = useState(false);
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
@@ -155,7 +156,10 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     autoPrompted.current = true; // don't stack the support prompt on top of the quiz
     url.searchParams.delete("quiz");
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
-    const frame = requestAnimationFrame(() => setQuizOpen(true));
+    const frame = requestAnimationFrame(() => {
+      setQuizSource("link");
+      setQuizOpen(true);
+    });
     return () => cancelAnimationFrame(frame);
   }, []);
 
@@ -299,6 +303,19 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         </a>
         <button
           type="button"
+          className="book-toc-support book-toc-quiz"
+          onClick={() => {
+            onPick?.();
+            setDrawerOpen(false);
+            setQuizSource("sidebar");
+            setQuizOpen(true);
+          }}
+        >
+          <Robot size={16} />
+          Quiz me
+        </button>
+        <button
+          type="button"
           className="book-toc-support"
           onClick={() => {
             onPick?.();
@@ -428,6 +445,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         }`}
         onClick={() => {
           setDrawerOpen(false);
+          setQuizSource("fab");
           setQuizOpen(true);
         }}
         aria-label="Quiz me: test what you've read"
@@ -445,6 +463,8 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               <FigureLightbox />
               {quizOpen ? (
                 <QuizBot
+                  source={quizSource}
+                  onSupport={() => openSupport("support", "quiz")}
                   onClose={() => setQuizOpen(false)}
                   onReadChapter={(id) =>
                     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })

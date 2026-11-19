@@ -2722,6 +2722,50 @@ a.is-active .book-toc-num {
   }
 }
 
+/* quiz: sidebar link and end-of-quiz help card */
+.book-toc-quiz .robot {
+  margin-left: -1px;
+}
+.quiz-help {
+  margin: 4px 0 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--b-stick-edge) 45%, var(--b-line));
+  background: color-mix(in srgb, var(--b-stick-edge) 8%, var(--card-bg));
+  text-align: left;
+}
+.quiz-help-title {
+  margin: 0 0 4px;
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.quiz-help-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--b-soft);
+}
+.quiz-help-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.quiz-help-actions .quiz-btn {
+  margin-top: 0;
+  text-decoration: none;
+}
+.quiz-btn-help {
+  background: #f3bf3f;
+  color: #20242b;
+}
+.quiz-btn-help:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
 /* ---------- print ---------- */
 @media print {
   .book-bar,
