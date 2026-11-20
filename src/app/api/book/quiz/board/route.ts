@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { insightsEnabled, readerFromRequest } from "@/lib/insights/server";
 import { loadBoard } from "@/lib/quiz/board";
+import { bookFrom } from "@/lib/books";
 import { weekKey, weekStartLabel } from "@/lib/quiz/server";
 
-/** This week's leaderboard: top 20, plus the requesting reader's own row if they're further down. */
+/** This week's leaderboard for a book (?book=): top 20, plus the requesting reader's own row if they're further down. */
 export async function GET(request: Request) {
   if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
   const rid = readerFromRequest(request);
-  const rows = await loadBoard(weekKey());
+  const book = bookFrom(new URL(request.url).searchParams.get("book"));
+  const rows = await loadBoard(weekKey(), { book });
   const shape = (r: (typeof rows)[number], i: number) => ({
     rank: i + 1,
     name: r.name,

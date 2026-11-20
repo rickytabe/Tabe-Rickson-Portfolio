@@ -1,14 +1,16 @@
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "crypto";
 import { getApps } from "firebase-admin/app";
 import { adminDb } from "@/lib/firebase/admin";
+import { BOOKS, type BookInfo } from "@/lib/books";
 
 /*
- * Anonymous reader insights for the book. No accounts and no personal data: each reader gets a
+ * Anonymous reader insights for the books. No accounts and no personal data: each reader gets a
  * random id in a signed, HttpOnly cookie that page scripts cannot read and nobody can forge.
- * Only this server writes to Firestore.
+ * One reader id covers every book. Only this server writes to Firestore.
  */
 
-export const BOOK_ID = "csc207";
+/** The first book's id. Kept for code that predates the second book; prefer a BookInfo. */
+export const BOOK_ID = BOOKS.csc207.id;
 const COOKIE = "bk_rid";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
@@ -47,6 +49,18 @@ export function readerFromRequest(request: Request): string | null {
   const got = Buffer.from(sig);
   return want.length === got.length && timingSafeEqual(want, got) ? id : null;
 }
+
+/**
+ * A reader's own invite code, e.g. "k7p2xq9m": the same for a reader every time, and impossible to
+ * guess or to turn back into the reader id. Shared as ?ref=i-<code>.
+ */
+export function inviteCodeFor(rid: string): string {
+  const alphabet = "23456789abcdefghjkmnpqrstuvwxyz";
+  const bytes = createHmac("sha256", secret()!).update(`invite|${rid}`).digest();
+  return Array.from(bytes.subarray(0, 8), (b) => alphabet[b % alphabet.length]).join("");
+}
+
+export const INVITE_REF = /^i-([2-9a-hjkmnp-z]{8})$/;
 
 export function newReaderId(): string {
   return randomUUID();
@@ -89,16 +103,19 @@ export function dayKey(date = new Date()): string {
  * The reader behind a request: the signed cookie's id, or a new reader (recorded in Firestore and
  * counted in the stats). When `isNew` is true, set `readerCookie(rid)` on the response.
  */
-export async function ensureReader(request: Request): Promise<{ rid: string; isNew: boolean }> {
+export async function ensureReader(
+  request: Request,
+  book: BookInfo = BOOKS.csc207
+): Promise<{ rid: string; isNew: boolean }> {
   const existing = readerFromRequest(request);
   if (existing) return { rid: existing, isNew: false };
   const rid = newReaderId();
   const { FieldValue } = await import("firebase-admin/firestore");
   const store = db();
-  await store.collection("bookReaders").doc(rid).set({ book: BOOK_ID, firstSeen: FieldValue.serverTimestamp(), ref: null });
+  await store.collection("bookReaders").doc(rid).set({ book: book.id, firstSeen: FieldValue.serverTimestamp(), ref: null });
   await store
     .collection("bookStats")
-    .doc(BOOK_ID)
+    .doc(book.id)
     .set(
       {
         readers: { total: FieldValue.increment(1) },

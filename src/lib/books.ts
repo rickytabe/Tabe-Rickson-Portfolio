@@ -1,0 +1,74 @@
+// The books on the site. Plain data, safe to import from client components and the server.
+// Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
+
+export type BookId = "csc207" | "csc211";
+
+export type BookInfo = {
+  id: BookId;
+  title: string;
+  path: string;
+  /** Link shared from the quiz's "Challenge a classmate" button. */
+  quizLink: string;
+  /** Short link to the book, used for invite links. */
+  shortLink: string;
+  /** What a section of the book is called in the quiz and feedback ("chapter", "question"). */
+  sectionNoun: string;
+  /** Section ids in reading order: every id the stats and the quiz may refer to. */
+  sections: string[];
+  /** Paid books: the first `freeSections` solutions are open, the rest unlock. */
+  paywall?: { freeSections: number; priceFcfa: number; invitesNeeded: number };
+};
+
+const range = (prefix: string, from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${from + i}`);
+
+export const BOOKS: Record<BookId, BookInfo> = {
+  csc207: {
+    id: "csc207",
+    title: "CSC207 Made Easy",
+    path: "/algorithms-made-easy-csc207",
+    quizLink: "https://taberickson.com/csc207/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc207",
+    sectionNoun: "chapter",
+    sections: range("c", 1, 24),
+  },
+  csc211: {
+    id: "csc211",
+    title: "CSC211 Made Easy",
+    path: "/csc211-tutorial-solutions",
+    quizLink: "https://taberickson.com/csc211/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc211",
+    sectionNoun: "question",
+    // Part A questions 1 to 35, then Part B questions 26 to 39, in the order of the sheet.
+    sections: [...range("a", 1, 35), ...range("b", 26, 39)],
+    paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 },
+  },
+};
+
+export const BOOK_IDS = Object.keys(BOOKS) as BookId[];
+
+/** The book a request is about. Requests from pages built before there were two books say nothing: CSC207. */
+export function bookFrom(value: unknown): BookInfo {
+  return typeof value === "string" && value in BOOKS ? BOOKS[value as BookId] : BOOKS.csc207;
+}
+
+/** Whether a section's solution is behind the paywall. */
+export function isLocked(book: BookInfo, section: string): boolean {
+  if (!book.paywall) return false;
+  const i = book.sections.indexOf(section);
+  return i >= book.paywall.freeSections;
+}
+
+/**
+ * Firestore keys that are per book. CSC207 was the only book when its data was first written,
+ * so its keys stay exactly as they were; other books get a prefix.
+ */
+export function scoped(book: BookInfo, key: string): string {
+  return book.id === "csc207" ? key : `${book.id}-${key}`;
+}
+
+/** "Q16", "B30": how a CSC211 section is printed on the question sheet. */
+export function sectionLabel(book: BookInfo, section: string): string {
+  if (book.id === "csc207") return String(Number(section.slice(1)));
+  return section.startsWith("b") ? `B${section.slice(1)}` : section.slice(1);
+}

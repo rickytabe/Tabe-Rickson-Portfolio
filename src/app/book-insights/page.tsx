@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ADMIN_COOKIE, dashboardEnabled, validSession } from "@/lib/insights/admin-auth";
-import { BOOK_ID, dayKey, db, insightsEnabled } from "@/lib/insights/server";
+import { dayKey, db, insightsEnabled } from "@/lib/insights/server";
 import { getPathViews } from "@/lib/vercel/analytics";
 import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
-import { QUIZ_QUESTIONS } from "../algorithms-made-easy-csc207/quiz-questions";
+import { CSC211_LABELS, CSC211_NUMBERS } from "@/content/csc211/render";
+import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
+import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
+import { listCodes, type CodeRow } from "@/lib/unlock";
+import { NEW_CODE_COOKIE } from "@/lib/insights/admin-auth";
 import { weekKey, weekStartLabel } from "@/lib/quiz/server";
 import "./insights.css";
 
@@ -44,11 +48,23 @@ type Stats = {
     byScore?: Counts;
   };
   quizQ?: Counts; // `${questionId}_seen` and `${questionId}_wrong`
+  // Paid books.
+  unlock_shown?: Counts;
+  unlock_copy?: Counts;
+  unlock_dial?: Counts;
+  unlock_whatsapp?: Counts;
+  invite_share?: Counts;
+  paywall?: {
+    codes?: number;
+    codesUsed?: number;
+    unlockedByCode?: number;
+    unlockedByInvite?: number;
+    invitesCounted?: number;
+  };
   updatedAt?: { toDate(): Date };
 };
 type Note = { chapter: string; vote: "up" | "down"; text: string; at: Date | null };
 
-const CHAPTERS = Array.from({ length: 24 }, (_, i) => `c${i + 1}`);
 const n = (c: Counts | undefined, k = "total") => Number(c?.[k] ?? 0);
 const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
 const fmt = new Intl.NumberFormat("en");
@@ -60,18 +76,32 @@ const when = new Intl.DateTimeFormat("en-GB", {
   minute: "2-digit",
 });
 
-async function load() {
+// Sidebar labels and printed numbers per book, for the tables below.
+const LABELS: Record<BookInfo["id"], Record<string, string>> = { csc207: TOPIC_LABELS, csc211: CSC211_LABELS };
+const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
+  csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
+  csc211: CSC211_NUMBERS,
+};
+// Older URLs whose views still count toward a book.
+const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
+  csc207: ["/algorithms-made-easy-csc207", "/algorithms"],
+  csc211: ["/csc211-tutorial-solutions"],
+};
+
+async function load(book: BookInfo) {
   const store = db();
-  const [statsSnap, notesSnap, views, board] = await Promise.all([
-    store.collection("bookStats").doc(BOOK_ID).get(),
-    store.collection("bookFeedback").orderBy("at", "desc").limit(60).get(),
-    Promise.all([getPathViews("/algorithms-made-easy-csc207"), getPathViews("/algorithms")]),
-    loadBoard(weekKey(), { includeHidden: true }),
+  const [statsSnap, notesSnap, views, board, codes] = await Promise.all([
+    store.collection("bookStats").doc(book.id).get(),
+    store.collection("bookFeedback").orderBy("at", "desc").limit(120).get(),
+    Promise.all(VIEW_PATHS[book.id].map((p) => getPathViews(p))),
+    loadBoard(weekKey(), { includeHidden: true, book }),
+    book.paywall ? listCodes(book) : Promise.resolve([] as CodeRow[]),
   ]);
   const stats = (statsSnap.data() ?? {}) as Stats;
   const notes: Note[] = notesSnap.docs
     .map((d) => d.data())
-    .filter((d) => d.book === BOOK_ID)
+    .filter((d) => d.book === book.id)
+    .slice(0, 60)
     .map((d) => ({ chapter: d.chapter, vote: d.vote, text: d.text, at: d.at?.toDate?.() ?? null }));
   const known = views.filter((v): v is number => v !== null);
 
@@ -83,7 +113,7 @@ async function load() {
     return { key: dayKey(d), label: dayLabel.format(d) };
   });
 
-  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays, board };
+  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays, board, codes };
 }
 
 function Login({ failed }: { failed: boolean }) {
@@ -105,13 +135,26 @@ function Login({ failed }: { failed: boolean }) {
   );
 }
 
-export default async function BookInsights({ searchParams }: { searchParams: Promise<{ e?: string }> }) {
+export default async function BookInsights({
+  searchParams,
+}: {
+  searchParams: Promise<{ e?: string; book?: string }>;
+}) {
   if (!dashboardEnabled()) notFound();
   const jar = await cookies();
+  const params = await searchParams;
   if (!validSession(jar.get(ADMIN_COOKIE)?.value)) {
-    const { e } = await searchParams;
-    return <Login failed={e === "1"} />;
+    return <Login failed={params.e === "1"} />;
   }
+  const book = bookFrom(params.book);
+  const labels = LABELS[book.id];
+  const numbers = NUMBERS[book.id];
+  const newCode = (() => {
+    const raw = jar.get(NEW_CODE_COOKIE)?.value;
+    if (!raw) return null;
+    const [code, note] = decodeURIComponent(raw).split("|");
+    return { code, note: note ?? "" };
+  })();
   if (!insightsEnabled()) {
     return (
       <main className="ins">
@@ -120,7 +163,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
     );
   }
 
-  const { stats, notes, views, recentDays, board } = await load();
+  const { stats, notes, views, recentDays, board, codes } = await load(book);
   const readers = n(stats.readers);
   const finished = n(stats.end);
   const downloads = n(stats.download_free) + n(stats.download_supported) + n(stats.download_direct);
@@ -129,10 +172,10 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
   const shownBy = stats.support_shown ?? {};
   const shown = Object.values(shownBy).reduce((a, b) => a + Number(b), 0);
 
-  const rows = CHAPTERS.map((c) => {
+  const rows = book.sections.map((c) => {
     const up = n(stats.clarity, `${c}_up`);
     const down = n(stats.clarity, `${c}_down`);
-    return { id: c, num: Number(c.slice(1)), label: TOPIC_LABELS[c] ?? c, reach: n(stats.reach, c), up, down };
+    return { id: c, num: numbers[c] ?? c, label: labels[c] ?? c, reach: n(stats.reach, c), up, down };
   });
   const votesUp = rows.reduce((a, r) => a + r.up, 0);
   const votesDown = rows.reduce((a, r) => a + r.down, 0);
@@ -177,7 +220,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
   const scoreRows = Array.from({ length: 11 }, (_, i) => ({ score: i, count: n(q.byScore, `s${i}`) }));
   const scoreMax = Math.max(...scoreRows.map((r) => r.count), 1);
   const qStats = stats.quizQ ?? {};
-  const hardest = QUIZ_QUESTIONS.map((question) => {
+  const hardest = quizBank(book).questions.map((question) => {
     const seen = n(qStats, `${question.id}_seen`);
     const wrong = n(qStats, `${question.id}_wrong`);
     return { q: question, seen, wrong, rate: seen ? wrong / seen : 0 };
@@ -188,18 +231,34 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
 
   const updated = stats.updatedAt?.toDate?.();
 
+  // Paid books: unlocks and what they are worth.
+  const pw = stats.paywall ?? {};
+  const unlockShownBy = stats.unlock_shown ?? {};
+  const unlockShown = Object.values(unlockShownBy).reduce((a, b) => a + Number(b), 0);
+  const byCode = Number(pw.unlockedByCode ?? 0);
+  const byInvite = Number(pw.unlockedByInvite ?? 0);
+  const codesUsed = Number(pw.codesUsed ?? 0);
+  const revenue = codesUsed * (book.paywall?.priceFcfa ?? 0);
+
   return (
     <main className="ins">
       <header className="ins-head">
         <div>
-          <p className="ins-kicker">CSC207 Made Easy</p>
+          <p className="ins-kicker">{book.title}</p>
           <h1 className="ins-h1">Book insights</h1>
+          <nav className="ins-tabs" aria-label="Books">
+            {BOOK_IDS.map((id) => (
+              <a key={id} href={`/book-insights?book=${id}`} aria-current={id === book.id ? "page" : undefined}>
+                {BOOKS[id].title}
+              </a>
+            ))}
+          </nav>
           <p className="ins-sub">
             {updated ? `Last activity ${when.format(updated)}` : "No activity yet"} · Cameroon time
           </p>
         </div>
         <div className="ins-head-actions">
-          <a href="/book-insights" className="ins-btn ins-btn-ghost">
+          <a href={`/book-insights?book=${book.id}`} className="ins-btn ins-btn-ghost">
             Refresh
           </a>
           <form method="post" action="/api/book/admin">
@@ -222,14 +281,27 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
         <Tile label="Readers" value={fmt.format(readers)} hint={`${fmt.format(today)} new today`} />
         <Tile label="Page views" value={views === null ? "–" : fmt.format(views)} hint="Vercel Analytics" />
         <Tile label="Finished the book" value={`${pct(finished, readers)}%`} hint={`${fmt.format(finished)} readers`} />
-        <Tile label="PDF downloads" value={fmt.format(downloads)} hint={`${fmt.format(n(stats.download_free))} chose free`} />
+        {book.paywall ? (
+          <>
+            <Tile label="Unlocked" value={fmt.format(byCode + byInvite)} hint={`${fmt.format(byCode)} paid · ${fmt.format(byInvite)} invited`} />
+            <Tile
+              label="Revenue (codes used)"
+              value={`${fmt.format(revenue)} FCFA`}
+              hint={`${fmt.format(codesUsed)} × ${book.paywall.priceFcfa} FCFA`}
+            />
+          </>
+        ) : (
+          <>
+            <Tile label="PDF downloads" value={fmt.format(downloads)} hint={`${fmt.format(n(stats.download_free))} chose free`} />
+            <Tile
+              label="Copied or dialled code"
+              value={fmt.format(copies + dials)}
+              hint={`${pct(copies + dials, shown)}% of prompts shown`}
+            />
+          </>
+        )}
         <Tile
-          label="Copied or dialled code"
-          value={fmt.format(copies + dials)}
-          hint={`${pct(copies + dials, shown)}% of prompts shown`}
-        />
-        <Tile
-          label="Found chapters clear"
+          label={`Found ${book.sectionNoun}s clear`}
           value={votesUp + votesDown ? `${pct(votesUp, votesUp + votesDown)}%` : "–"}
           hint={`${fmt.format(votesUp + votesDown)} votes`}
         />
@@ -258,7 +330,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
 
       {/* Chapters */}
       <section className="ins-card">
-        <h2 className="ins-h2">Chapters: reach and clarity</h2>
+        <h2 className="ins-h2">{book.id === "csc207" ? "Chapters" : "Questions"}: reach and clarity</h2>
         <div className="ins-callouts">
           <p>
             <b>Biggest drop:</b>{" "}
@@ -277,7 +349,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
           <table className="ins-table">
             <thead>
               <tr>
-                <th scope="col">Chapter</th>
+                <th scope="col">{book.id === "csc207" ? "Chapter" : "Question"}</th>
                 <th scope="col">Readers reached</th>
                 <th scope="col">Clear?</th>
               </tr>
@@ -288,7 +360,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
                 return (
                   <tr key={r.id}>
                     <th scope="row">
-                      <span className="ins-num">{String(r.num).padStart(2, "0")}</span> {r.label}
+                      <span className="ins-num">{r.num.padStart(2, "0")}</span> {r.label}
                     </th>
                     <td>
                       <div className="ins-hbar" title={`${r.reach} readers (${pct(r.reach, readers)}%)`}>
@@ -321,8 +393,20 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
         </div>
       </section>
 
+      {book.paywall ? (
+        <PaywallPanel
+          book={book}
+          stats={stats}
+          shownBy={unlockShownBy}
+          shown={unlockShown}
+          codes={codes}
+          newCode={newCode}
+        />
+      ) : null}
+
       <div className="ins-grid">
         {/* Support funnel */}
+        {book.paywall ? null : (
         <section className="ins-card">
           <h2 className="ins-h2">Support funnel</h2>
           <dl className="ins-funnel">
@@ -372,6 +456,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
             Money.
           </p>
         </section>
+        )}
 
         {/* Sources */}
         <section className="ins-card">
@@ -456,7 +541,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
             [
               ["fab", "Quiz me button"],
               ["sidebar", "Sidebar / menu"],
-              ["link", "Direct link (/csc207/quiz)"],
+              ["link", `Direct link (/${book.id}/quiz)`],
             ] as const
           ).map(([k, label]) => (
             <li key={k}>
@@ -491,7 +576,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
               <li key={h.q.id}>
                 <span>
                   <span className="ins-num">
-                    {Number(h.q.chapter.slice(1))}. {TOPIC_LABELS[h.q.chapter]}
+                    {numbers[h.q.chapter] ?? h.q.chapter}. {labels[h.q.chapter]}
                   </span>
                   <br />
                   {h.q.q}
@@ -524,6 +609,7 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
                 </span>
                 <form method="post" action="/api/book/admin/board">
                   <input type="hidden" name="id" value={r.id} />
+                  <input type="hidden" name="book" value={book.id} />
                   <input type="hidden" name="hidden" value={r.hidden ? "0" : "1"} />
                   <button type="submit" className="ins-btn ins-btn-ghost ins-btn-sm">
                     {r.hidden ? "Show" : "Hide"}
@@ -540,14 +626,16 @@ export default async function BookInsights({ searchParams }: { searchParams: Pro
       {/* Notes */}
       <section className="ins-card">
         <h2 className="ins-h2">Reader notes</h2>
-        <p className="ins-note">Latest {notes.length || ""} notes from &ldquo;Was this chapter clear?&rdquo;</p>
+        <p className="ins-note">
+          Latest {notes.length || ""} notes from &ldquo;Was this {book.id === "csc207" ? "chapter" : "solution"} clear?&rdquo;
+        </p>
         {notes.length ? (
           <ul className="ins-notes">
             {notes.map((note, i) => (
               <li key={i} className={note.vote === "down" ? "is-down" : "is-up"}>
                 <p className="ins-note-meta">
                   <span aria-label={note.vote === "down" ? "not quite" : "clear"}>{note.vote === "down" ? "👎" : "👍"}</span>{" "}
-                  {Number(note.chapter.slice(1))}. {TOPIC_LABELS[note.chapter] ?? note.chapter}
+                  {numbers[note.chapter] ?? note.chapter}. {labels[note.chapter] ?? note.chapter}
                   {note.at ? <span className="ins-muted"> · {when.format(note.at)}</span> : null}
                 </p>
                 <p className="ins-note-text">{note.text}</p>
@@ -568,6 +656,163 @@ function Tile({ label, value, hint }: { label: string; value: string; hint: stri
       <p className="ins-tile-label">{label}</p>
       <p className="ins-tile-value">{value}</p>
       <p className="ins-tile-hint">{hint}</p>
+    </div>
+  );
+}
+
+const codeWhen = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Douala", day: "numeric", month: "short" });
+
+/** Paid books: the unlock funnel, invites, and the unlock codes. */
+function PaywallPanel({
+  book,
+  stats,
+  shownBy,
+  shown,
+  codes,
+  newCode,
+}: {
+  book: BookInfo;
+  stats: Stats;
+  shownBy: Counts;
+  shown: number;
+  codes: CodeRow[];
+  newCode: { code: string; note: string } | null;
+}) {
+  const pw = stats.paywall ?? {};
+  const wall = book.paywall!;
+  const sources: [string, string][] = [
+    ["inline", "Lock card on a solution"],
+    ["fab", "Floating Unlock button"],
+    ["sidebar", "Sidebar"],
+    ["footer", "Footer"],
+    ["quiz", "End of a quiz"],
+  ];
+  const waMessage = (code: string) =>
+    encodeURIComponent(
+      `Thank you! Your ${book.title} unlock code is ${code}. Open ${book.shortLink}, tap Unlock, then "I already have a code". It works on 2 devices.`
+    );
+  return (
+    <div className="ins-grid">
+      <section className="ins-card">
+        <h2 className="ins-h2">Unlock funnel</h2>
+        <dl className="ins-funnel">
+          <div>
+            <dt>Unlock sheet opened</dt>
+            <dd>{fmt.format(shown)}</dd>
+          </div>
+          <div>
+            <dt>Copied or dialled MoMo</dt>
+            <dd>
+              {fmt.format(n(stats.unlock_copy) + n(stats.unlock_dial))}{" "}
+              <small>{pct(n(stats.unlock_copy) + n(stats.unlock_dial), shown)}%</small>
+            </dd>
+          </div>
+          <div>
+            <dt>Opened WhatsApp</dt>
+            <dd>
+              {fmt.format(n(stats.unlock_whatsapp))} <small>{pct(n(stats.unlock_whatsapp), shown)}%</small>
+            </dd>
+          </div>
+          <div>
+            <dt>Unlocked with a code</dt>
+            <dd>
+              {fmt.format(Number(pw.unlockedByCode ?? 0))}{" "}
+              <small>{pct(Number(pw.unlockedByCode ?? 0), shown)}%</small>
+            </dd>
+          </div>
+        </dl>
+        <h3 className="ins-h3">Where the unlock sheet opened</h3>
+        <ul className="ins-list">
+          {sources.map(([k, label]) => (
+            <li key={k}>
+              <span>{label}</span>
+              <b>{fmt.format(n(shownBy, k))}</b>
+            </li>
+          ))}
+        </ul>
+        <h3 className="ins-h3">Invites</h3>
+        <ul className="ins-list">
+          <li>
+            <span>Invite link shared (WhatsApp / copied)</span>
+            <b>
+              {fmt.format(n(stats.invite_share, "whatsapp"))} / {fmt.format(n(stats.invite_share, "copy"))}
+            </b>
+          </li>
+          <li>
+            <span>Readers who arrived from an invite</span>
+            <b>{fmt.format(n(stats.refs, "invite"))}</b>
+          </li>
+          <li>
+            <span>Invited readers who read {wall.invitesNeeded} questions (counted)</span>
+            <b>{fmt.format(Number(pw.invitesCounted ?? 0))}</b>
+          </li>
+          <li>
+            <span>Unlocked by inviting {wall.invitesNeeded} classmates</span>
+            <b>{fmt.format(Number(pw.unlockedByInvite ?? 0))}</b>
+          </li>
+        </ul>
+      </section>
+
+      <section className="ins-card" id="codes">
+        <h2 className="ins-h2">Unlock codes</h2>
+        <p className="ins-note">
+          When a payment screenshot arrives on WhatsApp, check it against your MoMo messages, make a code here and
+          send it back. Each code works on {2} devices. Codes are stored only as a fingerprint, so copy it now.
+        </p>
+        {newCode ? (
+          <div className="ins-newcode" role="status">
+            <p className="ins-kicker">New code{newCode.note ? ` for ${newCode.note}` : ""}</p>
+            <p className="ins-newcode-value">{newCode.code}</p>
+            <a
+              className="ins-btn"
+              href={`https://wa.me/?text=${waMessage(newCode.code)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Send on WhatsApp
+            </a>
+            <p className="ins-note">Shown for one minute. Make a new one if you miss it.</p>
+          </div>
+        ) : null}
+        <form method="post" action="/api/book/admin/codes" className="ins-codeform">
+          <input type="hidden" name="book" value={book.id} />
+          <label htmlFor="code-note" className="ins-label">
+            Who paid (name or last digits of their number)
+          </label>
+          <div className="ins-codeform-row">
+            <input id="code-note" name="note" maxLength={80} className="ins-input" placeholder="e.g. Brenda ·· 4471" />
+            <button type="submit" className="ins-btn">
+              Make a code
+            </button>
+          </div>
+        </form>
+        {codes.length ? (
+          <ul className="ins-list ins-codes">
+            {codes.map((c) => (
+              <li key={c.id} className={c.revoked ? "is-hidden" : undefined}>
+                <span>
+                  <code>····-{c.hint}</code> {c.note || <i className="ins-muted">no note</i>}
+                  <br />
+                  <span className="ins-muted">
+                    {codeWhen.format(new Date(c.createdAt))} · used on {c.uses} of 2 devices
+                    {c.revoked ? " · switched off" : ""}
+                  </span>
+                </span>
+                <form method="post" action="/api/book/admin/codes">
+                  <input type="hidden" name="book" value={book.id} />
+                  <input type="hidden" name="id" value={c.id} />
+                  <input type="hidden" name="revoked" value={c.revoked ? "0" : "1"} />
+                  <button type="submit" className="ins-btn ins-btn-ghost ins-btn-sm">
+                    {c.revoked ? "Switch on" : "Switch off"}
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="ins-muted">No codes yet.</p>
+        )}
+      </section>
     </div>
   );
 }

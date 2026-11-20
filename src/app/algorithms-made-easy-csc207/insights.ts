@@ -4,10 +4,27 @@
  * Anonymous reading stats for the book. Events are batched, sent one request at a time (so the
  * first response can set the reader cookie before the next request), and flushed with
  * sendBeacon when the page is hidden. The server counts each event once per reader.
+ * Shared by every book: the reader calls setBook() first.
  */
 
 const ENDPOINT = "/api/book/events";
-const REF_KEY = "csc207-ref";
+
+let book = "csc207";
+
+/** Which book this page is (sent with every event and feedback). */
+export function setBook(id: string) {
+  book = id;
+}
+
+/** The book set by setBook(), for other modules that talk to the server. */
+export function currentBook() {
+  return book;
+}
+
+/** Wait for a pending first request, which may be setting the reader cookie. */
+export function settled() {
+  return inFlight;
+}
 
 let queue: { type: string; key: string }[] = [];
 const seen = new Set<string>();
@@ -18,6 +35,7 @@ let listening = false;
 /** Where the reader came from: ?ref= on the link (e.g. ?ref=l2-whatsapp), else the referring site. */
 function getRef(): string | null {
   try {
+    const REF_KEY = `${book}-ref`;
     const stored = sessionStorage.getItem(REF_KEY);
     if (stored) return stored;
     const fromUrl = new URLSearchParams(location.search).get("ref");
@@ -34,7 +52,7 @@ function getRef(): string | null {
 }
 
 function payload() {
-  const body = JSON.stringify({ events: queue, ref: getRef() });
+  const body = JSON.stringify({ events: queue, ref: getRef(), book });
   queue = [];
   return body;
 }
@@ -87,7 +105,7 @@ export async function sendFeedback(chapter: string, vote: "up" | "down", text = 
     const res = await fetch("/api/book/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chapter, vote, text }),
+      body: JSON.stringify({ chapter, vote, text, book }),
       credentials: "same-origin",
     });
     return res.ok || res.status === 204;

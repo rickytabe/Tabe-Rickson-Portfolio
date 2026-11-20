@@ -4,6 +4,7 @@ import { getPathViews } from "@/lib/vercel/analytics";
 // Paths whose view counts may be read, each with older URLs whose views still count toward it.
 const COUNTED: Record<string, string[]> = {
   "/algorithms-made-easy-csc207": ["/algorithms-made-easy-csc207", "/algorithms"],
+  "/csc211-tutorial-solutions": ["/csc211-tutorial-solutions"],
 };
 
 export async function GET(request: Request) {

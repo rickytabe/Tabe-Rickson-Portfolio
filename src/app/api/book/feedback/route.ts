@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import {
-  BOOK_ID,
   dayKey,
   db,
   insightsEnabled,
@@ -10,27 +9,28 @@ import {
   readerFromRequest,
   sameOrigin,
 } from "@/lib/insights/server";
+import { bookFrom, scoped } from "@/lib/books";
 
-const CHAPTER = /^c([1-9]|1[0-9]|2[0-4])$/;
 const MAX_TEXT = 600;
 
 /**
- * "Was this chapter clear?" One vote per reader per chapter (changing it moves the count), plus
+ * "Was this chapter clear?" ({ book, chapter, vote, text }). One vote per reader per chapter (changing it moves the count), plus
  * an optional private note. Notes are stored for the author only and never shown publicly here.
  */
 export async function POST(request: Request) {
   if (!insightsEnabled()) return new NextResponse(null, { status: 204 });
   if (!sameOrigin(request)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  let body: { chapter?: unknown; vote?: unknown; text?: unknown };
+  let body: { chapter?: unknown; vote?: unknown; text?: unknown; book?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
+  const book = bookFrom(body.book);
   const chapter = String(body.chapter ?? "");
   const vote = body.vote === "up" || body.vote === "down" ? body.vote : null;
-  if (!CHAPTER.test(chapter) || !vote) {
+  if (!book.sections.includes(chapter) || !vote) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
   const text =
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
 
   const store = db();
   const reader = store.collection("bookReaders").doc(rid);
-  const voteDoc = reader.collection("votes").doc(chapter);
-  const statsDoc = store.collection("bookStats").doc(BOOK_ID);
+  const voteDoc = reader.collection("votes").doc(scoped(book, chapter));
+  const statsDoc = store.collection("bookStats").doc(book.id);
 
   try {
     await store.runTransaction(async (tx) => {
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         if (prev) counts[`${chapter}_${prev}`] = FieldValue.increment(-1);
       }
       if (isNew) {
-        tx.set(reader, { book: BOOK_ID, firstSeen: FieldValue.serverTimestamp(), ref: null });
+        tx.set(reader, { book: book.id, firstSeen: FieldValue.serverTimestamp(), ref: null });
       }
       tx.set(voteDoc, { vote, at: FieldValue.serverTimestamp() });
       if (Object.keys(counts).length || isNew) {
@@ -77,8 +77,8 @@ export async function POST(request: Request) {
         );
       }
       if (text) {
-        tx.set(store.collection("bookFeedback").doc(`${rid}_${chapter}`), {
-          book: BOOK_ID,
+        tx.set(store.collection("bookFeedback").doc(scoped(book, `${rid}_${chapter}`)), {
+          book: book.id,
           chapter,
           vote,
           text,

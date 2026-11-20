@@ -1,38 +1,48 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import {
-  BOOK_ID,
   cleanRef,
   dayKey,
   db,
   fieldKey,
   insightsEnabled,
+  INVITE_REF,
   newReaderId,
   readerCookie,
   readerFromRequest,
   sameOrigin,
 } from "@/lib/insights/server";
+import { bookFrom, scoped, type BookInfo } from "@/lib/books";
+import { creditInvite, INVITE_READS } from "@/lib/unlock";
 
 // Every metric counts unique readers: an event is counted the first time a reader sends it.
-const CHAPTERS = new Set(Array.from({ length: 24 }, (_, i) => `c${i + 1}`));
-const EVENTS: Record<string, (key: string) => boolean> = {
-  reach: (k) => CHAPTERS.has(k), // reached a chapter
-  end: (k) => k === "", // reached the end of the book
-  support_shown: (k) => ["timer", "fab", "sidebar", "footer", "download", "quiz"].includes(k),
-  support_copy: (k) => k === "",
-  support_dial: (k) => k === "",
-  download_free: (k) => k === "", // "I'd love to support, but..." download
-  download_supported: (k) => k === "", // downloaded from the thank-you screen
-  download_direct: (k) => k === "", // returning supporter, no prompt
-  figure_open: (k) => k === "",
-  quiz_open: (k) => ["", "fab", "sidebar", "link"].includes(k), // where the reader opened Algo from
-  quiz_share: (k) => k === "", // tapped "Challenge a classmate"
-  // Older pages sent these; attempt-level quiz numbers are now counted on the server.
-  quiz_finish: (k) => /^s([0-9]|10)$/.test(k),
-  quiz_miss: (k) => /^q\d{1,3}$/.test(k),
-};
+function eventRules(book: BookInfo): Record<string, (key: string) => boolean> {
+  const sections = new Set(book.sections);
+  return {
+    reach: (k) => sections.has(k), // reached a chapter (CSC207) or a question (CSC211)
+    end: (k) => k === "", // reached the end of the book
+    support_shown: (k) => ["timer", "fab", "sidebar", "footer", "download", "quiz"].includes(k),
+    support_copy: (k) => k === "",
+    support_dial: (k) => k === "",
+    download_free: (k) => k === "", // "I'd love to support, but..." download
+    download_supported: (k) => k === "", // downloaded from the thank-you screen
+    download_direct: (k) => k === "", // returning supporter, no prompt
+    figure_open: (k) => k === "",
+    quiz_open: (k) => ["", "fab", "sidebar", "link"].includes(k), // where the reader opened Algo from
+    quiz_share: (k) => k === "", // tapped "Challenge a classmate"
+    // Paid books: the unlock funnel.
+    unlock_shown: (k) => ["inline", "fab", "sidebar", "footer", "quiz"].includes(k), // opened the unlock sheet
+    unlock_copy: (k) => k === "", // copied the Mobile Money code
+    unlock_dial: (k) => k === "", // tapped Dial now
+    unlock_whatsapp: (k) => k === "", // opened WhatsApp to send the payment screenshot
+    invite_share: (k) => ["whatsapp", "copy"].includes(k), // shared their invite link
+    // Older pages sent these; attempt-level quiz numbers are now counted on the server.
+    quiz_finish: (k) => /^s([0-9]|10)$/.test(k),
+    quiz_miss: (k) => /^q\d{1,3}$/.test(k),
+  };
+}
 
-type Incoming = { events?: { type?: unknown; key?: unknown }[]; ref?: unknown };
+type Incoming = { events?: { type?: unknown; key?: unknown }[]; ref?: unknown; book?: unknown };
 
 /** Whether insights are switched on (lets us check a deployment without exposing any data). */
 export async function GET() {
@@ -50,10 +60,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 
+  const book = bookFrom(body.book);
+  const rules = eventRules(book);
   const events = (body.events ?? [])
     .slice(0, 40)
     .map((e) => ({ type: String(e.type ?? ""), key: String(e.key ?? "") }))
-    .filter((e) => EVENTS[e.type]?.(e.key));
+    .filter((e) => rules[e.type]?.(e.key));
 
   let rid = readerFromRequest(request);
   const isNew = !rid;
@@ -69,9 +81,17 @@ export async function POST(request: Request) {
   try {
     if (isNew) {
       const ref = cleanRef(body.ref);
-      await reader.set({ book: BOOK_ID, firstSeen: FieldValue.serverTimestamp(), ref: ref ?? null });
+      // Invite links (?ref=i-<code>) are counted together, and remember who sent the reader.
+      const invite = ref ? INVITE_REF.exec(ref)?.[1] : undefined;
+      const inviter = invite ? (await store.collection("inviteCodes").doc(invite).get()).data()?.rid : undefined;
+      await reader.set({
+        book: book.id,
+        firstSeen: FieldValue.serverTimestamp(),
+        ref: invite ? "invite" : (ref ?? null),
+        ...(inviter ? { invitedBy: { [book.id]: inviter } } : {}),
+      });
       bump("readers", "total");
-      bump("refs", ref ?? "direct");
+      bump("refs", invite ? "invite" : (ref ?? "direct"));
       bump("daily", dayKey());
     }
 
@@ -80,18 +100,37 @@ export async function POST(request: Request) {
       events.map((e) =>
         reader
           .collection("marks")
-          .doc(fieldKey(`${e.type}-${e.key || "x"}`))
+          .doc(fieldKey(scoped(book, `${e.type}-${e.key || "x"}`)))
           .create({ at: FieldValue.serverTimestamp() })
           .then(() => e)
       )
     );
-    for (const r of results) if (r.status === "fulfilled") bump(r.value.type, r.value.key);
+    let newReaches = 0;
+    for (const r of results) {
+      if (r.status !== "fulfilled") continue;
+      bump(r.value.type, r.value.key);
+      if (r.value.type === "reach") newReaches += 1;
+    }
 
     if (Object.keys(stats).length) {
       await store
         .collection("bookStats")
-        .doc(BOOK_ID)
+        .doc(book.id)
         .set({ ...stats, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    }
+
+    // Paid books: an invited reader counts for the friend who sent them once they have actually
+    // read a few questions, not just opened the link.
+    if (book.paywall && newReaches) {
+      const after = await store.runTransaction(async (tx) => {
+        const data = (await tx.get(reader)).data() ?? {};
+        const reads = Number(data.reads?.[book.id] ?? 0) + newReaches;
+        tx.set(reader, { reads: { [book.id]: reads } }, { merge: true });
+        return { reads, inviter: data.invitedBy?.[book.id] as string | undefined, credited: !!data.inviteCredited?.[book.id] };
+      });
+      if (after.inviter && !after.credited && after.reads >= INVITE_READS && after.inviter !== rid) {
+        await creditInvite(book, after.inviter, rid);
+      }
     }
   } catch (error) {
     console.error("Book insights write failed", error);
