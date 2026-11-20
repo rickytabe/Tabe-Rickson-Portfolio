@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rejectUnlessSanityWebhook } from '@/lib/webhook-auth';
 
 const INDEXNOW_KEY = 'cdb373bc9286433e8a4a2b9a7c645391';
 const HOST_URL = 'taberickson.com';
@@ -6,12 +7,8 @@ const HOST_URL = 'taberickson.com';
 export async function POST(req: Request) {
   try {
     // 1. Verify Webhook Secret
-    const authHeader = req.headers.get('authorization');
-    const secret = process.env.SANITY_WEBHOOK_SECRET;
-
-    if (secret && authHeader !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const rejected = rejectUnlessSanityWebhook(req);
+    if (rejected) return rejected;
 
     // 2. Parse the Sanity Webhook Payload
     const body = await req.json();

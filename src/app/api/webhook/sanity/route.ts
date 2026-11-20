@@ -1,18 +1,15 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { Resend } from 'resend';
+import { rejectUnlessSanityWebhook } from '@/lib/webhook-auth';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
-    // Basic verification - set this same secret in your Sanity Webhook HTTP Headers
-    const authHeader = req.headers.get('authorization');
-    const secret = process.env.NEXT_PUBLIC_SANITY_WEBHOOK_SECRET || process.env.SANITY_WEBHOOK_SECRET;
-    
-    if (secret && authHeader !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Only Sanity, holding SANITY_WEBHOOK_SECRET, may trigger emails to subscribers.
+    const rejected = rejectUnlessSanityWebhook(req);
+    if (rejected) return rejected;
 
     const body = await req.json();
     
