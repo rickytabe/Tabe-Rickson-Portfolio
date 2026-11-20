@@ -1,4 +1,4 @@
-// CSC211 Made Easy: the tutorial sheet with full worked solutions. Server-only content: the page
+// CSC211 Tutorial Sheet Solutions: the tutorial sheet with full worked solutions. Server-only content: the page
 // renders the free solutions, and the locked ones are served by /api/book/solutions after unlock.
 // Maths is TeX between \( \) (inline) or \[ \] (display), rendered with KaTeX on the server.
 // Questions keep the sheet's wording, typing mistakes included, so students recognise them.

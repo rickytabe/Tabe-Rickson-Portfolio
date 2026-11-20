@@ -52,7 +52,7 @@ const books: Book[] = [
   },
   {
     title: BOOKS.csc211.title,
-    subtitle: "Every CSC211 tutorial question, solved step by step",
+    subtitle: "Probability and statistics, every question solved step by step",
     description: `The whole CSC211 probability and statistics tutorial sheet, solved in full. Before each solution, a short box shows how to recognise the problem and which rule to use. Questions 1 to ${BOOKS.csc211.paywall!.freeSections} are free; the other ${LOCKED_COUNT} solutions unlock for ${BOOKS.csc211.paywall!.priceFcfa} FCFA, or free by inviting ${BOOKS.csc211.paywall!.invitesNeeded} classmates.`,
     href: BOOKS.csc211.path,
     cover: `${BOOKS.csc211.path}/opengraph-image`,
@@ -67,7 +67,7 @@ const books: Book[] = [
 
 const title = "Books | Tabe Rickson";
 const description =
-  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC211 Made Easy solves every CSC211 probability tutorial question step by step.";
+  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC211 Tutorial Sheet Solutions solves every probability tutorial question step by step.";
 
 export const metadata: Metadata = {
   title,

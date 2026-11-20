@@ -1,4 +1,4 @@
-/* CSC211 Made Easy: what the solutions book adds on top of the shared book styles in
+/* CSC211 Tutorial Sheet Solutions: what the solutions book adds on top of the shared book styles in
    ../algorithms-made-easy-csc207/book.css: maths, locked solutions and the unlock sheet. */
 
 /* ---------- maths ---------- */
@@ -380,4 +380,39 @@
   .sol-lock {
     min-height: 300px;
   }
+}
+
+/* ---------- instant Mobile Money checkout ---------- */
+.unlock-pay {
+  margin: 18px 0 4px;
+  text-align: center;
+}
+.unlock-pay-btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: 13px;
+}
+.unlock-pay-note {
+  justify-content: center;
+  margin-top: 8px;
+}
+.unlock-manual {
+  margin-top: 12px;
+}
+.unlock-manual > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  list-style: none;
+  font-size: 13.5px;
+  color: var(--b-soft);
+  cursor: pointer;
+}
+.unlock-manual > summary::-webkit-details-marker {
+  display: none;
+}
+.unlock-manual[open] > summary svg {
+  transform: rotate(180deg);
 }

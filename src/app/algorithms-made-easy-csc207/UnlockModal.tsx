@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Copy, KeyRound, Loader2, MessageCircle, Phone, Share2, Users, X } from "lucide-react";
+import { Check, ChevronDown, Copy, KeyRound, Loader2, MessageCircle, Phone, Share2, Smartphone, Users, X } from "lucide-react";
 import { settled, track } from "./insights";
 
 // MTN Mobile Money (Cameroon) transfer to Tabe, with the unlock price as the amount.
@@ -10,7 +10,9 @@ const WHATSAPP = "237671353341";
 
 export type UnlockStatus = {
   unlocked: boolean;
-  via: "code" | "invite" | null;
+  via: "code" | "invite" | "payment" | null;
+  /** Whether instant Mobile Money checkout is switched on (Fapshi keys set). */
+  pay: boolean;
   invite: { link: string; count: number; needed: number };
 };
 
@@ -52,7 +54,9 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(status?.unlocked ?? false);
+  const [redeemed, setDone] = useState(false);
+  // Unlocked here (a code), or found unlocked by the reader (a payment that just confirmed).
+  const done = redeemed || !!status?.unlocked;
   const [copied, setCopied] = useState<"momo" | "link" | null>(null);
   const [canDial] = useState(() => window.matchMedia("(pointer: coarse)").matches);
   const [opener] = useState(() => document.activeElement as HTMLElement | null);
@@ -63,6 +67,37 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
 
   const momo = momoCode(book.priceFcfa);
   const invite = status?.invite;
+  const canPay = !!status?.pay;
+  const [paying, setPaying] = useState(false);
+
+  // Instant checkout: Fapshi's page takes MTN or Orange Money, then sends the reader back here,
+  // where the book checks the payment with Fapshi and unlocks.
+  const payNow = async () => {
+    if (paying) return;
+    setPaying(true);
+    setError("");
+    track("pay_start");
+    try {
+      await settled();
+      const res = await fetch("/api/book/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ book: book.id }),
+        credentials: "same-origin",
+      });
+      const data = (await res.json().catch(() => ({}))) as { link?: string; unlocked?: boolean; error?: string };
+      if (data.unlocked) {
+        setDone(true);
+        onUnlocked();
+        return;
+      }
+      if (!res.ok || !data.link) throw new Error(data.error || "Couldn't start the payment. Try again.");
+      window.location.assign(data.link);
+    } catch (e) {
+      setError((e as Error).message);
+      setPaying(false);
+    }
+  };
 
   const close = useCallback(() => {
     if (closeTimer.current) return;
@@ -188,8 +223,8 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
               Every solution is open. Go ace that CA.
             </h2>
             <p className="support-text">
-              All {book.lockedCount} locked solutions are now showing on this device. They stay unlocked when you come
-              back.
+              {status?.via === "payment" ? "Payment received. " : ""}All {book.lockedCount} locked solutions are now
+              showing on this device. They stay unlocked when you come back.
             </p>
             <div className="support-actions">
               <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
@@ -211,6 +246,35 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
               {invite?.needed ?? 3} classmates and unlock it free.
             </p>
 
+            {canPay ? (
+              <div className="unlock-pay">
+                <button
+                  ref={firstRef}
+                  type="button"
+                  className="support-btn support-btn-primary unlock-pay-btn"
+                  onClick={payNow}
+                  disabled={paying}
+                >
+                  {paying ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : <Smartphone className="w-4 h-4" aria-hidden />}
+                  {paying ? "Opening checkout…" : `Pay ${book.priceFcfa} FCFA`}
+                </button>
+                <p className="unlock-step-text unlock-pay-note">
+                  MTN Mobile Money or Orange Money. Confirm on your phone and the solutions open straight away.
+                </p>
+                {error && !code ? (
+                  <p className="unlock-error" role="alert">
+                    {error}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            <details className="unlock-manual" open={!canPay || startWithCode}>
+              {canPay ? (
+                <summary>
+                  Paid Tabe directly, or have a code? <ChevronDown className="w-4 h-4" aria-hidden />
+                </summary>
+              ) : null}
             <ol className="unlock-steps">
               <li>
                 <span className="unlock-step-n">1</span>
@@ -235,9 +299,9 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
                       </a>
                     ) : null}
                     <button
-                      ref={firstRef}
+                      ref={canPay ? undefined : firstRef}
                       type="button"
-                      className={`support-btn ${canDial ? "support-btn-ghost" : "support-btn-primary"}`}
+                      className={`support-btn ${canDial || canPay ? "support-btn-ghost" : "support-btn-primary"}`}
                       onClick={async () => {
                         if (await copyText(momo)) {
                           track("unlock_copy");
@@ -310,6 +374,7 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
                 </form>
               </li>
             </ol>
+            </details>
 
             <div className="unlock-or" role="separator">
               <span>or unlock free</span>
