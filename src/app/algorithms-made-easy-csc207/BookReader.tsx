@@ -74,6 +74,10 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
   const [solutions, setSolutions] = useState<Record<string, string> | null>(null);
   const [unlockOpen, setUnlockOpen] = useState<false | "offer" | "code">(false);
   const unlocked = !!unlock?.unlocked;
+  const unlockedRef = useRef(false);
+  useEffect(() => {
+    unlockedRef.current = unlocked;
+  }, [unlocked]);
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -226,6 +230,28 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [paid, unlocked, refreshUnlock]);
+
+  // Back from Mobile Money checkout (?paid=1): drop the flag, show the unlock sheet, and keep
+  // checking for up to a minute, since the phone confirmation can land after the redirect.
+  useEffect(() => {
+    if (!paid) return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("paid")) return;
+    url.searchParams.delete("paid");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    track("pay_return");
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (unlockedRef.current || tries > 6) clearInterval(timer);
+      else void refreshUnlock();
+    }, 10000);
+    const frame = requestAnimationFrame(() => setUnlockOpen("offer"));
+    return () => {
+      clearInterval(timer);
+      cancelAnimationFrame(frame);
+    };
+  }, [paid, refreshUnlock]);
 
   // Once the solutions arrive, hide the blurred placeholders they replace.
   useEffect(() => {

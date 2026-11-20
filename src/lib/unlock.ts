@@ -17,7 +17,7 @@ const CODE_LENGTH = 8;
 const DEVICES_PER_CODE = 2;
 const TRIES_PER_DAY = 10;
 
-export type Unlock = { via: "code" | "invite"; at: number };
+export type Unlock = { via: "code" | "invite" | "payment"; at: number };
 
 const readers = () => db().collection("bookReaders");
 const codes = () => db().collection("unlockCodes");
