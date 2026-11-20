@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { BOOK_ID, dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
-import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
-import { QUIZ_ANSWERS } from "@/lib/quiz/answers";
+import { dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/lib/insights/server";
+import { bookFrom } from "@/lib/books";
+import { boardDocId, DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
+import { quizBank } from "@/lib/quiz/bank";
 
 type Session = {
+  book?: string; // missing on sessions started before there were two books: CSC207
   rid: string;
   week: string;
   ids: string[];
@@ -31,8 +33,7 @@ export async function POST(request: Request) {
   const sid = typeof body.sid === "string" ? body.sid : "";
   const qid = typeof body.qid === "string" ? body.qid : "";
   const choice = typeof body.choice === "number" ? body.choice : -1;
-  const key = QUIZ_ANSWERS[qid];
-  if (!/^[A-Za-z0-9]{10,40}$/.test(sid) || !key || ![0, 1, 2, 3].includes(choice)) {
+  if (!/^[A-Za-z0-9]{10,40}$/.test(sid) || !qid || ![0, 1, 2, 3].includes(choice)) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 
@@ -44,6 +45,9 @@ export async function POST(request: Request) {
       const s = snap.data() as Session | undefined;
       if (!s || s.rid !== rid) return { status: 404 as const };
       if (!s.ids.includes(qid)) return { status: 400 as const };
+      const book = bookFrom(s.book);
+      const key = quizBank(book).answers[qid];
+      if (!key) return { status: 400 as const };
       if (s.answered[qid]) return { status: 409 as const };
 
       const correct = choice === key.answer;
@@ -60,7 +64,7 @@ export async function POST(request: Request) {
         const ms = now - s.startedAt;
         update.done = true;
         update.ms = ms;
-        const boardRef = store.collection("quizBoard").doc(`${s.week}_${rid}`);
+        const boardRef = store.collection("quizBoard").doc(boardDocId(book, s.week, rid));
         const entry = readEntry((await tx.get(boardRef)).data());
         const today = dayKey();
         const countedToday = entry.days[today] ?? 0;
@@ -72,6 +76,7 @@ export async function POST(request: Request) {
           ranked = true;
           // Written in full (not merged) so entries in the old format are converted in place.
           tx.set(boardRef, {
+            book: book.id,
             week: s.week,
             rid,
             points,
@@ -93,7 +98,7 @@ export async function POST(request: Request) {
           if (!r.correct) perQuestion[`${id}_wrong`] = FieldValue.increment(1);
         }
         tx.set(
-          store.collection("bookStats").doc(BOOK_ID),
+          store.collection("bookStats").doc(book.id),
           {
             quiz: {
               finished: FieldValue.increment(1),
@@ -108,15 +113,15 @@ export async function POST(request: Request) {
         );
       }
       tx.update(ref, update);
-      return { status: 200 as const, correct, done, score, ranked, points, quizzes };
+      return { status: 200 as const, correct, done, score, ranked, points, quizzes, key };
     });
 
     if (result.status !== 200) return NextResponse.json({ error: "Not allowed" }, { status: result.status });
     return NextResponse.json(
       {
         correct: result.correct,
-        answer: key.answer,
-        explain: key.explain,
+        answer: result.key.answer,
+        explain: result.key.explain,
         done: result.done,
         score: result.score,
         ranked: result.ranked,

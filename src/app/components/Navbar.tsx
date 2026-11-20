@@ -18,12 +18,12 @@ const navLinks = [
 
 // `match` lists extra paths that count as this section (a book lives at its own URL)
 const tagLinks = [
-  { label: "BOOKS", href: "/books", match: ["/algorithms-made-easy-csc207"] },
+  { label: "BOOKS", href: "/books", match: ["/algorithms-made-easy-csc207", "/csc211-tutorial-solutions"] },
   { label: "EVENTS", href: "/events" },
 ];
 
 const mobileContentLinks = [
-  { label: "BOOKS", href: "/books", match: ["/algorithms-made-easy-csc207"] },
+  { label: "BOOKS", href: "/books", match: ["/algorithms-made-easy-csc207", "/csc211-tutorial-solutions"] },
   { label: "EVENTS", href: "/events" },
   { label: "PROJECTS", href: "/projects" },
 ];

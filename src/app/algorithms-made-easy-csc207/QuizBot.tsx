@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, Check, Heart, Loader2, RotateCcw, Share2, Trophy, X } from "lucide-react";
-import { TOPIC_LABELS } from "./book-info";
 import { track } from "./insights";
-import { hasSupported } from "./SupportModal";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -16,16 +14,32 @@ type BoardRow = { rank: number; name: string | null; points: number; quizzes: nu
 type Board = { week: string; total: number; top: BoardRow[]; you: BoardRow | null };
 type Phase = "loading" | "name" | "intro" | "q" | "done" | "board" | "error";
 
+/** What Algo needs to know about the book it is quizzing on. Plain data, passed from the reader. */
+export type QuizBook = {
+  id: string;
+  title: string;
+  quizLink: string;
+  /** "chapter" or "question": used in "Read chapter 7" and "Read question B30". */
+  sectionNoun: string;
+  /** Section id to sidebar label, for "Revisit these topics". */
+  labels: Record<string, string>;
+  /** Section id to its printed number ("7", "B30"). */
+  numbers: Record<string, string>;
+  /** Line in the intro under "10 quick questions from across the book." */
+  introLine: string;
+  /** The card at the end of a quiz. */
+  help: { title: string; text: string; button: string | null };
+};
+
 type Props = {
+  book: QuizBook;
   onClose: () => void;
   onReadChapter: (chapterId: string) => void;
-  /** Close the quiz and open the support prompt. */
+  /** Close the quiz and open the support (or unlock) prompt. */
   onSupport: () => void;
   /** Where Algo was opened from, for the stats. */
   source?: "fab" | "sidebar" | "link";
 };
-
-const QUIZ_LINK = "https://taberickson.com/csc207/quiz?ref=quiz-share";
 
 async function api<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`/api/book/quiz/${path}`, {
@@ -55,7 +69,7 @@ function verdict(score: number) {
  * 10-question quiz graded on the server. The first finished attempt each week goes on the
  * weekly leaderboard.
  */
-export default function QuizBot({ onClose, onReadChapter, onSupport, source }: Props) {
+export default function QuizBot({ book, onClose, onReadChapter, onSupport, source }: Props) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nameInput, setNameInput] = useState("");
@@ -75,7 +89,6 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
 
   const [board, setBoard] = useState<Board | null>(null);
   const [boardBack, setBoardBack] = useState<Phase>("intro");
-  const [supporter] = useState(() => hasSupported());
 
   const [closing, setClosing] = useState(false);
   const [opener] = useState(() => document.activeElement as HTMLElement | null);
@@ -131,7 +144,10 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
     setBusy(true);
     setNameError("");
     try {
-      const p = await api<Profile>("profile", anonymous ? { anonymous: true } : { name: nameInput });
+      const p = await api<Profile>(
+        "profile",
+        anonymous ? { anonymous: true, book: book.id } : { name: nameInput, book: book.id }
+      );
       setProfile(p);
       setPhase("intro");
     } catch (e) {
@@ -151,7 +167,7 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
         points: number;
         quizzes: number;
         questions: Omit<Question, "order">[];
-      }>("start", {});
+      }>("start", { book: book.id });
       setSid(s.sid);
       setRanked(s.ranked);
       setOnBoard(false);
@@ -217,7 +233,7 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
     setBoard(null);
     setPhase("board");
     try {
-      setBoard(await api<Board>("board"));
+      setBoard(await api<Board>(`board?book=${book.id}`));
     } catch {
       setBoard({ week: "", total: 0, top: [], you: null });
     }
@@ -291,7 +307,7 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
         ? "Quiz complete"
         : phase === "board"
           ? "Weekly leaderboard"
-          : "CSC207 Made Easy";
+          : book.title;
 
   return (
     <div
@@ -389,8 +405,8 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
                 )}
               </p>
               <p className="quiz-bubble">
-                <b>10 quick questions</b>{" "}from across the book. No calculations, just pick A, B, C or D. Every
-                quiz you finish adds your score to this week&apos;s{" "}<b>leaderboard</b>{" "}(up to 5 a day).
+                <b>10 quick questions</b>{" "}from across the book. {book.introLine} Every quiz you finish adds your
+                score to this week&apos;s{" "}<b>leaderboard</b>{" "}(up to 5 a day).
               </p>
               <button ref={primaryRef} type="button" className="quiz-btn" onClick={start} disabled={busy}>
                 {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Start the quiz{" "}
@@ -468,7 +484,8 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
                       className="quiz-read"
                       onClick={() => close(() => onReadChapter(current.chapter))}
                     >
-                      <BookOpen className="w-3.5 h-3.5" aria-hidden /> Read chapter {Number(current.chapter.slice(1))}
+                      <BookOpen className="w-3.5 h-3.5" aria-hidden /> Read {book.sectionNoun}{" "}
+                      {book.numbers[current.chapter] ?? current.chapter}
                     </button>
                   ) : null}
                   <button ref={primaryRef} type="button" className="quiz-btn" onClick={next}>
@@ -504,32 +521,18 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
                     : "Practice round: 5 quizzes a day count for points, and you've done today's. Come back tomorrow for more!"}
               </p>
               <div className="quiz-help">
-                {supporter ? (
-                  <>
-                    <p className="quiz-help-title">Thank you for supporting Algo 💚</p>
-                    <p className="quiz-help-text">
-                      You&apos;re part of why this stays free. Know someone cramming for the CA? Send them Algo.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="quiz-help-title">Algo is free. Help keep it that way 💚</p>
-                    <p className="quiz-help-text">
-                      Every question, explanation and chapter here is free for every student, no ads. Tips from
-                      students like you keep new quizzes and solved tutorials coming before the CA.
-                    </p>
-                  </>
-                )}
+                <p className="quiz-help-title">{book.help.title}</p>
+                <p className="quiz-help-text">{book.help.text}</p>
                 <div className="quiz-help-actions">
-                  {!supporter ? (
+                  {book.help.button ? (
                     <button type="button" className="quiz-btn quiz-btn-help" onClick={() => close(onSupport)}>
-                      <Heart className="w-4 h-4" aria-hidden /> Support the book
+                      <Heart className="w-4 h-4" aria-hidden /> {book.help.button}
                     </button>
                   ) : null}
                   <a
                     className="quiz-btn quiz-btn-ghost"
                     href={`https://wa.me/?text=${encodeURIComponent(
-                      `I just scored ${score}/10 on Algo's CSC207 quiz 🤖 Think you can beat me? Free practice before the CA: ${QUIZ_LINK}`
+                      `I just scored ${score}/10 on Algo's ${book.title.split(" ")[0]} quiz 🤖 Think you can beat me? Free practice before the CA: ${book.quizLink}`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -547,7 +550,7 @@ export default function QuizBot({ onClose, onReadChapter, onSupport, source }: P
                       <li key={c}>
                         <button type="button" onClick={() => close(() => onReadChapter(c))}>
                           <BookOpen className="w-3.5 h-3.5" aria-hidden />
-                          {Number(c.slice(1))}. {TOPIC_LABELS[c] ?? c}
+                          {book.numbers[c] ?? c}. {book.labels[c] ?? c}
                         </button>
                       </li>
                     ))}

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import {
-  BOOK_ID,
   db,
   ensureReader,
   insightsEnabled,
@@ -10,6 +9,7 @@ import {
   sameOrigin,
 } from "@/lib/insights/server";
 import { cleanName } from "@/lib/quiz/server";
+import { bookFrom } from "@/lib/books";
 
 /** What Algo should call this reader: { asked, name, anonymous }. */
 export async function GET(request: Request) {
@@ -23,11 +23,12 @@ export async function GET(request: Request) {
   );
 }
 
-/** Save a display name ({ name }) or the anonymous choice ({ anonymous: true }). */
+/** Save a display name ({ name }) or the anonymous choice ({ anonymous: true }), from a book ({ book }). */
 export async function POST(request: Request) {
   if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
   if (!sameOrigin(request)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const body = (await request.json().catch(() => ({}))) as { name?: unknown; anonymous?: unknown };
+  const body = (await request.json().catch(() => ({}))) as { name?: unknown; anonymous?: unknown; book?: unknown };
+  const book = bookFrom(body.book);
 
   let update: Record<string, unknown>;
   if (body.anonymous === true) {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     update = { quizName: check.name, quizAnon: false };
   }
 
-  const { rid, isNew } = await ensureReader(request);
+  const { rid, isNew } = await ensureReader(request, book);
   const store = db();
   const readerRef = store.collection("bookReaders").doc(rid);
   const firstTime = !(await readerRef.get()).data()?.quizAskedAt;
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
   if (firstTime) {
     await store
       .collection("bookStats")
-      .doc(BOOK_ID)
+      .doc(book.id)
       .set({ quiz: { [update.quizAnon ? "anonymous" : "named"]: FieldValue.increment(1) } }, { merge: true });
   }
 

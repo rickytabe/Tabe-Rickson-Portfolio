@@ -3,27 +3,53 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUp, ChevronDown, Download, List, Smile, X } from "lucide-react";
+import { ArrowUp, ChevronDown, Download, KeyRound, List, Lock, Smile, X } from "lucide-react";
 import SupportModal, { hasSupported, mayAutoPrompt } from "./SupportModal";
+import UnlockModal, { type UnlockStatus } from "./UnlockModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
 import ChapterFeedback from "./ChapterFeedback";
-import QuizBot, { Robot } from "./QuizBot";
-import { track } from "./insights";
-import { BOOK_PATH } from "./book-info";
+import QuizBot, { Robot, type QuizBook } from "./QuizBot";
+import { setBook, settled, track } from "./insights";
 
 export type BookSubtopic = { id: string; title: string };
-export type BookChapter = { id: string; num: number; title: string; subs: BookSubtopic[] };
+/** `tag` replaces the zero-padded number in the sidebar ("B30"); `locked` marks a paid solution. */
+export type BookChapter = {
+  id: string;
+  num: number;
+  title: string;
+  subs: BookSubtopic[];
+  tag?: string;
+  locked?: boolean;
+};
 export type BookPart = { name: string; chapters: BookChapter[] };
 
+/** Everything the reader needs to know about its book. Plain data, from the server page. */
+export type ReaderBook = {
+  id: string;
+  title: string;
+  path: string;
+  quiz: Omit<QuizBook, "help">;
+  feedback: { noun: string; example: string };
+  /** Paid books: the solutions after `freeSections` unlock. */
+  paywall?: { priceFcfa: number; freeSections: number; lockedCount: number; invitesNeeded: number };
+};
+
 type Props = {
+  book: ReaderBook;
   parts: BookPart[];
-  pdf: string;
+  pdf?: string;
   className?: string;
+  /** The paragraph under the book's title in the footer. */
+  about: React.ReactNode;
+  /** Small print at the very end. */
+  credits: React.ReactNode;
   children: React.ReactNode;
 };
 
-export default function BookReader({ parts, pdf, className = "", children }: Props) {
+export default function BookReader({ book, parts, pdf, className = "", about, credits, children }: Props) {
+  setBook(book.id);
+  const paid = !!book.paywall;
   const rootRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLElement>(null);
@@ -43,6 +69,11 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
   const [viewsSlot, setViewsSlot] = useState<HTMLElement | null>(null);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [feedbackSlots, setFeedbackSlots] = useState<HTMLElement[]>([]);
+  const [lockSlots, setLockSlots] = useState<HTMLElement[]>([]);
+  const [unlock, setUnlock] = useState<UnlockStatus | null>(null);
+  const [solutions, setSolutions] = useState<Record<string, string> | null>(null);
+  const [unlockOpen, setUnlockOpen] = useState<false | "offer" | "code">(false);
+  const unlocked = !!unlock?.unlocked;
 
   const chapters = parts.flatMap((p) => p.chapters);
   const activeChapter = chapters.find((c) => c.id === active);
@@ -144,6 +175,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       setViewsSlot(document.querySelector<HTMLElement>("[data-book-views]"));
       setPortalTarget(document.body);
       setFeedbackSlots(Array.from(document.querySelectorAll<HTMLElement>(".ch-feedback[data-chapter]")));
+      setLockSlots(Array.from(document.querySelectorAll<HTMLElement>(".sol-lock[data-q] .sol-lock-slot")));
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -163,9 +195,57 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Count one minute of actual reading: time only passes while the tab is visible.
+  // Paid books: whether this reader has unlocked, their invite progress, and the solutions once
+  // unlocked. Checked again when the reader comes back to the tab (an invite may have counted).
+  const refreshUnlock = useCallback(async () => {
+    if (!paid) return;
+    try {
+      await settled();
+      const res = await fetch(`/api/book/unlock?book=${book.id}`, { credentials: "same-origin" });
+      if (!res.ok) return;
+      const status = (await res.json()) as UnlockStatus;
+      setUnlock(status);
+      if (status.unlocked) {
+        const sol = await fetch(`/api/book/solutions?book=${book.id}`, { credentials: "same-origin" });
+        if (sol.ok) setSolutions(((await sol.json()) as { solutions: Record<string, string> }).solutions);
+      }
+    } catch {
+      // offline: the lock cards stay, and the next visit tries again
+    }
+  }, [paid, book.id]);
+
   useEffect(() => {
-    if (!mayAutoPrompt()) return;
+    if (!paid) return;
+    const frame = requestAnimationFrame(() => void refreshUnlock());
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && !unlocked) void refreshUnlock();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [paid, unlocked, refreshUnlock]);
+
+  // Once the solutions arrive, hide the blurred placeholders they replace.
+  useEffect(() => {
+    if (!solutions) return;
+    for (const slot of lockSlots) {
+      if (solutions[slot.parentElement?.dataset.q ?? ""]) slot.parentElement?.classList.add("is-open");
+    }
+  }, [solutions, lockSlots]);
+
+  const openUnlock = useCallback((source: string, step: "offer" | "code" = "offer") => {
+    autoPrompted.current = true;
+    track("unlock_shown", source);
+    setDrawerOpen(false);
+    setUnlockOpen(step);
+  }, []);
+
+  // Count one minute of actual reading: time only passes while the tab is visible.
+  // Paid books don't ask for a tip: their lock cards already make the one ask.
+  useEffect(() => {
+    if (paid || !mayAutoPrompt()) return;
     let seconds = 0;
     const tick = setInterval(() => {
       if (document.visibilityState !== "visible") return;
@@ -176,7 +256,7 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
       }
     }, 1000);
     return () => clearInterval(tick);
-  }, []);
+  }, [paid]);
 
   // Ask for support once that minute is up (never on arrival). If the contents drawer or the
   // prompt is already open, wait until it closes.
@@ -261,8 +341,9 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
                       aria-current={isActive ? "true" : undefined}
                       className={isActive ? "is-active" : undefined}
                     >
-                      <span className="book-toc-num">{String(c.num).padStart(2, "0")}</span>
+                      <span className="book-toc-num">{c.tag ?? String(c.num).padStart(2, "0")}</span>
                       <span>{c.title}</span>
+                      {c.locked && !unlocked ? <Lock className="book-toc-lock" aria-label="locked" /> : null}
                     </a>
                     {hasSubs ? (
                       <button
@@ -297,10 +378,12 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         </div>
       ))}
       <div className="book-toc-extra">
-        <a href={pdf} download className="book-toc-pdf">
-          <Download className="w-3.5 h-3.5" aria-hidden />
-          Download the PDF
-        </a>
+        {pdf ? (
+          <a href={pdf} download className="book-toc-pdf">
+            <Download className="w-3.5 h-3.5" aria-hidden />
+            Download the PDF
+          </a>
+        ) : null}
         <button
           type="button"
           className="book-toc-support book-toc-quiz"
@@ -314,17 +397,33 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
           <Robot size={16} />
           Quiz me
         </button>
-        <button
-          type="button"
-          className="book-toc-support"
-          onClick={() => {
-            onPick?.();
-            openSupport("support", "sidebar");
-          }}
-        >
-          <Smile className="w-3.5 h-3.5" aria-hidden />
-          Support this book
-        </button>
+        {paid ? (
+          unlocked ? null : (
+            <button
+              type="button"
+              className="book-toc-support book-toc-unlock"
+              onClick={() => {
+                onPick?.();
+                openUnlock("sidebar");
+              }}
+            >
+              <KeyRound className="w-3.5 h-3.5" aria-hidden />
+              Unlock all solutions
+            </button>
+          )
+        ) : (
+          <button
+            type="button"
+            className="book-toc-support"
+            onClick={() => {
+              onPick?.();
+              openSupport("support", "sidebar");
+            }}
+          >
+            <Smile className="w-3.5 h-3.5" aria-hidden />
+            Support this book
+          </button>
+        )}
       </div>
     </>
   );
@@ -347,12 +446,14 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
           <nav className="book-crumbs" aria-label="Breadcrumb">
             <Link href="/books">Books</Link>
             <span aria-hidden>/</span>
-            <a href="#top">CSC207 Made Easy</a>
+            <a href="#top">{book.title}</a>
           </nav>
           <p className="book-bar-chapter" aria-live="polite">
             {activeChapter ? (
               <>
-                <span className="book-bar-num">{String(activeChapter.num).padStart(2, "0")}</span>
+                <span className="book-bar-num">
+                  {activeChapter.tag ?? String(activeChapter.num).padStart(2, "0")}
+                </span>
                 <span className="book-bar-title">{activeChapter.title}</span>
               </>
             ) : null}
@@ -373,30 +474,32 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
         <div className="book-main">
           {children}
           <footer className="book-foot">
-            <h2>CSC207 Made Easy</h2>
-            <p>
-              A plain English rewrite of the CSC207 Introduction to Algorithms course, 2023/2024 academic year.
-              Every definition, pseudocode listing, code sample and complexity rule has been kept in full. What has
-              been added is the explanation around them.
-            </p>
+            <h2>{book.title}</h2>
+            <p>{about}</p>
             <div className="book-foot-links">
-              <a href={pdf} download>
-                <Download className="w-4 h-4" aria-hidden /> Download the PDF
-              </a>
-              <button type="button" onClick={() => openSupport("support", "footer")}>
-                <Smile className="w-4 h-4" aria-hidden /> Support this book
-              </button>
-              <Link href="/books">More free books &rarr;</Link>
+              {pdf ? (
+                <a href={pdf} download>
+                  <Download className="w-4 h-4" aria-hidden /> Download the PDF
+                </a>
+              ) : null}
+              {paid ? (
+                unlocked ? null : (
+                  <button type="button" onClick={() => openUnlock("footer")}>
+                    <KeyRound className="w-4 h-4" aria-hidden /> Unlock all solutions
+                  </button>
+                )
+              ) : (
+                <button type="button" onClick={() => openSupport("support", "footer")}>
+                  <Smile className="w-4 h-4" aria-hidden /> Support this book
+                </button>
+              )}
+              <Link href="/books">More books &rarr;</Link>
             </div>
             <p className="book-foot-credit">
-              Anonymous reading stats and chapter feedback help improve this book. No names or personal details
-              are collected.
+              Anonymous reading stats and {book.feedback.noun} feedback help improve this book. No names or personal
+              details are collected.
             </p>
-            <p className="book-foot-credit">
-              Original course material by Drs. Nyanga B., Achenkeng P. and Fotsing C. Definitions quoted in chapter 1
-              are from Dromey, <i>How to Solve it by Computer</i> (1982) and Woodhouse et al, <i>Computer Science</i>{" "}
-              (1984).
-            </p>
+            {credits}
           </footer>
         </div>
       </div>
@@ -421,26 +524,42 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
 
       <button
         type="button"
-        className={`book-top ${showTop && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""}`}
+        className={`book-top ${showTop && !drawerOpen && !supportOpen && !quizOpen && !unlockOpen ? "is-on" : ""}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Back to top"
       >
         <ArrowUp className="w-4 h-4" aria-hidden />
       </button>
 
-      <button
-        type="button"
-        className={`book-fab ${showFab && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""}`}
-        onClick={() => openSupport("support", "fab")}
-        aria-label="Support this book"
-      >
-        <Smile className="book-fab-icon" aria-hidden />
-        <span>Support</span>
-      </button>
+      {paid ? (
+        unlocked ? null : (
+          <button
+            type="button"
+            className={`book-fab book-fab-unlock ${showFab && !drawerOpen && !quizOpen && !unlockOpen ? "is-on" : ""}`}
+            onClick={() => openUnlock("fab")}
+            aria-label="Unlock all solutions"
+          >
+            <KeyRound className="book-fab-icon" aria-hidden />
+            <span>Unlock</span>
+          </button>
+        )
+      ) : (
+        <button
+          type="button"
+          className={`book-fab ${showFab && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""}`}
+          onClick={() => openSupport("support", "fab")}
+          aria-label="Support this book"
+        >
+          <Smile className="book-fab-icon" aria-hidden />
+          <span>Support</span>
+        </button>
+      )}
 
       <button
         type="button"
-        className={`book-quiz-fab ${showFab && !drawerOpen && !supportOpen && !quizOpen ? "is-on" : ""} ${
+        className={`book-quiz-fab ${
+          showFab && !drawerOpen && !supportOpen && !quizOpen && !unlockOpen ? "is-on" : ""
+        } ${
           showTop ? "is-raised" : ""
         }`}
         onClick={() => {
@@ -463,8 +582,9 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               <FigureLightbox />
               {quizOpen ? (
                 <QuizBot
+                  book={{ ...book.quiz, help: quizHelp(book, unlocked) }}
                   source={quizSource}
-                  onSupport={() => openSupport("support", "quiz")}
+                  onSupport={() => (paid ? openUnlock("quiz") : openSupport("support", "quiz"))}
                   onClose={() => setQuizOpen(false)}
                   onReadChapter={(id) =>
                     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -474,14 +594,91 @@ export default function BookReader({ parts, pdf, className = "", children }: Pro
               {supportOpen ? (
                 <SupportModal mode={supportMode} pdf={pdf} onClose={() => setSupportOpen(false)} />
               ) : null}
+              {unlockOpen && book.paywall ? (
+                <UnlockModal
+                  book={{ id: book.id, title: book.title, ...book.paywall }}
+                  status={unlock}
+                  startWithCode={unlockOpen === "code"}
+                  onUnlocked={() => void refreshUnlock()}
+                  onClose={() => setUnlockOpen(false)}
+                />
+              ) : null}
             </div>,
             portalTarget
           )
         : null}
-      {feedbackSlots.map((slot) =>
-        createPortal(<ChapterFeedback chapter={slot.dataset.chapter!} />, slot, slot.dataset.chapter)
-      )}
-      {viewsSlot ? createPortal(<ViewCount path={BOOK_PATH} className="bs-views-in" />, viewsSlot) : null}
+      {feedbackSlots
+        .filter((slot) => !slot.dataset.locked || solutions?.[slot.dataset.chapter!])
+        .map((slot) =>
+          createPortal(
+            <ChapterFeedback
+              chapter={slot.dataset.chapter!}
+              book={book.id}
+              noun={book.feedback.noun}
+              example={book.feedback.example}
+            />,
+            slot,
+            slot.dataset.chapter
+          )
+        )}
+      {book.paywall
+        ? lockSlots.map((slot) => {
+            const q = slot.parentElement?.dataset.q ?? "";
+            const html = solutions?.[q];
+            const wall = book.paywall!;
+            return createPortal(
+              html ? (
+                <div className="sol-unlocked" dangerouslySetInnerHTML={{ __html: html }} />
+              ) : (
+                <div className="sol-lock-card">
+                  <Lock className="sol-lock-icon" aria-hidden />
+                  <p className="sol-lock-title">Solution locked</p>
+                  <p className="sol-lock-text">
+                    Questions 1 to {wall.freeSections} are free. Unlock all {wall.lockedCount} worked solutions for{" "}
+                    {wall.priceFcfa} FCFA, or free by inviting {wall.invitesNeeded} classmates.
+                  </p>
+                  <button type="button" className="sol-lock-btn" onClick={() => openUnlock("inline")}>
+                    <KeyRound className="w-4 h-4" aria-hidden /> Unlock all solutions
+                  </button>
+                  <button type="button" className="sol-lock-code" onClick={() => openUnlock("inline", "code")}>
+                    I already have a code
+                  </button>
+                </div>
+              ),
+              slot,
+              q
+            );
+          })
+        : null}
+      {viewsSlot ? createPortal(<ViewCount path={book.path} className="bs-views-in" />, viewsSlot) : null}
     </div>
   );
+}
+
+/** The card at the end of a quiz: a tip for free books, the unlock for paid ones. */
+function quizHelp(book: ReaderBook, unlocked: boolean): QuizBook["help"] {
+  if (book.paywall) {
+    return unlocked
+      ? {
+          title: "Thanks for unlocking 💚",
+          text: "Know someone revising for the CA? Send them Algo. The quiz is free for everyone.",
+          button: null,
+        }
+      : {
+          title: "Want every worked solution?",
+          text: `Questions 1 to ${book.paywall.freeSections} are free. Unlock the other ${book.paywall.lockedCount} for ${book.paywall.priceFcfa} FCFA, or free by inviting ${book.paywall.invitesNeeded} classmates.`,
+          button: "Unlock all solutions",
+        };
+  }
+  return hasSupported()
+    ? {
+        title: "Thank you for supporting Algo 💚",
+        text: "You're part of why this stays free. Know someone cramming for the CA? Send them Algo.",
+        button: null,
+      }
+    : {
+        title: "Algo is free. Help keep it that way 💚",
+        text: "Every question, explanation and chapter here is free for every student, no ads. Tips from students like you keep new quizzes and solved tutorials coming before the CA.",
+        button: "Support the book",
+      };
 }

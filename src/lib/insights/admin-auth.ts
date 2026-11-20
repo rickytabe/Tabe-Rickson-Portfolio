@@ -7,6 +7,8 @@ import { createHash, createHmac, timingSafeEqual } from "crypto";
  */
 
 export const ADMIN_COOKIE = "bk_admin";
+/** Carries a just-made unlock code to the dashboard for one minute. */
+export const NEW_CODE_COOKIE = "bk_newcode";
 const SESSION_DAYS = 30;
 
 function password(): string | null {

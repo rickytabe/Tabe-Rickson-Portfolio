@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces } from "next/font/google";
-import BookReader, { type BookPart } from "./BookReader";
+import BookReader, { type BookPart, type ReaderBook } from "./BookReader";
+import { BOOKS } from "@/lib/books";
 import { TOPIC_LABELS as topicLabels } from "./book-info";
 import {
   BOOK_AUTHOR,
@@ -211,9 +212,39 @@ export default function AlgorithmsBook() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <BookReader parts={parts} pdf={pdfPath} className={fraunces.variable}>
+      <BookReader
+        book={readerBook}
+        parts={parts}
+        pdf={pdfPath}
+        className={fraunces.variable}
+        about="A plain English rewrite of the CSC207 Introduction to Algorithms course, 2023/2024 academic year. Every definition, pseudocode listing, code sample and complexity rule has been kept in full. What has been added is the explanation around them."
+        credits={
+          <p className="book-foot-credit">
+            Original course material by Drs. Nyanga B., Achenkeng P. and Fotsing C. Definitions quoted in chapter 1
+            are from Dromey, <i>How to Solve it by Computer</i> (1982) and Woodhouse et al, <i>Computer Science</i>{" "}
+            (1984).
+          </p>
+        }
+      >
         <article className="book-content" dangerouslySetInnerHTML={{ __html: html }} />
       </BookReader>
     </>
   );
 }
+
+const book = BOOKS.csc207;
+const readerBook: ReaderBook = {
+  id: book.id,
+  title: book.title,
+  path: book.path,
+  quiz: {
+    id: book.id,
+    title: book.title,
+    quizLink: book.quizLink,
+    sectionNoun: "chapter",
+    labels: topicLabels,
+    numbers: Object.fromEntries(book.sections.map((id) => [id, String(Number(id.slice(1)))])),
+    introLine: "No calculations, just pick A, B, C or D.",
+  },
+  feedback: { noun: "chapter", example: "e.g. the part about the frequency count lost me" },
+};

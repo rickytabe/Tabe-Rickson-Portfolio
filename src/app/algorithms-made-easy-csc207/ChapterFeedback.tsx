@@ -4,27 +4,37 @@ import { useState } from "react";
 import { Check, ThumbsDown, ThumbsUp } from "lucide-react";
 import { sendFeedback } from "./insights";
 
-const STORE = "csc207-feedback";
 type Saved = Record<string, { vote: "up" | "down"; noted?: boolean }>;
 
-function load(): Saved {
+function load(store: string): Saved {
   try {
-    return JSON.parse(localStorage.getItem(STORE) || "{}") as Saved;
+    return JSON.parse(localStorage.getItem(store) || "{}") as Saved;
   } catch {
     return {};
   }
 }
-function save(chapter: string, entry: Saved[string]) {
+function save(store: string, chapter: string, entry: Saved[string]) {
   try {
-    localStorage.setItem(STORE, JSON.stringify({ ...load(), [chapter]: entry }));
+    localStorage.setItem(store, JSON.stringify({ ...load(store), [chapter]: entry }));
   } catch {
     // storage blocked: the vote is still sent, it just won't be remembered on this device
   }
 }
 
-/** "Was this chapter clear?" at the end of a chapter, with an optional private note. */
-export default function ChapterFeedback({ chapter }: { chapter: string }) {
-  const [state, setState] = useState(() => load()[chapter] ?? null);
+/** "Was this chapter clear?" at the end of a chapter (or solution), with an optional private note. */
+export default function ChapterFeedback({
+  chapter,
+  book = "csc207",
+  noun = "chapter",
+  example = "e.g. the part about the frequency count lost me",
+}: {
+  chapter: string;
+  book?: string;
+  noun?: string;
+  example?: string;
+}) {
+  const store = `${book}-feedback`;
+  const [state, setState] = useState(() => load(store)[chapter] ?? null);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -32,7 +42,7 @@ export default function ChapterFeedback({ chapter }: { chapter: string }) {
     if (state?.vote === v) return;
     const next = { vote: v, noted: state?.noted };
     setState(next);
-    save(chapter, next);
+    save(store, chapter, next);
     void sendFeedback(chapter, v);
   };
 
@@ -42,7 +52,7 @@ export default function ChapterFeedback({ chapter }: { chapter: string }) {
     await sendFeedback(chapter, state.vote, text.trim());
     const next = { ...state, noted: true };
     setState(next);
-    save(chapter, next);
+    save(store, chapter, next);
     setSending(false);
   };
 
@@ -54,8 +64,8 @@ export default function ChapterFeedback({ chapter }: { chapter: string }) {
   return (
     <div className="cf" aria-label="Chapter feedback">
       <div className="cf-row">
-        <p className="cf-q">Was this chapter clear?</p>
-        <div className="cf-votes" role="group" aria-label="Was this chapter clear?">
+        <p className="cf-q">Was this {noun} clear?</p>
+        <div className="cf-votes" role="group" aria-label={`Was this ${noun} clear?`}>
           <button
             type="button"
             className={`cf-btn ${state?.vote === "up" ? "is-on" : ""}`}
@@ -88,7 +98,7 @@ export default function ChapterFeedback({ chapter }: { chapter: string }) {
               maxLength={600}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder={state.vote === "down" ? "e.g. the part about the frequency count lost me" : "Optional"}
+              placeholder={state.vote === "down" ? example : "Optional"}
             />
             <button type="button" className="cf-send" onClick={sendNote} disabled={!text.trim() || sending}>
               {sending ? "Sending" : "Send"}

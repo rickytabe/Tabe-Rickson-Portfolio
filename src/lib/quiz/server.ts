@@ -1,4 +1,5 @@
-import { QUIZ_QUESTIONS } from "@/app/algorithms-made-easy-csc207/quiz-questions";
+import type { BookInfo } from "@/lib/books";
+import { quizBank } from "@/lib/quiz/bank";
 
 export const QUIZ_LENGTH = 10;
 
@@ -47,10 +48,11 @@ export function cleanName(input: unknown): NameCheck {
   return { ok: true, name };
 }
 
-/** Draw a quiz on the server: questions from different chapters where possible, in book order. */
-export function drawQuestionIds(count = QUIZ_LENGTH): string[] {
-  const shuffled = [...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5);
-  const picked: typeof QUIZ_QUESTIONS = [];
+/** Draw a quiz on the server: questions from different sections where possible, in book order. */
+export function drawQuestionIds(book: BookInfo, count = QUIZ_LENGTH): string[] {
+  const { questions } = quizBank(book);
+  const shuffled = [...questions].sort(() => Math.random() - 0.5);
+  const picked: typeof questions = [];
   const chapters = new Set<string>();
   for (const q of shuffled) {
     if (picked.length >= count) break;
@@ -63,6 +65,7 @@ export function drawQuestionIds(count = QUIZ_LENGTH): string[] {
     if (picked.length >= count) break;
     if (!picked.includes(q)) picked.push(q);
   }
-  picked.sort((a, b) => Number(a.chapter.slice(1)) - Number(b.chapter.slice(1)));
+  const order = (q: (typeof questions)[number]) => book.sections.indexOf(q.chapter);
+  picked.sort((a, b) => order(a) - order(b));
   return picked.map((q) => q.id);
 }

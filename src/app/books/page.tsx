@@ -12,6 +12,8 @@ import {
   readBookHtml,
   readingMinutes,
 } from "../algorithms-made-easy-csc207/book-meta";
+import { BOOKS } from "@/lib/books";
+import { LOCKED_COUNT, SOLVED_COUNT, bookHtml } from "@/content/csc211/render";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -21,10 +23,11 @@ type Book = {
   subtitle: string;
   description: string;
   href: string;
-  pdf: string;
+  pdf?: string;
   cover: string;
-  pages: number;
-  chapters: number;
+  /** The small print above the title, e.g. ["24 CHAPTERS", "68-PAGE PDF"]. */
+  facts: string[];
+  price: string;
   author: string;
   avatar: string;
   readTime: string;
@@ -40,24 +43,39 @@ const books: Book[] = [
     href: BOOK_PATH,
     pdf: "/algorithms-made-easy-csc207/csc207-made-easy.pdf",
     cover: "/algorithms-made-easy-csc207/og.png",
-    pages: 68,
-    chapters: BOOK_CHAPTERS,
+    facts: [`${BOOK_CHAPTERS} CHAPTERS`, "68-PAGE PDF"],
+    price: "FREE",
     author: BOOK_AUTHOR,
     avatar: BOOK_AUTHOR_AVATAR,
     readTime: formatReadTime(readingMinutes(readBookHtml())),
     topics: ["Algorithms", "Pseudocode", "Flowcharts", "Dynamic programming", "Big O notation"],
   },
+  {
+    title: BOOKS.csc211.title,
+    subtitle: "Every CSC211 tutorial question, solved step by step",
+    description: `The whole CSC211 probability and statistics tutorial sheet, solved in full. Before each solution, a short box shows how to recognise the problem and which rule to use. Questions 1 to ${BOOKS.csc211.paywall!.freeSections} are free; the other ${LOCKED_COUNT} solutions unlock for ${BOOKS.csc211.paywall!.priceFcfa} FCFA, or free by inviting ${BOOKS.csc211.paywall!.invitesNeeded} classmates.`,
+    href: BOOKS.csc211.path,
+    cover: `${BOOKS.csc211.path}/opengraph-image`,
+    facts: [`${SOLVED_COUNT} QUESTIONS`, "ALGO QUIZ BOT"],
+    price: `Q1\u2013${BOOKS.csc211.paywall!.freeSections} FREE`,
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: formatReadTime(readingMinutes(bookHtml())),
+    topics: ["Probability", "Bayes", "Binomial", "Poisson", "Normal distribution", "Joint densities"],
+  },
 ];
 
 const title = "Books | Tabe Rickson";
 const description =
-  "Free books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English, with 24 illustrated chapters and a downloadable PDF.";
+  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC211 Made Easy solves every CSC211 probability tutorial question step by step.";
 
 export const metadata: Metadata = {
   title,
   description,
   keywords: [
     "CSC207",
+    "CSC211",
+    "CSC211 tutorial solutions",
     "Introduction to Algorithms",
     "algorithms in plain English",
     "free algorithms book",
@@ -137,7 +155,7 @@ export default function BooksIndex() {
               The <span className="text-[#39FF14]">Books</span>
             </h1>
             <p className="text-foreground/60 text-lg max-w-2xl font-inter">
-              Hard subjects, rewritten in plain English. Free to read online, with a PDF to keep.
+              Hard subjects, rewritten in plain English, and tutorial sheets solved step by step.
             </p>
           </div>
 
@@ -154,6 +172,7 @@ export default function BooksIndex() {
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    unoptimized={book.cover.endsWith("/opengraph-image")}
                     priority
                   />
                   <div className="absolute inset-0 border-b border-foreground/10 pointer-events-none" />
@@ -161,11 +180,13 @@ export default function BooksIndex() {
 
                 <div className="p-6 md:p-8 flex flex-col flex-grow">
                   <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-mono text-foreground/50">
-                    <span>{book.chapters} CHAPTERS</span>
-                    <span className="text-foreground/30">•</span>
-                    <span>{book.pages}-PAGE PDF</span>
-                    <span className="text-foreground/30">•</span>
-                    <span className="text-[#39FF14]">FREE</span>
+                    {book.facts.map((fact) => (
+                      <span key={fact} className="contents">
+                        <span>{fact}</span>
+                        <span className="text-foreground/30">•</span>
+                      </span>
+                    ))}
+                    <span className="text-[#39FF14]">{book.price}</span>
                   </div>
 
                   <h2 className="text-2xl font-bold font-sans text-foreground mb-1 leading-snug">
@@ -213,13 +234,15 @@ export default function BooksIndex() {
                     >
                       READ ONLINE <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <a
-                      href={book.pdf}
-                      download
-                      className="inline-flex items-center gap-2 text-sm font-mono font-semibold text-foreground/60 hover:text-[#39FF14] transition-colors"
-                    >
-                      <Download className="w-4 h-4" /> DOWNLOAD PDF
-                    </a>
+                    {book.pdf ? (
+                      <a
+                        href={book.pdf}
+                        download
+                        className="inline-flex items-center gap-2 text-sm font-mono font-semibold text-foreground/60 hover:text-[#39FF14] transition-colors"
+                      >
+                        <Download className="w-4 h-4" /> DOWNLOAD PDF
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               </article>

@@ -1,35 +1,38 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { BOOK_ID, dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
-import { DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
+import { dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
+import { bookFrom } from "@/lib/books";
+import { boardDocId, DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { drawQuestionIds, weekKey } from "@/lib/quiz/server";
-import { QUIZ_QUESTIONS } from "@/app/algorithms-made-easy-csc207/quiz-questions";
+import { quizBank } from "@/lib/quiz/bank";
 
 /**
- * Start a quiz attempt. The server picks the questions and records the start time, so it can
- * grade every answer and time the attempt itself. Only questions are returned, never answers.
+ * Start a quiz attempt ({ book }). The server picks the questions and records the start time, so it
+ * can grade every answer and time the attempt itself. Only questions are returned, never answers.
  */
 export async function POST(request: Request) {
   if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
   if (!sameOrigin(request)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { rid, isNew } = await ensureReader(request);
+  const body = (await request.json().catch(() => ({}))) as { book?: unknown };
+  const book = bookFrom(body.book);
+  const { rid, isNew } = await ensureReader(request, book);
   const store = db();
   const week = weekKey();
-  const ids = drawQuestionIds();
-  const entry = readEntry((await store.collection("quizBoard").doc(`${week}_${rid}`).get()).data());
+  const ids = drawQuestionIds(book);
+  const entry = readEntry((await store.collection("quizBoard").doc(boardDocId(book, week, rid)).get()).data());
   const countedToday = entry.days[dayKey()] ?? 0;
   // A hint for the intro: whether this quiz will add to the weekly points (decided at the finish).
   const ranked = countedToday < DAILY_COUNTED;
 
   const session = store.collection("quizSessions").doc();
-  await session.set({ rid, week, ids, startedAt: Date.now(), answered: {}, score: 0, done: false, ranked });
+  await session.set({ book: book.id, rid, week, ids, startedAt: Date.now(), answered: {}, score: 0, done: false, ranked });
   await store
     .collection("bookStats")
-    .doc(BOOK_ID)
+    .doc(book.id)
     .set({ quiz: { started: FieldValue.increment(1) }, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
 
-  const byId = new Map(QUIZ_QUESTIONS.map((q) => [q.id, q]));
+  const byId = new Map(quizBank(book).questions.map((q) => [q.id, q]));
   const res = NextResponse.json(
     {
       sid: session.id,

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE, validSession } from "@/lib/insights/admin-auth";
 import { db, insightsEnabled, sameOrigin } from "@/lib/insights/server";
+import { BOARD_DOC_ID } from "@/lib/quiz/board";
+import { bookFrom } from "@/lib/books";
 
 /** Hide or show a leaderboard entry. Owner only (dashboard session), same origin only. */
 export async function POST(request: Request) {
@@ -13,9 +15,10 @@ export async function POST(request: Request) {
   const form = await request.formData().catch(() => null);
   const id = String(form?.get("id") ?? "");
   const hidden = form?.get("hidden") === "1";
-  if (!/^w\d{4}-\d{2}_[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
+  if (!BOARD_DOC_ID.test(id)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
 
   const ref = db().collection("quizBoard").doc(id);
   if ((await ref.get()).exists) await ref.update({ hidden });
-  return NextResponse.redirect(new URL("/book-insights#leaderboard", request.url), 303);
+  const book = bookFrom(form?.get("book"));
+  return NextResponse.redirect(new URL(`/book-insights?book=${book.id}#leaderboard`, request.url), 303);
 }
