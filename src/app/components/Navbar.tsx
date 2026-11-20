@@ -104,13 +104,20 @@ export default function Navbar() {
     }
   }, [isOnHomePage, pathname]);
 
+  // The frosted background shows once the page scrolls, on every page. (It used to be set only by
+  // the home page's section tracking, so other pages kept a see-through navbar over their content.)
+  useEffect(() => {
+    const onScroll = () => setHasScrolled(window.scrollY > 0);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
   useEffect(() => {
     // Only track scroll sections when on the home page
     if (!isOnHomePage) return;
 
     const updateActiveSection = () => {
-      setHasScrolled(window.scrollY > 0);
-
       const visibleSections = navLinks.map((link) => {
         const el = document.getElementById(link.sectionId);
         if (!el) {
