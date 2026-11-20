@@ -34,7 +34,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   },
   csc211: {
     id: "csc211",
-    title: "CSC211 Made Easy",
+    title: "CSC211 Tutorial Sheet Solutions",
     path: "/csc211-tutorial-solutions",
     quizLink: "https://taberickson.com/csc211/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc211",
