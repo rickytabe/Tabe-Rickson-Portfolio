@@ -42,14 +42,14 @@ export const metadata: Metadata = {
   alternates: { canonical: book.path },
   openGraph: {
     type: "book",
-    title: "CSC211 Made Easy: tutorial solutions",
-    description: `Every CSC211 tutorial question, solved step by step. Questions 1 to ${wall.freeSections} free.`,
+    title: "CSC211 Tutorial Sheet Solutions",
+    description: "Every CSC211 tutorial question, solved step by step. Know exactly which rule to use in the CA.",
     url: pageUrl,
   },
   twitter: {
     card: "summary_large_image",
-    title: "CSC211 Made Easy: tutorial solutions",
-    description: `Every CSC211 tutorial question, solved step by step. Questions 1 to ${wall.freeSections} free.`,
+    title: "CSC211 Tutorial Sheet Solutions",
+    description: "Every CSC211 tutorial question, solved step by step. Know exactly which rule to use in the CA.",
   },
 };
 
