@@ -109,8 +109,8 @@ function tocHtml(): string {
 
 function coverHtml(): string {
   return `<header class="cover">
-  <div class="kicker">CSC211 made easy &middot; probability and statistics</div>
-  <h1 class="title">CSC211 <em>Made Easy</em></h1>
+  <div class="kicker">Probability &amp; statistics &middot; every question solved</div>
+  <h1 class="title">CSC211 <em>Tutorial Sheet Solutions</em></h1>
   <p class="sub">Every question on the CSC211 tutorial sheet, solved step by step. Before each solution, a short box shows you how to recognise the type of problem and which tool to reach for.</p>
   <!--book-stats-->
   <div class="coverart">

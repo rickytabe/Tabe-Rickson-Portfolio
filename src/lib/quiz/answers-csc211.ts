@@ -1,5 +1,5 @@
 // Server-only: correct option (index into the question's `options`) and explanation per id, for
-// CSC211 Made Easy. Never import this from a client component.
+// CSC211 Tutorial Sheet Solutions. Never import this from a client component.
 
 export const CSC211_ANSWERS: Record<string, { answer: number; explain: string }> = {
   p1: { answer: 0, explain: "Three things with 2 states each give 2³ = 8 outcomes, from uuu to ddd." },

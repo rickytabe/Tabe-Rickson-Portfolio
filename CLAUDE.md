@@ -8,7 +8,7 @@ Next.js 16 App Router (Turbopack), deployed on Vercel from `master`. Content for
 - Every change goes on its own branch and ships as a pull request against `master`; Vercel builds a preview for each PR.
 - Before pushing to a branch, check its PR has not already merged. If it has, start a fresh branch from `origin/master`.
 - Run `npx tsc --noEmit` and `npx eslint` on the changed files before committing.
-- Keep the tone of anything students see warm and voluntary. CSC207 Made Easy stays fully free: support is always optional, no guilt, no paywall. CSC211 Made Easy is the one paid book (see below), and even there every question and hint is free, the first 15 solutions are free, and inviting classmates unlocks the rest at no cost.
+- Keep the tone of anything students see warm and voluntary. CSC207 Made Easy stays fully free: support is always optional, no guilt, no paywall. CSC211 Tutorial Sheet Solutions is the one paid book (see below), and even there every question and hint is free, the first 15 solutions are free, and inviting classmates unlocks the rest at no cost.
 - Never commit secrets. `.env*` is git-ignored; keys live in Vercel → Project → Settings → Environment Variables.
 
 ## Running locally
@@ -57,7 +57,7 @@ A free online book for CSC207 students, rendered natively at `/algorithms-made-e
 - CSC207's Firestore keys are unchanged. Other books get a prefix: marks and votes are `csc211-…`, board docs are `csc211_{week}_{rid}` with a `book` field, stats are `bookStats/{book}`. One `bk_rid` reader id covers both books.
 - Quiz banks are per book in `src/lib/quiz/bank.ts` (questions public, answers server-only).
 
-## The book: CSC211 Made Easy (tutorial solutions, paid)
+## The book: CSC211 Tutorial Sheet Solutions (tutorial solutions, paid)
 
 Every question on the CSC211 probability tutorial sheet, solved, at `/csc211-tutorial-solutions` (short links `/csc211`, `/csc211/quiz`).
 

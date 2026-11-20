@@ -1,4 +1,4 @@
-// Algo's questions for CSC211 Made Easy (public: no answers here).
+// Algo's questions for CSC211 Tutorial Sheet Solutions (public: no answers here).
 // Answers and explanations live server-side in src/lib/quiz/answers-csc211.ts. The correct option
 // is always listed first there; the quiz shuffles the options. Keep ids stable: stats use them.
 // `chapter` is the question on the sheet where the idea is used, so "Read question 7" goes there.
