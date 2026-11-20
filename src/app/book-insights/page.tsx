@@ -10,6 +10,7 @@ import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
 import { listCodes, type CodeRow } from "@/lib/unlock";
+import { fapshiEnabled, listPayments, type PaymentRow } from "@/lib/fapshi";
 import { NEW_CODE_COOKIE } from "@/lib/insights/admin-auth";
 import { weekKey, weekStartLabel } from "@/lib/quiz/server";
 import "./insights.css";
@@ -54,12 +55,20 @@ type Stats = {
   unlock_dial?: Counts;
   unlock_whatsapp?: Counts;
   invite_share?: Counts;
+  pay_start?: Counts;
+  pay_return?: Counts;
   paywall?: {
     codes?: number;
     codesUsed?: number;
     unlockedByCode?: number;
     unlockedByInvite?: number;
     invitesCounted?: number;
+    paymentsStarted?: number;
+    unlockedByPayment?: number;
+    paymentsAmount?: number;
+    paymentsRevenue?: number;
+    paidBy_mtn?: number;
+    paidBy_orange?: number;
   };
   updatedAt?: { toDate(): Date };
 };
@@ -90,12 +99,13 @@ const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
 
 async function load(book: BookInfo) {
   const store = db();
-  const [statsSnap, notesSnap, views, board, codes] = await Promise.all([
+  const [statsSnap, notesSnap, views, board, codes, payments] = await Promise.all([
     store.collection("bookStats").doc(book.id).get(),
     store.collection("bookFeedback").orderBy("at", "desc").limit(120).get(),
     Promise.all(VIEW_PATHS[book.id].map((p) => getPathViews(p))),
     loadBoard(weekKey(), { includeHidden: true, book }),
     book.paywall ? listCodes(book) : Promise.resolve([] as CodeRow[]),
+    book.paywall ? listPayments(book) : Promise.resolve([] as PaymentRow[]),
   ]);
   const stats = (statsSnap.data() ?? {}) as Stats;
   const notes: Note[] = notesSnap.docs
@@ -113,7 +123,7 @@ async function load(book: BookInfo) {
     return { key: dayKey(d), label: dayLabel.format(d) };
   });
 
-  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays, board, codes };
+  return { stats, notes, views: known.length ? known.reduce((a, b) => a + b, 0) : null, recentDays, board, codes, payments };
 }
 
 function Login({ failed }: { failed: boolean }) {
@@ -163,7 +173,7 @@ export default async function BookInsights({
     );
   }
 
-  const { stats, notes, views, recentDays, board, codes } = await load(book);
+  const { stats, notes, views, recentDays, board, codes, payments } = await load(book);
   const readers = n(stats.readers);
   const finished = n(stats.end);
   const downloads = n(stats.download_free) + n(stats.download_supported) + n(stats.download_direct);
@@ -238,7 +248,9 @@ export default async function BookInsights({
   const byCode = Number(pw.unlockedByCode ?? 0);
   const byInvite = Number(pw.unlockedByInvite ?? 0);
   const codesUsed = Number(pw.codesUsed ?? 0);
-  const revenue = codesUsed * (book.paywall?.priceFcfa ?? 0);
+  const byPayment = Number(pw.unlockedByPayment ?? 0);
+  // Codes: what students sent you directly. Payments: what Fapshi pays out, after its 3% fee.
+  const revenue = codesUsed * (book.paywall?.priceFcfa ?? 0) + Number(pw.paymentsRevenue ?? 0);
 
   return (
     <main className="ins">
@@ -283,11 +295,15 @@ export default async function BookInsights({
         <Tile label="Finished the book" value={`${pct(finished, readers)}%`} hint={`${fmt.format(finished)} readers`} />
         {book.paywall ? (
           <>
-            <Tile label="Unlocked" value={fmt.format(byCode + byInvite)} hint={`${fmt.format(byCode)} paid · ${fmt.format(byInvite)} invited`} />
             <Tile
-              label="Revenue (codes used)"
+              label="Unlocked"
+              value={fmt.format(byCode + byInvite + byPayment)}
+              hint={`${fmt.format(byPayment)} MoMo · ${fmt.format(byCode)} code · ${fmt.format(byInvite)} invited`}
+            />
+            <Tile
+              label="Revenue"
               value={`${fmt.format(revenue)} FCFA`}
-              hint={`${fmt.format(codesUsed)} × ${book.paywall.priceFcfa} FCFA`}
+              hint={`after Fapshi's 3% · ${fmt.format(codesUsed)} codes`}
             />
           </>
         ) : (
@@ -401,6 +417,7 @@ export default async function BookInsights({
           shown={unlockShown}
           codes={codes}
           newCode={newCode}
+          payments={payments}
         />
       ) : null}
 
@@ -670,6 +687,7 @@ function PaywallPanel({
   shown,
   codes,
   newCode,
+  payments,
 }: {
   book: BookInfo;
   stats: Stats;
@@ -677,6 +695,7 @@ function PaywallPanel({
   shown: number;
   codes: CodeRow[];
   newCode: { code: string; note: string } | null;
+  payments: PaymentRow[];
 }) {
   const pw = stats.paywall ?? {};
   const wall = book.paywall!;
@@ -699,6 +718,21 @@ function PaywallPanel({
           <div>
             <dt>Unlock sheet opened</dt>
             <dd>{fmt.format(shown)}</dd>
+          </div>
+          <div>
+            <dt>Tapped Pay (Fapshi)</dt>
+            <dd>
+              {fmt.format(n(stats.pay_start))} <small>{pct(n(stats.pay_start), shown)}%</small>
+            </dd>
+          </div>
+          <div>
+            <dt>Paid through Fapshi</dt>
+            <dd>
+              {fmt.format(Number(pw.unlockedByPayment ?? 0))}{" "}
+              <small>
+                MTN {fmt.format(Number(pw.paidBy_mtn ?? 0))} · Orange {fmt.format(Number(pw.paidBy_orange ?? 0))}
+              </small>
+            </dd>
           </div>
           <div>
             <dt>Copied or dialled MoMo</dt>
@@ -751,6 +785,34 @@ function PaywallPanel({
             <b>{fmt.format(Number(pw.unlockedByInvite ?? 0))}</b>
           </li>
         </ul>
+      </section>
+
+      <section className="ins-card" id="payments">
+        <h2 className="ins-h2">Mobile Money payments (Fapshi)</h2>
+        <p className="ins-note">
+          {fapshiEnabled()
+            ? "Instant checkout is on. Payments are confirmed with Fapshi before anything unlocks."
+            : "Instant checkout is off: set FAPSHI_BASE_URL, FAPSHI_API_USER and FAPSHI_API_KEY to switch it on. Students see the manual steps meanwhile."}
+        </p>
+        {payments.length ? (
+          <ul className="ins-list">
+            {payments.map((p) => (
+              <li key={p.id}>
+                <span>
+                  <b>{p.status}</b> · {p.amount} FCFA{p.medium ? ` · ${p.medium}` : ""}
+                  {p.env === "sandbox" ? <span className="ins-muted"> · sandbox</span> : null}
+                  <br />
+                  <span className="ins-muted">
+                    {when.format(new Date(p.createdAt))} · <code>{p.id}</code>
+                  </span>
+                </span>
+                <b>{p.revenue === null ? "–" : `${p.revenue} FCFA`}</b>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="ins-muted">No payments yet.</p>
+        )}
       </section>
 
       <section className="ins-card" id="codes">
