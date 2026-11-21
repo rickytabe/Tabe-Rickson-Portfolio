@@ -70,7 +70,7 @@ const books: Book[] = [
     description: `Every question on CSC207 Tutorial Sheet 1 solved in the course pseudocode: ordered set Insert and Union, isPalindrome, ten branching programs, ten looping programs and the exact-output tracing questions. Each one starts with how to recognise the problem and which construct to use. Free to read.`,
     href: BOOKS.csc207t.path,
     pdf: CSC207T_PDF,
-    cover: `${BOOKS.csc207t.path}/opengraph-image`,
+    cover: `${BOOKS.csc207t.path}/og.png`,
     facts: [`${CSC207T_SOLVED_COUNT} QUESTIONS`, "22-PAGE PDF"],
     price: "FREE",
     author: BOOK_AUTHOR,

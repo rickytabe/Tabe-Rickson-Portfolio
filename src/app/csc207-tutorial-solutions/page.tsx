@@ -19,6 +19,15 @@ import "./csc207t.css";
 const book = BOOKS.csc207t;
 const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
+// A static image on the www host (the apex 308-redirects), so WhatsApp gets it in one fast request.
+// It is the card the old opengraph-image.tsx drew; replace the PNG to change it.
+const ogImage = {
+  url: `https://www.taberickson.com${book.path}/og.png`,
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt: "CSC207 Tutorial Sheet Solutions: every question solved step by step.",
+};
 
 const title = "CSC207 Tutorial Sheet Solutions: Branching and Looping, Every Question Solved";
 const description = `All ${SOLVED_COUNT} questions on CSC207 Tutorial Sheet 1 solved in full pseudocode: ordered set Insert and Union, isPalindrome, branching programs (grades, leap year, BMI, calculator), looping programs (factorial, Fibonacci, primes, patterns) and exact-output tracing. Each one starts with how to recognise the problem.`;
@@ -42,11 +51,13 @@ export const metadata: Metadata = {
     title: "CSC207 Tutorial Sheet Solutions",
     description: "Every CSC207 tutorial question, solved step by step. Know exactly which construct to use in the CA.",
     url: pageUrl,
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: "CSC207 Tutorial Sheet Solutions",
     description: "Every CSC207 tutorial question, solved step by step. Know exactly which construct to use in the CA.",
+    images: [ogImage],
   },
 };
 
