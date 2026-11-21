@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowUp, ChevronDown, Download, KeyRound, List, Lock, Smile, X } from "lucide-react";
-import SupportModal, { hasSupported, mayAutoPrompt, Smiley } from "./SupportModal";
+import SupportModal, { hasSupported, markSupported, mayAutoPrompt, Smiley } from "./SupportModal";
 import UnlockModal, { type UnlockStatus } from "./UnlockModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
@@ -33,6 +33,8 @@ export type ReaderBook = {
   feedback: { noun: string; example: string };
   /** Paid books: the solutions after `freeSections` unlock. */
   paywall?: { priceFcfa: number; freeSections: number; lockedCount: number; invitesNeeded: number };
+  /** Free books: the support prompt's ask in this book's words. */
+  support?: { title: string; text: string };
 };
 
 type Props = {
@@ -61,6 +63,7 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportMode, setSupportMode] = useState<"support" | "download">("support");
+  const [supportThanked, setSupportThanked] = useState(false);
   const [showFab, setShowFab] = useState(false);
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizSource, setQuizSource] = useState<"fab" | "sidebar" | "link">("fab");
@@ -70,6 +73,7 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [feedbackSlots, setFeedbackSlots] = useState<HTMLElement[]>([]);
   const [lockSlots, setLockSlots] = useState<HTMLElement[]>([]);
+  const [supportSlots, setSupportSlots] = useState<HTMLElement[]>([]);
   const [unlock, setUnlock] = useState<UnlockStatus | null>(null);
   const [solutions, setSolutions] = useState<Record<string, string> | null>(null);
   const [unlockOpen, setUnlockOpen] = useState<false | "offer" | "code">(false);
@@ -180,6 +184,7 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
       setPortalTarget(document.body);
       setFeedbackSlots(Array.from(document.querySelectorAll<HTMLElement>(".ch-feedback[data-chapter]")));
       setLockSlots(Array.from(document.querySelectorAll<HTMLElement>(".sol-lock[data-q] .sol-lock-slot")));
+      setSupportSlots(Array.from(document.querySelectorAll<HTMLElement>(".support-inline[data-support-inline]")));
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -230,6 +235,46 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [paid, unlocked, refreshUnlock]);
+
+  // Back from a tip checkout (?tipped=1): drop the flag and ask Fapshi (through our server) whether
+  // the tip went through, for up to a minute. Only a confirmed tip shows the thank-you.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("tipped")) return;
+    url.searchParams.delete("tipped");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    autoPrompted.current = true; // no timed prompt on top of this
+    track("tip_return");
+    let tries = 0;
+    let done = false;
+    const check = async () => {
+      if (done) return;
+      tries += 1;
+      try {
+        await settled();
+        const res = await fetch(`/api/book/tip?book=${book.id}`, { credentials: "same-origin" });
+        const data = res.ok ? ((await res.json()) as { supported: boolean }) : { supported: false };
+        if (data.supported && !done) {
+          done = true;
+          markSupported();
+          setSupportMode("support");
+          setSupportThanked(true);
+          setSupportOpen(true);
+        }
+      } catch {
+        // offline: try again on the next tick
+      }
+    };
+    void check();
+    const timer = setInterval(() => {
+      if (done || tries >= 7) clearInterval(timer);
+      else void check();
+    }, 10000);
+    return () => {
+      done = true;
+      clearInterval(timer);
+    };
+  }, [book.id]);
 
   // Back from Mobile Money checkout (?paid=1): drop the flag, show the unlock sheet, and keep
   // checking for up to a minute, since the phone confirmation can land after the redirect.
@@ -652,7 +697,17 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
                 />
               ) : null}
               {supportOpen ? (
-                <SupportModal mode={supportMode} pdf={pdf} onClose={() => setSupportOpen(false)} />
+                <SupportModal
+                  bookId={book.id}
+                  mode={supportMode}
+                  pdf={pdf}
+                  ask={book.support}
+                  thanked={supportThanked}
+                  onClose={() => {
+                    setSupportOpen(false);
+                    setSupportThanked(false);
+                  }}
+                />
               ) : null}
               {unlockOpen && book.paywall ? (
                 <UnlockModal
@@ -710,6 +765,15 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
             );
           })
         : null}
+      {!paid
+        ? supportSlots.map((slot) =>
+            createPortal(
+              <SupportInline onSupport={() => openSupport("support", "inline")} />,
+              slot,
+              slot.dataset.supportInline
+            )
+          )
+        : null}
       {viewsSlot ? createPortal(<ViewCount path={book.path} className="bs-views-in" />, viewsSlot) : null}
     </div>
   );
@@ -741,4 +805,32 @@ function quizHelp(book: ReaderBook, unlocked: boolean): QuizBook["help"] {
         text: "Every question, explanation and chapter here is free for every student, no ads. Tips from students like you keep new quizzes and solved tutorials coming before the CA.",
         button: "Support the book",
       };
+}
+
+/** A small support card between exercises in a free book. The button opens the support prompt. */
+function SupportInline({ onSupport }: { onSupport: () => void }) {
+  const [supported] = useState(() => hasSupported());
+  return (
+    <aside className="support-inline-card" aria-label="Support this book">
+      <Smiley grin={supported} size={44} className="support-inline-face" />
+      <div className="support-inline-body">
+        {supported ? (
+          <>
+            <p className="support-inline-title">Thank you for supporting this book 💚</p>
+            <p className="support-inline-text">You&apos;re part of why it stays free for every student.</p>
+          </>
+        ) : (
+          <>
+            <p className="support-inline-title">Did these solutions help?</p>
+            <p className="support-inline-text">
+              They&apos;re free for everyone, no ads. A small tip helps Tabe keep solving new sheets before every CA.
+            </p>
+            <button type="button" className="support-inline-btn" onClick={onSupport}>
+              <Smile className="w-4 h-4" aria-hidden /> Support this book
+            </button>
+          </>
+        )}
+      </div>
+    </aside>
+  );
 }

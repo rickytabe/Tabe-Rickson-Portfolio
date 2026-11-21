@@ -21,9 +21,9 @@ function eventRules(book: BookInfo): Record<string, (key: string) => boolean> {
   return {
     reach: (k) => sections.has(k), // reached a chapter (CSC207) or a question (CSC211)
     end: (k) => k === "", // reached the end of the book
-    support_shown: (k) => ["timer", "fab", "sidebar", "footer", "download", "quiz"].includes(k),
-    support_copy: (k) => k === "",
-    support_dial: (k) => k === "",
+    support_shown: (k) => ["timer", "fab", "sidebar", "footer", "download", "quiz", "inline"].includes(k),
+    tip_start: (k) => ["200", "500", "1000"].includes(k), // tapped "Support with … FCFA" (Fapshi)
+    tip_return: (k) => k === "", // came back from the tip checkout
     download_free: (k) => k === "", // "I'd love to support, but..." download
     download_supported: (k) => k === "", // downloaded from the thank-you screen
     download_direct: (k) => k === "", // returning supporter, no prompt
@@ -32,9 +32,6 @@ function eventRules(book: BookInfo): Record<string, (key: string) => boolean> {
     quiz_share: (k) => k === "", // tapped "Challenge a classmate"
     // Paid books: the unlock funnel.
     unlock_shown: (k) => ["inline", "fab", "sidebar", "footer", "quiz"].includes(k), // opened the unlock sheet
-    unlock_copy: (k) => k === "", // copied the Mobile Money code
-    unlock_dial: (k) => k === "", // tapped Dial now
-    unlock_whatsapp: (k) => k === "", // opened WhatsApp to send the payment screenshot
     pay_start: (k) => k === "", // tapped Pay (instant Mobile Money checkout)
     pay_return: (k) => k === "", // came back from the checkout page
     invite_share: (k) => ["whatsapp", "copy"].includes(k), // shared their invite link

@@ -1,6 +1,6 @@
 // Server-only: turns the CSC207 tutorial content into the book's HTML. Built like
 // src/content/csc211/render.ts (the template for every solutions book), with pseudocode in place of maths.
-import { BOOKS, isLocked, sectionLabel } from "@/lib/books";
+import { BOOKS, sectionLabel } from "@/lib/books";
 import { CSC207T_ITEMS, CSC207T_QUICK_GUIDE, type Csc207tItem } from "./questions";
 
 const BOOK = BOOKS.csc207t;
@@ -25,47 +25,33 @@ export const CSC207T_NUMBERS: Record<string, string> = Object.fromEntries(
   CSC207T_ITEMS.map((i) => [i.id, sectionLabel(BOOK, i.id)])
 );
 
-const locked = CSC207T_ITEMS.filter((i) => isLocked(BOOK, i.id));
-export const CSC207T_LOCKED_COUNT = locked.length;
 export const CSC207T_SOLVED_COUNT = CSC207T_ITEMS.length;
 
-function solutionHtml(item: Csc207tItem): string {
-  return `<div class="sol">${item.solution}</div>`;
-}
-
-/** Locked solutions, by question id. Only for readers who unlocked the book. */
-export function csc207tLockedSolutions(): Record<string, string> {
-  return Object.fromEntries(locked.map((i) => [i.id, solutionHtml(i)]));
-}
-
-// Blurred placeholder lines: shaped like code, with nothing in them.
-const TEASER = `<div class="sol-teaser" aria-hidden="true">
-  <span style="width:58%"></span><span style="width:74%"></span>
-  <span class="sol-teaser-eq" style="width:66%"></span>
-  <span style="width:48%"></span><span style="width:80%"></span>
-  <span class="sol-teaser-eq" style="width:52%"></span>
-</div>`;
+// The last question of each exercise gets an inline support card after it (rendered by the reader).
+const EXERCISE_ENDS = new Set(
+  (["I", "II", "III", "IV"] as const).map((part) => CSC207T_ITEMS.filter((i) => i.part === part).at(-1)!.id)
+);
 
 function sectionHtml(item: Csc207tItem): string {
   const num = sectionLabel(BOOK, item.id);
-  const isLockedItem = isLocked(BOOK, item.id);
   const head = `<div class="ch-head">
     <div class="ch-num">${num}</div>
     <div>
       <h3>${item.topic}</h3>
-      <p class="oneline">Tutorial Sheet 1 &middot; Exercise ${item.part} &middot; Question ${num}${isLockedItem ? ' &middot; <span class="ch-lock">Locked solution</span>' : ""}</p>
+      <p class="oneline">Tutorial Sheet 1 &middot; Exercise ${item.part} &middot; Question ${num}</p>
     </div>
   </div>`;
-  const body = isLockedItem
-    ? `<div class="sol-lock" data-q="${item.id}">${TEASER}<div class="sol-lock-slot"></div></div>`
-    : solutionHtml(item);
-  return `<section class="ch" id="${item.id}"${isLockedItem ? ' data-locked="1"' : ""}>
+  const support = EXERCISE_ENDS.has(item.id)
+    ? `<div class="support-inline" data-support-inline="exercise-${item.part.toLowerCase()}"></div>`
+    : "";
+  return `<section class="ch" id="${item.id}">
   ${head}
   <div class="box note q-box"><div class="lab">Question ${num}</div>${item.question}</div>
   <div class="box stick"><div class="lab">How to think about it</div>${item.think}</div>
   <h4 class="sol-h">Solution</h4>
-  ${body}
-  <div class="ch-feedback" data-chapter="${item.id}"${isLockedItem ? ' data-locked="1"' : ""}></div>
+  <div class="sol">${item.solution}</div>
+  <div class="ch-feedback" data-chapter="${item.id}"></div>
+  ${support}
 </section>`;
 }
 
@@ -79,8 +65,7 @@ function tocHtml(): string {
     ${p.ids
       .map((id) => {
         const item = byId.get(id)!;
-        const lock = isLocked(BOOK, id) ? ' <i class="toc-lock" aria-label="locked">🔒</i>' : "";
-        return `<li><a href="#${id}"><b>${sectionLabel(BOOK, id)}</b><span>${item.topic}${lock}</span></a></li>`;
+        return `<li><a href="#${id}"><b>${sectionLabel(BOOK, id)}</b><span>${item.topic}</span></a></li>`;
       })
       .join("\n    ")}
   </ol>`
@@ -120,15 +105,14 @@ function coverHtml(): string {
 }
 
 function introHtml(): string {
-  const wall = BOOK.paywall!;
   return `<div class="box note">
   <div class="lab">How to use this book</div>
   <p>Each question has three parts. The <b>blue box</b> is the question exactly as it is on the sheet. The <b>yellow box</b> tells you how to recognise the type of problem and which tool to use. Read it before the solution. If you can explain the yellow box in your own words, you can solve any problem of the same type in the CA.</p>
   <p>The sheet says "Program here refers to pseudocodes", so the solutions are pseudocode in the course style: curly braces, typed functions, <code>*</code> and <code>-&gt;</code> for the struct, and <code>//</code> comments.</p>
 </div>
 <div class="box real free-note">
-  <div class="lab">Free to read</div>
-  <p>Every question and every &ldquo;how to think about it&rdquo; box is free. The worked solutions to the first ${wall.freeSections} questions are free too. The other ${CSC207T_LOCKED_COUNT} unlock for <strong>${wall.priceFcfa} FCFA</strong>, or for free when ${wall.invitesNeeded} classmates start reading through your link.</p>
+  <div class="lab">Free for everyone</div>
+  <p>Every question, every &ldquo;how to think about it&rdquo; box and every worked solution here is free, with no ads. If it helps you, a small tip tells <strong>Tabe</strong> it was worth it and keeps new sheets coming before every CA. Completely optional.</p>
 </div>
 <div class="box stick">
   <div class="lab">Conventions used in the solutions</div>

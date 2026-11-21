@@ -58,7 +58,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
       ...range("s1-e3-", 1, 10),
       "s1-e4-a", "s1-e4-b", "s1-e4-c", "s1-e4-d",
     ],
-    paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 },
+    // Free for everyone (Tabe's call): supported by voluntary tips, like CSC207 Made Easy.
   },
 };
 

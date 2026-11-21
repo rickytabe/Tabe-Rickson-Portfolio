@@ -8,7 +8,8 @@ Next.js 16 App Router (Turbopack), deployed on Vercel from `master`. Content for
 - Every change goes on its own branch and ships as a pull request against `master`; Vercel builds a preview for each PR.
 - Before pushing to a branch, check its PR has not already merged. If it has, start a fresh branch from `origin/master`.
 - Run `npx tsc --noEmit` and `npx eslint` on the changed files before committing.
-- Keep the tone of anything students see warm and voluntary. CSC207 Made Easy stays fully free: support is always optional, no guilt, no paywall. CSC211 Tutorial Sheet Solutions is the one paid book (see below), and even there every question and hint is free, the first 15 solutions are free, and inviting classmates unlocks the rest at no cost.
+- Keep the tone of anything students see warm and voluntary. CSC207 Made Easy and CSC207 Tutorial Sheet Solutions are fully free: support is always optional, no guilt, no paywall. CSC211 Tutorial Sheet Solutions is the one paid book (see below), and even there every question and hint is free, the first 15 solutions are free, and inviting classmates unlocks the rest at no cost.
+- **Every payment goes through Fapshi** (tips and unlocks). Never show a USSD dial code (`*126*…#`) or ask for payment screenshots: Tabe asked for that to be removed everywhere.
 - Never commit secrets. `.env*` is git-ignored; keys live in Vercel → Project → Settings → Environment Variables.
 
 ## Running locally
@@ -34,7 +35,7 @@ A free online book for CSC207 students, rendered natively at `/algorithms-made-e
 - `src/app/algorithms-made-easy-csc207/`
   - `page.tsx`: page and SEO metadata. `content.html` holds the book body; `book.css` holds its styles, including a softer light-mode palette for reading.
   - `BookReader.tsx`: topic sidebar with subtopics, reading bar, views, author and read time, floating support button, Quiz me entry.
-  - `SupportModal.tsx`: voluntary MTN Mobile Money tip (code `*126*1*1*681110631*200#`, recipient Tabe). Opens after about 1 minute of reading and when the PDF is downloaded. The download flow always has a free path ("I'd love to support, but I don't have money right now"). It remembers "later" and "supported" in localStorage.
+  - `SupportModal.tsx`: voluntary tip of 200, 500 or 1000 FCFA through Fapshi's checkout (MTN or Orange Money; `/api/book/tip`). The reader comes back with `?tipped=1`, the book confirms the tip with Fapshi, and only then shows the thank-you and remembers "supported" in localStorage. Opens after about 1 minute of reading, from the floating button, sidebar, footer, inline cards and the end of a quiz, and when the PDF is downloaded. The download flow always has a free path ("I'd love to support, but I don't have money right now"). Any free book can pass its own wording (`ReaderBook.support`).
   - `FigureLightbox.tsx`: click-to-expand illustrations with an origin-aware FLIP animation.
   - `QuizBot.tsx` and `quiz-questions.ts`: Algo, the quiz robot (see below).
   - `insights.ts` (client `track()`), `book-info.ts` (`TOPIC_LABELS`, `BOOK_PATH`), `book-meta.ts`, `ViewCount.tsx`, `ChapterFeedback.tsx`.
@@ -65,22 +66,23 @@ Every question on the CSC211 probability tutorial sheet, solved, at `/csc211-tut
 - Paywall: questions, hints and solutions 1–15 are in the page. Locked solutions (Q16 to B39, 33 of them) are **never in the page**: the page has blurred placeholder lines, and `/api/book/solutions` returns the real ones only to an unlocked reader. Don't move them into the page or a client bundle.
 - Unlock: three ways in, all recorded on the reader (`unlocks.{book}` with `via`).
   - **Pay with Fapshi (main path, live):** "Pay 200 FCFA" sends the student to Fapshi's hosted checkout (MTN or Orange Money); back on the book (`?paid=1`) the site asks Fapshi for the status and unlocks. Code in `src/lib/fapshi.ts`, `/api/book/pay`, webhook `/api/payments/fapshi` (checked with `x-wh-secret`). Nothing unlocks from the browser or a webhook body alone: always `GET /payment-status/{transId}` with our keys. Unsettled payments are re-checked on every unlock-status call for 7 days. Env: `FAPSHI_BASE_URL` (`https://live.fapshi.com`), `FAPSHI_API_USER`, `FAPSHI_API_KEY`, `FAPSHI_WEBHOOK_SECRET`. In Fapshi the webhook URL must be `https://www.taberickson.com/api/payments/fapshi` (the apex domain 308-redirects to `www`). Fapshi keeps 3%: revenue is 194 per 200.
-  - **Code (backup):** a student who paid Tabe directly gets a code made on `/book-insights?book=csc211`. Codes are 8 characters (`K7P2-XQ9M`), stored only as a SHA-256 fingerprint, work on 2 devices, can be switched off, and readers get 10 tries a day.
+  - **Gift code:** Tabe can make a code on `/book-insights?book=csc211` to give someone free access ("Have an unlock code?" in the unlock sheet). Codes are 8 characters (`K7P2-XQ9M`), stored only as a SHA-256 fingerprint, work on 2 devices, can be switched off, and readers get 10 tries a day. They are not a payment path.
   - **Invites (free):** each reader has a link `taberickson.com/csc211?ref=i-<code>` (`inviteCodeFor`). An invited reader counts once they have reached 3 questions on their own device; 3 counted invites unlock.
 - After unlocking, the reader thanks them: the grinning smiley ("Thank you, truly.") opens once per device (`{book}-thanked` in localStorage), and a thank-you card replaces the unlock button in the sidebar and footer.
 - Unlocks are tied to the anonymous cookie. A student who clears cookies or changes phone uses their code again (2 devices), or asks Tabe for a new one.
 - The dashboard (`/book-insights`) opens on a board of every book; a book's tab adds the unlock funnel, Fapshi payments, invites, revenue and the code maker.
 - Firestore transactions must do every read before any write (a read after a write broke every payment once). Test money paths against the emulator with Fapshi's API simulated before shipping.
 
-## The book: CSC207 Tutorial Sheet Solutions (tutorial solutions, paid)
+## The book: CSC207 Tutorial Sheet Solutions (tutorial solutions, free)
 
-The CSC207 tutorial sheets, solved in the course pseudocode, at `/csc207-tutorial-solutions` (book id `csc207t`). Built from the CSC211 template.
+The CSC207 tutorial sheets, solved in the course pseudocode, at `/csc207-tutorial-solutions` (book id `csc207t`). Built from the CSC211 template but **free** (Tabe's call): no paywall, every solution in the page, supported by Fapshi tips through the support pop-up (after a minute of reading, floating button, sidebar, footer, end of a quiz) and an inline support card after the last question of each exercise (`data-support-inline` slots).
 
 - Short links are `/csc207/tutorial` and `/csc207/tutorial/quiz`, because `/csc207` and `/csc207/quiz` belong to CSC207 Made Easy. Keep it that way.
 - Content: `src/content/csc207t/questions.ts`, with section ids `s<sheet>-e<exercise>-<question>` (e.g. `s1-e2-5`), printed as `II.5` by `sectionLabel`. Add later sheets as new items and new `sections` entries in `src/lib/books.ts`; the paywall counts from the start, so keep new sheets after the existing ones.
 - Solutions are pre-rendered HTML pseudocode blocks (`pre.code` with tinted keywords). Ligatures are off for code, so `==` and `->` print as typed. Exercise IV-style questions end in an "Exact output" box.
 - The page reuses `csc211.css` (lock cards, unlock sheet) through the `book-csc211` class, and adds `csc207t.css`.
-- The sheet's PDF version (with every solution) lives outside the repo; don't publish it on the site, since it would bypass the paywall.
+- Code is mobile-first: each line is a `.ln` block with its indentation in `--ind`, and end-of-line comments are `.c-trail` spans. On phones (≤720px) lines wrap with a hanging indent and comments move onto their own line, so there is no sideways scroll.
+- The sheet's PDF version lives outside the repo (`csc207-tutorial-1-source/` next to the repo holds its build script).
 
 ## New books and solution sets: always this format
 
@@ -102,7 +104,7 @@ Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Soluti
 - Dashboard: add the book to `LABELS`, `NUMBERS` and `VIEW_PATHS` in `src/app/book-insights/page.tsx`. Also `src/app/api/views/route.ts`, `sitemap.ts`, the Books page card, and the Navbar `match` list.
 
 **Money and gratitude**
-- Questions and hints all free; solutions 1–15 free; the rest unlock for 200 FCFA through Fapshi (code and invite paths as backup). Same unlock sheet, thank-you smiley and sidebar thank-you card.
+- Ask Tabe whether a new book is paid or free. Paid: questions and hints all free; solutions 1–15 free; the rest unlock for 200 FCFA through Fapshi, or free with 3 invites. Free: every solution open, with the Fapshi support pop-up and inline support cards. Either way: the thank-you smiley and sidebar thank-you card, and no dial codes.
 
 **Marketing**
 - `opengraph-image.tsx`: a pure marketing card. The title "<COURSE> Tutorial Sheet Solutions", a one-line promise, and the short link, in two fixed columns so art never covers text. No free/paid details.

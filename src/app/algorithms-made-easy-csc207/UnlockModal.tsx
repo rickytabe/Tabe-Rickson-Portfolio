@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Copy, KeyRound, Loader2, MessageCircle, Phone, Share2, Smartphone, Users, X } from "lucide-react";
+import { Check, ChevronDown, Copy, KeyRound, Loader2, Share2, Smartphone, Users, X } from "lucide-react";
 import { settled, track } from "./insights";
 import { Smiley } from "./SupportModal";
 
-// MTN Mobile Money (Cameroon) transfer to Tabe, with the unlock price as the amount.
-const momoCode = (price: number) => `*126*1*1*681110631*${price}#`;
-const WHATSAPP = "237671353341";
 
 export type UnlockStatus = {
   unlocked: boolean;
@@ -58,15 +55,13 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
   const [redeemed, setDone] = useState(false);
   // Unlocked here (a code), or found unlocked by the reader (a payment that just confirmed).
   const done = redeemed || !!status?.unlocked;
-  const [copied, setCopied] = useState<"momo" | "link" | null>(null);
-  const [canDial] = useState(() => window.matchMedia("(pointer: coarse)").matches);
+  const [copied, setCopied] = useState<"link" | null>(null);
   const [opener] = useState(() => document.activeElement as HTMLElement | null);
   const cardRef = useRef<HTMLDivElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const firstRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const momo = momoCode(book.priceFcfa);
   const invite = status?.invite;
   const canPay = !!status?.pay;
   const [paying, setPaying] = useState(false);
@@ -159,7 +154,7 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
     if (startWithCode) codeRef.current?.scrollIntoView({ block: "center" });
   }, [startWithCode]);
 
-  const flash = (what: "momo" | "link") => {
+  const flash = (what: "link") => {
     setCopied(what);
     setTimeout(() => setCopied(null), 1600);
   };
@@ -187,9 +182,6 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
     }
   };
 
-  const waText = encodeURIComponent(
-    `Hi Tabe, I just paid ${book.priceFcfa} FCFA to unlock ${book.title}. Here is my payment screenshot:`
-  );
   const inviteText = invite
     ? encodeURIComponent(
         `I'm revising ${book.title.split(" ")[0]} with this: every tutorial question solved step by step, free to start. ${invite.link}`
@@ -258,134 +250,78 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
               {invite?.needed ?? 3} classmates and unlock it free.
             </p>
 
-            {canPay ? (
-              <div className="unlock-pay">
-                <button
-                  ref={firstRef}
-                  type="button"
-                  className="support-btn support-btn-primary unlock-pay-btn"
-                  onClick={payNow}
-                  disabled={paying}
-                >
-                  {paying ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : <Smartphone className="w-4 h-4" aria-hidden />}
-                  {paying ? "Opening checkout…" : `Pay ${book.priceFcfa} FCFA`}
-                </button>
+            <div className="unlock-pay">
+              {canPay ? (
+                <>
+                  <button
+                    ref={firstRef}
+                    type="button"
+                    className="support-btn support-btn-primary unlock-pay-btn"
+                    onClick={payNow}
+                    disabled={paying}
+                  >
+                    {paying ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : <Smartphone className="w-4 h-4" aria-hidden />}
+                    {paying ? "Opening checkout…" : `Pay ${book.priceFcfa} FCFA`}
+                  </button>
+                  <p className="unlock-step-text unlock-pay-note">
+                    MTN Mobile Money or Orange Money. Confirm on your phone and the solutions open straight away.
+                  </p>
+                </>
+              ) : (
                 <p className="unlock-step-text unlock-pay-note">
-                  MTN Mobile Money or Orange Money. Confirm on your phone and the solutions open straight away.
+                  Mobile Money payments are paused for a moment. Please try again shortly, or unlock free below.
                 </p>
-                {error && !code ? (
-                  <p className="unlock-error" role="alert">
+              )}
+              {error && !code ? (
+                <p className="unlock-error" role="alert">
+                  {error}
+                </p>
+              ) : null}
+            </div>
+
+            <details className="unlock-manual" open={startWithCode}>
+              <summary>
+                Have an unlock code? <ChevronDown className="w-4 h-4" aria-hidden />
+              </summary>
+              <form
+                className="unlock-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void redeem();
+                }}
+              >
+                <label className="unlock-step-title" htmlFor="unlock-code-input">
+                  Enter your unlock code
+                </label>
+                <div className="unlock-form-row">
+                  <input
+                    ref={codeRef}
+                    id="unlock-code-input"
+                    className="unlock-input"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    placeholder="K7P2-XQ9M"
+                    autoComplete="one-time-code"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    maxLength={12}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "unlock-error" : undefined}
+                  />
+                  <button
+                    type="submit"
+                    className="support-btn support-btn-primary"
+                    disabled={busy || code.replace(/[^0-9a-z]/gi, "").length < 8}
+                  >
+                    {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Unlock
+                  </button>
+                </div>
+                {error ? (
+                  <p className="unlock-error" id="unlock-error" role="alert">
                     {error}
                   </p>
                 ) : null}
-              </div>
-            ) : null}
-
-            <details className="unlock-manual" open={!canPay || startWithCode}>
-              {canPay ? (
-                <summary>
-                  Paid Tabe directly, or have a code? <ChevronDown className="w-4 h-4" aria-hidden />
-                </summary>
-              ) : null}
-            <ol className="unlock-steps">
-              <li>
-                <span className="unlock-step-n">1</span>
-                <div>
-                  <p className="unlock-step-title">Send {book.priceFcfa} FCFA with MTN Mobile Money</p>
-                  <div className="support-code unlock-code">
-                    <code className="support-code-value" aria-label={`Mobile Money code ${momo}`}>
-                      {momo}
-                    </code>
-                    <span className="support-code-meta">
-                      Goes to <b>Tabe</b>. On Orange Money? Message Tabe on WhatsApp instead.
-                    </span>
-                  </div>
-                  <div className="support-actions">
-                    {canDial ? (
-                      <a
-                        href={"tel:" + momo.replace(/#/g, "%23")}
-                        className="support-btn support-btn-primary"
-                        onClick={() => track("unlock_dial")}
-                      >
-                        <Phone className="w-4 h-4" aria-hidden /> Dial now
-                      </a>
-                    ) : null}
-                    <button
-                      ref={canPay ? undefined : firstRef}
-                      type="button"
-                      className={`support-btn ${canDial || canPay ? "support-btn-ghost" : "support-btn-primary"}`}
-                      onClick={async () => {
-                        if (await copyText(momo)) {
-                          track("unlock_copy");
-                          flash("momo");
-                        }
-                      }}
-                    >
-                      {copied === "momo" ? <Check className="w-4 h-4" aria-hidden /> : <Copy className="w-4 h-4" aria-hidden />}
-                      {copied === "momo" ? "Copied" : "Copy code"}
-                    </button>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <span className="unlock-step-n">2</span>
-                <div>
-                  <p className="unlock-step-title">Send Tabe the payment screenshot</p>
-                  <p className="unlock-step-text">Tabe replies on WhatsApp with your unlock code.</p>
-                  <a
-                    className="support-btn support-btn-ghost unlock-wa"
-                    href={`https://wa.me/${WHATSAPP}?text=${waText}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => track("unlock_whatsapp")}
-                  >
-                    <MessageCircle className="w-4 h-4" aria-hidden /> Open WhatsApp
-                  </a>
-                </div>
-              </li>
-              <li>
-                <span className="unlock-step-n">3</span>
-                <form
-                  className="unlock-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    void redeem();
-                  }}
-                >
-                  <label className="unlock-step-title" htmlFor="unlock-code-input">
-                    Enter your unlock code
-                  </label>
-                  <div className="unlock-form-row">
-                    <input
-                      ref={codeRef}
-                      id="unlock-code-input"
-                      className="unlock-input"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value.toUpperCase())}
-                      placeholder="K7P2-XQ9M"
-                      autoComplete="one-time-code"
-                      autoCapitalize="characters"
-                      spellCheck={false}
-                      maxLength={12}
-                      aria-invalid={!!error}
-                      aria-describedby={error ? "unlock-error" : undefined}
-                    />
-                    <button
-                      type="submit"
-                      className="support-btn support-btn-primary"
-                      disabled={busy || code.replace(/[^0-9a-z]/gi, "").length < 8}
-                    >
-                      {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Unlock
-                    </button>
-                  </div>
-                  {error ? (
-                    <p className="unlock-error" id="unlock-error" role="alert">
-                      {error}
-                    </p>
-                  ) : null}
-                </form>
-              </li>
-            </ol>
+              </form>
             </details>
 
             <div className="unlock-or" role="separator">

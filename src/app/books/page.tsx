@@ -67,11 +67,11 @@ const books: Book[] = [
   {
     title: BOOKS.csc207t.title,
     subtitle: "Branching, loops and output tracing, every question solved",
-    description: `Every question on CSC207 Tutorial Sheet 1 solved in the course pseudocode: ordered set Insert and Union, isPalindrome, ten branching programs, ten looping programs and the exact-output tracing questions. Each one starts with how to recognise the problem and which construct to use.`,
+    description: `Every question on CSC207 Tutorial Sheet 1 solved in the course pseudocode: ordered set Insert and Union, isPalindrome, ten branching programs, ten looping programs and the exact-output tracing questions. Each one starts with how to recognise the problem and which construct to use. Free to read.`,
     href: BOOKS.csc207t.path,
     cover: `${BOOKS.csc207t.path}/opengraph-image`,
     facts: [`${CSC207T_SOLVED_COUNT} QUESTIONS`, "ALGO QUIZ BOT"],
-    price: `Q1–${BOOKS.csc207t.paywall!.freeSections} FREE`,
+    price: "FREE",
     author: BOOK_AUTHOR,
     avatar: BOOK_AUTHOR_AVATAR,
     readTime: formatReadTime(readingMinutes(csc207tBookHtml())),

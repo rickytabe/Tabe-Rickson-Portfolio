@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { Fraunces } from "next/font/google";
 import BookReader, { type BookPart, type ReaderBook } from "../algorithms-made-easy-csc207/BookReader";
 import { BOOK_AUTHOR, BOOK_AUTHOR_AVATAR, formatReadTime, readingMinutes } from "../algorithms-made-easy-csc207/book-meta";
-import { BOOKS, isLocked, sectionLabel } from "@/lib/books";
+import { BOOKS, sectionLabel } from "@/lib/books";
 import { CSC207T_ITEMS } from "@/content/csc207t/questions";
 import {
   csc207tBookHtml as bookHtml,
   CSC207T_LABELS,
-  CSC207T_LOCKED_COUNT as LOCKED_COUNT,
   CSC207T_NUMBERS,
   CSC207T_PARTS,
   CSC207T_SOLVED_COUNT as SOLVED_COUNT,
@@ -25,7 +24,6 @@ const fraunces = Fraunces({
 });
 
 const book = BOOKS.csc207t;
-const wall = book.paywall!;
 const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
@@ -72,11 +70,7 @@ const jsonLd = {
       url: pageUrl,
       inLanguage: "en",
       author: { "@type": "Person", name: BOOK_AUTHOR, url: siteUrl },
-      isAccessibleForFree: false,
-      hasPart: CSC207T_ITEMS.filter((i) => isLocked(book, i.id)).length
-        ? { "@type": "WebPageElement", isAccessibleForFree: false, cssSelector: ".sol-lock" }
-        : undefined,
-      offers: { "@type": "Offer", price: wall.priceFcfa, priceCurrency: "XAF", availability: "https://schema.org/InStock" },
+      isAccessibleForFree: true,
     },
     {
       "@type": "BreadcrumbList",
@@ -117,7 +111,6 @@ const parts: BookPart[] = CSC207T_PARTS.map((p) => ({
       tag: sectionLabel(book, id),
       title: item.topic,
       subs: [],
-      locked: isLocked(book, id),
     };
   }),
 }));
@@ -136,7 +129,10 @@ const readerBook: ReaderBook = {
     introLine: "Short questions on branching, loops and tracing. Pick A, B, C or D.",
   },
   feedback: { noun: "solution", example: "e.g. I didn't get why the loop stops at i * i <= n" },
-  paywall: { ...wall, lockedCount: LOCKED_COUNT },
+  support: {
+    title: "Did these solutions help you?",
+    text: "CSC207 Tutorial Sheet Solutions is every tutorial question solved in full, free for everyone, no ads. If it helped you, a small tip tells Tabe it was worth it and keeps new sheets coming before every CA.",
+  },
 };
 
 export default function Csc207TutorialBook() {
