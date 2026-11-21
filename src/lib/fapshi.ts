@@ -102,8 +102,11 @@ export async function settlePayment(transId: string): Promise<FapshiStatus | nul
   if (!p) return known.status as FapshiStatus;
 
   const store = db();
+  const readerRef = store.collection("bookReaders").doc(String(known.rid));
   await store.runTransaction(async (tx) => {
-    const doc = (await tx.get(ref)).data()!;
+    // Firestore transactions must do every read before any write.
+    const [paymentSnap, readerSnap] = await Promise.all([tx.get(ref), tx.get(readerRef)]);
+    const doc = paymentSnap.data()!;
     if (doc.status === "SUCCESSFUL") return;
     const paid = p.status === "SUCCESSFUL" && p.amount >= doc.amount && (p.transType ?? "Collection") === "Collection";
     tx.update(ref, {
@@ -114,8 +117,7 @@ export async function settlePayment(transId: string): Promise<FapshiStatus | nul
       ...(paid ? { paidAt: Date.now() } : {}),
     });
     if (!paid) return;
-    const readerRef = store.collection("bookReaders").doc(doc.rid);
-    const reader = (await tx.get(readerRef)).data() ?? {};
+    const reader = readerSnap.data() ?? {};
     if (!reader.unlocks?.[doc.book]) {
       tx.set(readerRef, { unlocks: { [doc.book]: { via: "payment", at: Date.now() } } }, { merge: true });
     }
@@ -140,12 +142,12 @@ export async function settleReaderPayments(book: BookInfo, rid: string): Promise
   const snap = await payments().where("rid", "==", rid).limit(20).get();
   const open = snap.docs
     .filter((d) => d.data().book === book.id && ["CREATED", "PENDING"].includes(d.data().status))
-    .filter((d) => Date.now() - Number(d.data().createdAt) < 25 * 60 * 60 * 1000);
-  let unlocked = false;
-  for (const d of open.slice(0, 3)) {
-    if ((await settlePayment(d.id)) === "SUCCESSFUL") unlocked = true;
-  }
-  return unlocked;
+    // A week: a paid checkout stays SUCCESSFUL at Fapshi, so a late return still unlocks.
+    .filter((d) => Date.now() - Number(d.data().createdAt) < 7 * 24 * 60 * 60 * 1000);
+  for (const d of open.slice(0, 3)) await settlePayment(d.id);
+  // Report what was actually recorded: a SUCCESSFUL status alone may be an underpayment.
+  const reader = (await db().collection("bookReaders").doc(rid).get()).data();
+  return !!reader?.unlocks?.[book.id];
 }
 
 /** The webhook's x-wh-secret header against FAPSHI_WEBHOOK_SECRET, compared in constant time. */
