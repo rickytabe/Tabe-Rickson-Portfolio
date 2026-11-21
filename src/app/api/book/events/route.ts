@@ -38,6 +38,7 @@ function eventRules(book: BookInfo): Record<string, (key: string) => boolean> {
     pay_start: (k) => k === "", // tapped Pay (instant Mobile Money checkout)
     pay_return: (k) => k === "", // came back from the checkout page
     invite_share: (k) => ["whatsapp", "copy"].includes(k), // shared their invite link
+    unlock_thanks: (k) => k === "", // saw the thank-you after unlocking
     // Older pages sent these; attempt-level quiz numbers are now counted on the server.
     quiz_finish: (k) => /^s([0-9]|10)$/.test(k),
     quiz_miss: (k) => /^q\d{1,3}$/.test(k),

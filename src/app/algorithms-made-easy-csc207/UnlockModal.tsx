@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, Copy, KeyRound, Loader2, MessageCircle, Phone, Share2, Smartphone, Users, X } from "lucide-react";
 import { settled, track } from "./insights";
+import { Smiley } from "./SupportModal";
 
 // MTN Mobile Money (Cameroon) transfer to Tabe, with the unlock price as the amount.
 const momoCode = (price: number) => `*126*1*1*681110631*${price}#`;
@@ -215,22 +216,33 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
 
         {done ? (
           <div className="support-body" key="done" aria-live="polite">
-            <div className="unlock-badge is-open" aria-hidden>
-              <Check className="w-7 h-7" />
-            </div>
-            <p className="support-kicker">Unlocked</p>
+            <Smiley grin />
+            <p className="support-kicker">{status?.via === "invite" ? "You and your classmates" : "You are a star"}</p>
             <h2 id="unlock-title" className="support-title">
-              Every solution is open. Go ace that CA.
+              Thank you, truly.
             </h2>
             <p className="support-text">
-              {status?.via === "payment" ? "Payment received. " : ""}All {book.lockedCount} locked solutions are now
-              showing on this device. They stay unlocked when you come back.
+              {status?.via === "invite" ? (
+                <>
+                  Sharing the book with your classmates means a lot. Every solution is now open for you, free.
+                </>
+              ) : (
+                <>
+                  Your support goes straight to <strong>Tabe</strong> and keeps new solutions coming before every CA.
+                  It really means a lot.
+                </>
+              )}
+            </p>
+            <p className="support-text unlock-done-note">
+              <Check className="w-4 h-4" aria-hidden /> All {book.lockedCount} solutions are open on this device and
+              stay open when you come back.
             </p>
             <div className="support-actions">
               <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
                 Back to the solutions
               </button>
             </div>
+            <p className="support-fine">Good luck in the CA. You&apos;ve got this.</p>
           </div>
         ) : (
           <div className="support-body" key="offer">

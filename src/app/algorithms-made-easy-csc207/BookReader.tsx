@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowUp, ChevronDown, Download, KeyRound, List, Lock, Smile, X } from "lucide-react";
-import SupportModal, { hasSupported, mayAutoPrompt } from "./SupportModal";
+import SupportModal, { hasSupported, mayAutoPrompt, Smiley } from "./SupportModal";
 import UnlockModal, { type UnlockStatus } from "./UnlockModal";
 import ViewCount from "./ViewCount";
 import FigureLightbox from "./FigureLightbox";
@@ -253,6 +253,22 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
     };
   }, [paid, refreshUnlock]);
 
+  // Say thank you once per device: the first time this reader is found unlocked (back from
+  // checkout, a code, or a payment that confirmed later), open the thank-you screen.
+  useEffect(() => {
+    if (!paid || !unlocked) return;
+    const key = `${book.id}-thanked`;
+    try {
+      if (window.localStorage.getItem(key)) return;
+      window.localStorage.setItem(key, String(Date.now()));
+    } catch {
+      return; // storage blocked: skip the automatic thank-you rather than repeat it
+    }
+    track("unlock_thanks");
+    const frame = requestAnimationFrame(() => setUnlockOpen("offer"));
+    return () => cancelAnimationFrame(frame);
+  }, [paid, unlocked, book.id]);
+
   // Once the solutions arrive, hide the blurred placeholders they replace.
   useEffect(() => {
     if (!solutions) return;
@@ -424,7 +440,23 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
           Quiz me
         </button>
         {paid ? (
-          unlocked ? null : (
+          unlocked ? (
+            <button
+              type="button"
+              className="book-toc-thanks"
+              onClick={() => {
+                onPick?.();
+                setDrawerOpen(false);
+                setUnlockOpen("offer");
+              }}
+            >
+              <Smiley grin={false} size={34} className="book-toc-thanks-face" />
+              <span>
+                <b>Thank you for supporting this book 💚</b>
+                <small>Every solution is open on this device.</small>
+              </span>
+            </button>
+          ) : (
             <button
               type="button"
               className="book-toc-support book-toc-unlock"
@@ -509,7 +541,9 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
                 </a>
               ) : null}
               {paid ? (
-                unlocked ? null : (
+                unlocked ? (
+                  <span className="book-foot-thanks">💚 Thank you for supporting this book</span>
+                ) : (
                   <button type="button" onClick={() => openUnlock("footer")}>
                     <KeyRound className="w-4 h-4" aria-hidden /> Unlock all solutions
                   </button>
