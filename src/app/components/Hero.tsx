@@ -1,192 +1,125 @@
-"use client";
-
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
-import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
 
-const DotLottieReact = dynamic(
-  () => import("@lottiefiles/dotlottie-react").then((mod) => mod.DotLottieReact),
-  { ssr: false }
-);
+const delay = (ms: number) => ({ "--hero-delay": `${ms}ms` }) as CSSProperties;
+
+const PORTRAIT_ALT = "Tabe Rickson, full-stack and AI engineer";
+
+/** Both portraits are rendered; CSS (`.hero-img-light` / `.hero-img-dark`) shows the one for the theme. */
+function Portrait({ sizes, priority }: { sizes: string; priority?: boolean }) {
+  return (
+    <>
+      <Image
+        src="/tabe-rickson-portrait-light-hq.webp"
+        alt={PORTRAIT_ALT}
+        fill
+        priority={priority}
+        unoptimized
+        sizes={sizes}
+        className="hero-img-light object-cover object-top"
+      />
+      <Image
+        src="/tabe-rickson-portrait-dark-hq.webp"
+        alt={PORTRAIT_ALT}
+        fill
+        priority={priority}
+        unoptimized
+        sizes={sizes}
+        className="hero-img-dark object-cover object-top"
+      />
+    </>
+  );
+}
 
 export default function Hero() {
-  const { theme } = useTheme();
-  const [showLottie, setShowLottie] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
-    const updateLottieVisibility = () => setShowLottie(mediaQuery.matches);
-
-    updateLottieVisibility();
-    mediaQuery.addEventListener("change", updateLottieVisibility);
-
-    return () => {
-      mediaQuery.removeEventListener("change", updateLottieVisibility);
-    };
-  }, []);
-
-  const heroDelay = (delay: string) =>
-    ({ "--hero-delay": delay } as CSSProperties);
-  const isLightTheme = theme === "light";
-  const portraitSrc = isLightTheme
-    ? "/tabe-rickson-portrait-light-hq.webp"
-    : "/tabe-rickson-portrait-dark-hq.webp";
-
   return (
     <section
       id="hero"
-      className="min-h-dvh relative flex flex-col justify-between pt-24 pb-40 lg:pb-12 px-8 lg:px-16 overflow-hidden bg-transparent"
+      className="relative flex items-center min-h-svh px-6 sm:px-8 lg:px-16 pt-28 pb-16 lg:pt-32 lg:pb-24"
     >
-
-      {/* Top Metadata Row */}
-      <div
-        className="hero-fade-down flex justify-between items-start text-[10px] tracking-[0.2em] text-foreground/50 w-full max-w-7xl mx-auto z-10 font-mono relative pt-4"
-      >
-        <div className="w-1/2">CAMEROON-BUEA</div>
-        <div className="w-1/2 text-right">SOFTWARE ENGINEER</div>
-      </div>
-
-      {/* Main Content Area — two-column on lg */}
-      <div className="flex flex-col lg:flex-row items-center justify-between flex-1 w-full max-w-7xl mx-auto z-10 mt-5 gap-8 lg:gap-8">
-
-        {/* Left Column — Text */}
-        <div className="flex-1 min-w-0">
-          {/* Massive Typography */}
-          <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black leading-[0.85] tracking-tighter font-sans flex flex-col">
-            <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
-                I BUILD
+      <div className="hero-grid w-full max-w-7xl mx-auto">
+        {/* Copy */}
+        <div className="min-w-0">
+          <div className="hero-rise flex items-center gap-4" style={delay(0)}>
+            <div className="hero-avatar lg:hidden">
+              <Portrait sizes="64px" priority />
+            </div>
+            <p className="font-mono text-xs sm:text-sm tracking-[0.12em] uppercase leading-relaxed">
+              <span className="font-bold text-foreground">Tabe Rickson</span>
+              <span className="block sm:inline text-foreground/65">
+                <span className="hidden sm:inline" aria-hidden="true"> · </span>
+                Full-stack &amp; AI engineer
               </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-foreground" style={heroDelay("80ms")}>
-                TECH THAT
+              <span className="block sm:inline text-foreground/65">
+                <span className="hidden sm:inline" aria-hidden="true"> · </span>
+                Buea, Cameroon
               </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span className="hero-line block neon-text" style={{ ...heroDelay("240ms"), color: "#39FF14" }}>
-                CHANGES
-              </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span className="hero-line block text-foreground" style={heroDelay("320ms")}>
-                LIVES.
-              </span>
-            </span>
-          </h1>
-
-          {/* Subtext */}
-          <div className="overflow-hidden mt-8 max-w-md">
-            <p
-              className="hero-line text-sm md:text-base text-foreground/60 leading-relaxed font-light font-inter"
-              style={heroDelay("400ms")}
-            >
-              Hi, My name is <span className="font-bold text-foreground">Tabe Rickson</span>. I&apos;m a full-stack engineer based in Cameroon, passionate about crafting impactful digital solutions that empower communities and drive innovation.
             </p>
           </div>
 
-          {/* Buttons */}
-          <div className="overflow-hidden mt-10">
-            <div
-              className="hero-line flex items-center gap-4"
-              style={heroDelay("480ms")}
+          <h1 className="hero-title font-sans text-foreground mt-8 lg:mt-10">
+            <span className="hero-rise block" style={delay(80)}>I build tech</span>
+            <span className="hero-rise block" style={delay(160)}>
+              that <span className="hero-accent">changes</span>
+            </span>
+            <span className="hero-rise block hero-accent" style={delay(240)}>lives.</span>
+          </h1>
+
+          <p
+            className="hero-rise mt-8 max-w-xl font-inter text-base sm:text-lg leading-relaxed text-foreground/75"
+            style={delay(320)}
+          >
+            I design and ship full-stack products for startups and communities, and I write study books
+            for computer science students in Cameroon.
+          </p>
+
+          <div
+            className="hero-rise mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4"
+            style={delay(400)}
+          >
+            <a
+              href="#portfolio"
+              className="group inline-flex h-12 items-center justify-center gap-2 px-7 text-sm font-bold text-[#121212] bg-[#39FF14] hover:bg-foreground hover:text-background transition-colors duration-300"
             >
-              <a
-                href="#portfolio"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 font-mono"
-                style={{ backgroundColor: "#39FF14" }}
+              See my work
+              <svg
+                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                width="12"
+                height="12"
+                viewBox="0 0 10 10"
+                fill="none"
+                aria-hidden="true"
               >
-                <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-                <span className="relative z-10">SEE MY WORK</span>
-                <svg className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-              <a
-                href="/lets-work"
-                className="group relative flex items-center gap-2 px-6 py-3 text-[10px] font-bold tracking-widest text-foreground border border-foreground/20 hover:border-foreground/60 transition-all duration-300 font-mono"
-              >
-                <div className="absolute inset-0 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0"></div>
-                <span className="relative z-10">LET&apos;S WORK</span>
-              </a>
-            </div>
+                <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+            <a
+              href="/books"
+              className="inline-flex h-12 items-center justify-center px-7 text-sm font-bold text-foreground border border-foreground/25 hover:border-foreground/70 hover:bg-foreground/5 transition-colors duration-300"
+            >
+              Read my books
+            </a>
           </div>
         </div>
 
-        {/* Right Column — Profile Picture with Spiral Aura */}
-        <div
-          className="shrink-0 flex items-center justify-center mt-12 lg:mt-0"
-        >
-          <div className="hero-portrait-wrapper hero-portrait-roll-in">
-            {/* Soft ambient glow behind the circle */}
-            <div className="hero-portrait-glow" />
-
-            {/* Flowing dashed ring */}
-            <svg
-              className="hero-dash-ring"
-              viewBox="0 0 400 400"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="4"
-                y="4"
-                width="392"
-                height="392"
-                rx="24"
-                ry="24"
-                stroke="#39FF14"
-                strokeWidth="3"
-                opacity="0.8"
-                strokeDasharray="8 16"
-                strokeLinecap="round"
-              />
-            </svg>
-
-            {/* The actual rectangular image */}
-            <div className="hero-portrait-frame">
-              <Image
-                key={portraitSrc}
-                src={portraitSrc}
-                alt="Tabe Rickson — Full-Stack Engineer"
-                fill
-                priority
-                unoptimized
-                fetchPriority="high"
-                sizes="(max-width: 640px) 300px, (max-width: 1023px) 375px, 510px"
-                className="hero-portrait-img"
-              />
-            </div>
+        {/* Portrait (desktop) */}
+        <div className="hero-fade hero-portrait hidden lg:block" style={delay(200)}>
+          <div className="hero-portrait-frame">
+            <Portrait sizes="440px" priority />
           </div>
         </div>
       </div>
 
-      {/* Bottom Right Metadata */}
-      <div
-        className="hero-fade-left absolute bottom-6 right-8 lg:right-16 text-right z-10 font-mono"
+      {/* Scroll cue */}
+      <a
+        href="#about"
+        aria-label="Scroll to About"
+        className="hero-fade hidden lg:flex absolute bottom-8 inset-x-0 mx-auto w-fit flex-col items-center gap-3 font-mono text-[11px] tracking-[0.25em] uppercase text-foreground/55 hover:text-foreground transition-colors"
+        style={delay(700)}
       >
-        <div className="text-[9px] tracking-[0.2em] text-foreground/50 mb-1">FULL-STACK ENGINEER</div>
-        <div className="text-[10px] tracking-[0.15em] font-bold text-foreground uppercase">Freelancer - CAMEROON</div>
-      </div>
-
-      {/* Large Lottie Arrow Animation */}
-      {showLottie && (
-        <div className={`hidden md:block absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-32 h-32 md:w-40 md:h-40 opacity-80 hover:opacity-100 transition-opacity ${!isLightTheme ? 'invert' : ''}`}>
-          <a href="#portfolio" aria-label="Skip to portfolio">
-            <DotLottieReact
-              src="https://lottie.host/aa8627f5-359a-4656-a0eb-5d8b5ae649e4/s3PT4aOdCD.lottie"
-              autoplay
-            />
-          </a>
-        </div>
-      )}
-
+        Scroll
+        <span className="hero-scroll-line" />
+      </a>
     </section>
   );
 }
