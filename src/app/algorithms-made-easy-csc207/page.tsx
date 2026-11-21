@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces } from "next/font/google";
+import { fraunces } from "../fonts/fraunces";
 import BookReader, { type BookPart, type ReaderBook } from "./BookReader";
 import { BOOKS } from "@/lib/books";
 import { TOPIC_LABELS as topicLabels } from "./book-info";
@@ -13,14 +13,6 @@ import {
   readingMinutes,
 } from "./book-meta";
 import "./book.css";
-
-// The illustrations' SVG text is set in Fraunces; the rest of the book uses the site fonts.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["400", "600", "800"],
-  style: ["normal", "italic"],
-});
 
 const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${BOOK_PATH}`;

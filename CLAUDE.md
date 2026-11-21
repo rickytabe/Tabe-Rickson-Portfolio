@@ -135,7 +135,7 @@ Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Soluti
 - JSX trims a space after a closing tag at a line break; write `{" "}` explicitly.
 - Don't call `Date.now()` during render (lint error). Do it inside effects or loaders.
 - Grid and flex children that overflow on mobile need `min-width: 0`.
-- A failed Vercel preview with font errors was a stale Turbopack build cache, not the code. Redeploy without cache.
+- Fonts are self-hosted with `next/font/local` (`src/app/fonts/`: `site.ts` for Space Grotesk, JetBrains Mono and Inter, `fraunces.ts` for the books). Don't go back to `next/font/google`: fetching from Google during Vercel builds kept failing production deploys with `module-not-found` in `[next]/internal/font/google/*.module.css`.
 
 ## Ideas not started yet
 
