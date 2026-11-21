@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces } from "next/font/google";
+import { fraunces } from "../fonts/fraunces";
 import BookReader, { type BookPart, type ReaderBook } from "../algorithms-made-easy-csc207/BookReader";
 import { BOOK_AUTHOR, BOOK_AUTHOR_AVATAR, formatReadTime, readingMinutes } from "../algorithms-made-easy-csc207/book-meta";
 import { BOOKS, sectionLabel } from "@/lib/books";
@@ -15,14 +15,6 @@ import {
 import "../algorithms-made-easy-csc207/book.css";
 import "../csc211-tutorial-solutions/csc211.css";
 import "./csc207t.css";
-
-// Illustration text is set in Fraunces, as in the other books.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["400", "600", "800"],
-  style: ["normal", "italic"],
-});
 
 const book = BOOKS.csc207t;
 const siteUrl = "https://taberickson.com";
