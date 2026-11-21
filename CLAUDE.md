@@ -72,12 +72,22 @@ Every question on the CSC211 probability tutorial sheet, solved, at `/csc211-tut
 - The dashboard (`/book-insights`) opens on a board of every book; a book's tab adds the unlock funnel, Fapshi payments, invites, revenue and the code maker.
 - Firestore transactions must do every read before any write (a read after a write broke every payment once). Test money paths against the emulator with Fapshi's API simulated before shipping.
 
+## The book: CSC207 Tutorial Sheet Solutions (tutorial solutions, paid)
+
+The CSC207 tutorial sheets, solved in the course pseudocode, at `/csc207-tutorial-solutions` (book id `csc207t`). Built from the CSC211 template.
+
+- Short links are `/csc207/tutorial` and `/csc207/tutorial/quiz`, because `/csc207` and `/csc207/quiz` belong to CSC207 Made Easy. Keep it that way.
+- Content: `src/content/csc207t/questions.ts`, with section ids `s<sheet>-e<exercise>-<question>` (e.g. `s1-e2-5`), printed as `II.5` by `sectionLabel`. Add later sheets as new items and new `sections` entries in `src/lib/books.ts`; the paywall counts from the start, so keep new sheets after the existing ones.
+- Solutions are pre-rendered HTML pseudocode blocks (`pre.code` with tinted keywords). Ligatures are off for code, so `==` and `->` print as typed. Exercise IV-style questions end in an "Exact output" box.
+- The page reuses `csc211.css` (lock cards, unlock sheet) through the `book-csc211` class, and adds `csc207t.css`.
+- The sheet's PDF version (with every solution) lives outside the repo; don't publish it on the site, since it would bypass the paywall.
+
 ## New books and solution sets: always this format
 
 Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Solutions format exactly, unless Tabe says otherwise.
 
 **Name and links**
-- Title: `<COURSE> Tutorial Sheet Solutions` (e.g. "CSC213 Tutorial Sheet Solutions"). Path `/<course>-tutorial-solutions`, short links `/<course>` and `/<course>/quiz` in `next.config.ts`.
+- Title: `<COURSE> Tutorial Sheet Solutions` (e.g. "CSC213 Tutorial Sheet Solutions"). Path `/<course>-tutorial-solutions`, short links `/<course>` and `/<course>/quiz` in `next.config.ts` (or `/<course>/tutorial` when the course already has a book on `/<course>`, as CSC207 does).
 
 **Content** (`src/content/<course>/`)
 - `questions.ts`: one item per sheet question with `id`, `topic` (sidebar label), `question` word for word from the sheet (typos included), a yellow "How to think about it" box (`think`), and a full worked `solution`. Maths as TeX in `\( \)` / `\[ \]`, rendered with KaTeX by `render.ts`. Keep the sheet's numbering; blank sheet questions stay as `blank` items.
@@ -88,7 +98,7 @@ Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Soluti
 - Register the book in `src/lib/books.ts` (`sections` in sheet order, `paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 }`).
 - Page `src/app/<course>-tutorial-solutions/page.tsx` built like CSC211's: shared `BookReader`, cover, "What is inside", how-to-use box, key formulas, quick guide, `book.css` + a small book CSS file, KaTeX CSS.
 - Algo: public questions in `src/app/<course>-tutorial-solutions/quiz-questions.ts` (correct option listed first), answers server-only in `src/lib/quiz/answers-<course>.ts`, both added to `src/lib/quiz/bank.ts`.
-- Solutions API: locked solutions are served only by `/api/book/solutions` for unlocked readers, never in the page or a client bundle.
+- Solutions API: add the book's `lockedSolutions` function to `LOCKED` in `src/app/api/book/solutions/route.ts`. Locked solutions are served only there, for unlocked readers, never in the page or a client bundle.
 - Dashboard: add the book to `LABELS`, `NUMBERS` and `VIEW_PATHS` in `src/app/book-insights/page.tsx`. Also `src/app/api/views/route.ts`, `sitemap.ts`, the Books page card, and the Navbar `match` list.
 
 **Money and gratitude**

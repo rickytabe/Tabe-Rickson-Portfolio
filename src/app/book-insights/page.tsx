@@ -6,6 +6,7 @@ import { dayKey, db, insightsEnabled } from "@/lib/insights/server";
 import { getPathViews } from "@/lib/vercel/analytics";
 import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
 import { CSC211_LABELS, CSC211_NUMBERS } from "@/content/csc211/render";
+import { CSC207T_LABELS, CSC207T_NUMBERS } from "@/content/csc207t/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
@@ -86,15 +87,21 @@ const when = new Intl.DateTimeFormat("en-GB", {
 });
 
 // Sidebar labels and printed numbers per book, for the tables below.
-const LABELS: Record<BookInfo["id"], Record<string, string>> = { csc207: TOPIC_LABELS, csc211: CSC211_LABELS };
+const LABELS: Record<BookInfo["id"], Record<string, string>> = {
+  csc207: TOPIC_LABELS,
+  csc211: CSC211_LABELS,
+  csc207t: CSC207T_LABELS,
+};
 const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
   csc211: CSC211_NUMBERS,
+  csc207t: CSC207T_NUMBERS,
 };
 // Older URLs whose views still count toward a book.
 const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207: ["/algorithms-made-easy-csc207", "/algorithms"],
   csc211: ["/csc211-tutorial-solutions"],
+  csc207t: ["/csc207-tutorial-solutions"],
 };
 
 async function load(book: BookInfo) {

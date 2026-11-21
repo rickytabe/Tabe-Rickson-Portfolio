@@ -1,0 +1,73 @@
+/* CSC207 Tutorial Sheet Solutions: what this book adds on top of book.css and csc211.css
+   (lock cards, unlock sheet): the sheet's own code, output boxes and trace tables. */
+
+/* Code exactly as typed: no ligatures (== and -> must not turn into symbols). */
+.book-csc207t pre,
+.book-csc207t code {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+.book-csc207t pre.code {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* The sheet's code inside a question box: plain, like the printed sheet. */
+.book-csc207t pre.sheet {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--b-note) 30%, transparent);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--foreground);
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Worked example and lecturer-choice notes under a solution. */
+.book-csc207t .eg,
+.book-csc207t .note {
+  font-size: 15px;
+}
+.book-csc207t .note {
+  padding: 10px 14px;
+  border-left: 3px solid var(--b-try);
+  border-radius: 4px 8px 8px 4px;
+  background: color-mix(in srgb, var(--b-try) 8%, transparent);
+}
+
+/* "Exact output" box, as the sheet asks: put your final output in a box. */
+.book-csc207t .outbox {
+  display: inline-block;
+  min-width: 200px;
+  margin: 14px 0 6px;
+  border: 2px solid var(--foreground);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.book-csc207t .outbox .outlab {
+  padding: 4px 12px;
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.book-csc207t .outbox pre {
+  margin: 0;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 15px;
+}
+
+/* Trace tables in Exercise IV. */
+.book-csc207t table.trace {
+  font-size: 14px;
+}

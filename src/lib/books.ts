@@ -1,7 +1,7 @@
 // The books on the site. Plain data, safe to import from client components and the server.
 // Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
 
-export type BookId = "csc207" | "csc211";
+export type BookId = "csc207" | "csc211" | "csc207t";
 
 export type BookInfo = {
   id: BookId;
@@ -43,6 +43,23 @@ export const BOOKS: Record<BookId, BookInfo> = {
     sections: [...range("a", 1, 35), ...range("b", 26, 39)],
     paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 },
   },
+  csc207t: {
+    id: "csc207t",
+    title: "CSC207 Tutorial Sheet Solutions",
+    path: "/csc207-tutorial-solutions",
+    quizLink: "https://taberickson.com/csc207/tutorial/quiz?ref=quiz-share",
+    // /csc207 and /csc207/quiz belong to CSC207 Made Easy, so the tutorials live under /csc207/tutorial.
+    shortLink: "https://taberickson.com/csc207/tutorial",
+    sectionNoun: "question",
+    // Tutorial Sheet 1: Exercise I (1a, 1b, 2), II (1-10), III (1-10), IV (a-d). Later sheets append here.
+    sections: [
+      "s1-e1-1a", "s1-e1-1b", "s1-e1-2",
+      ...range("s1-e2-", 1, 10),
+      ...range("s1-e3-", 1, 10),
+      "s1-e4-a", "s1-e4-b", "s1-e4-c", "s1-e4-d",
+    ],
+    paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 },
+  },
 };
 
 export const BOOK_IDS = Object.keys(BOOKS) as BookId[];
@@ -70,5 +87,10 @@ export function scoped(book: BookInfo, key: string): string {
 /** "Q16", "B30": how a CSC211 section is printed on the question sheet. */
 export function sectionLabel(book: BookInfo, section: string): string {
   if (book.id === "csc207") return String(Number(section.slice(1)));
+  if (book.id === "csc207t") {
+    // "s1-e2-3" -> "II.3", "s1-e4-a" -> "IV.a"
+    const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
+    return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
+  }
   return section.startsWith("b") ? `B${section.slice(1)}` : section.slice(1);
 }

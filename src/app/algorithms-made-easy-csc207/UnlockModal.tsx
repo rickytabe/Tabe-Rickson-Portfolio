@@ -192,7 +192,7 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
   );
   const inviteText = invite
     ? encodeURIComponent(
-        `I'm revising CSC211 with this: every tutorial question solved step by step, free to start. ${invite.link}`
+        `I'm revising ${book.title.split(" ")[0]} with this: every tutorial question solved step by step, free to start. ${invite.link}`
       )
     : "";
 
