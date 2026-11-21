@@ -109,7 +109,7 @@ function coverHtml(): string {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 3v12"/><path d="M7 11l5 5l5-5"/><path d="M4 20h16"/>
       </svg>
-      Download Tutorial Sheet 1 as a PDF
+      Download Tutorial Sheet 1 Solutions
     </a>
   </p>
   <p class="dlnote">A 22-page PDF with every question and solution. Print it, or read it offline on a phone.</p>
