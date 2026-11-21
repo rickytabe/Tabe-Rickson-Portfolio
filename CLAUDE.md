@@ -63,11 +63,43 @@ Every question on the CSC211 probability tutorial sheet, solved, at `/csc211-tut
 
 - Content is structured data in `src/content/csc211/questions.ts` (question word for word from the sheet, "How to think about it", solution), with TeX between `\( \)` and `\[ \]`. `render.ts` renders it with KaTeX on the server.
 - Paywall: questions, hints and solutions 1–15 are in the page. Locked solutions (Q16 to B39, 33 of them) are **never in the page**: the page has blurred placeholder lines, and `/api/book/solutions` returns the real ones only to an unlocked reader. Don't move them into the page or a client bundle.
-- Unlock (`src/lib/unlock.ts`, `/api/book/unlock`): either a code or invites.
-  - Code: the student pays 200 FCFA by MTN MoMo (`*126*1*1*681110631*200#`), sends the screenshot on WhatsApp, and Tabe makes a code on `/book-insights?book=csc211` and sends it back. Codes are 8 characters (`K7P2-XQ9M`), stored only as a SHA-256 fingerprint, work on 2 devices, can be switched off, and readers get 10 tries a day.
-  - Invites: each reader has a link `taberickson.com/csc211?ref=i-<code>` (`inviteCodeFor`). An invited reader counts once they have reached 3 questions on their own device; 3 counted invites unlock.
+- Unlock: three ways in, all recorded on the reader (`unlocks.{book}` with `via`).
+  - **Pay with Fapshi (main path, live):** "Pay 200 FCFA" sends the student to Fapshi's hosted checkout (MTN or Orange Money); back on the book (`?paid=1`) the site asks Fapshi for the status and unlocks. Code in `src/lib/fapshi.ts`, `/api/book/pay`, webhook `/api/payments/fapshi` (checked with `x-wh-secret`). Nothing unlocks from the browser or a webhook body alone: always `GET /payment-status/{transId}` with our keys. Unsettled payments are re-checked on every unlock-status call for 7 days. Env: `FAPSHI_BASE_URL` (`https://live.fapshi.com`), `FAPSHI_API_USER`, `FAPSHI_API_KEY`, `FAPSHI_WEBHOOK_SECRET`. In Fapshi the webhook URL must be `https://www.taberickson.com/api/payments/fapshi` (the apex domain 308-redirects to `www`). Fapshi keeps 3%: revenue is 194 per 200.
+  - **Code (backup):** a student who paid Tabe directly gets a code made on `/book-insights?book=csc211`. Codes are 8 characters (`K7P2-XQ9M`), stored only as a SHA-256 fingerprint, work on 2 devices, can be switched off, and readers get 10 tries a day.
+  - **Invites (free):** each reader has a link `taberickson.com/csc211?ref=i-<code>` (`inviteCodeFor`). An invited reader counts once they have reached 3 questions on their own device; 3 counted invites unlock.
+- After unlocking, the reader thanks them: the grinning smiley ("Thank you, truly.") opens once per device (`{book}-thanked` in localStorage), and a thank-you card replaces the unlock button in the sidebar and footer.
 - Unlocks are tied to the anonymous cookie. A student who clears cookies or changes phone uses their code again (2 devices), or asks Tabe for a new one.
-- The dashboard has a book switcher; the CSC211 tab adds the unlock funnel, invites, revenue (codes used × 200) and the code maker.
+- The dashboard (`/book-insights`) opens on a board of every book; a book's tab adds the unlock funnel, Fapshi payments, invites, revenue and the code maker.
+- Firestore transactions must do every read before any write (a read after a write broke every payment once). Test money paths against the emulator with Fapshi's API simulated before shipping.
+
+## New books and solution sets: always this format
+
+Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Solutions format exactly, unless Tabe says otherwise.
+
+**Name and links**
+- Title: `<COURSE> Tutorial Sheet Solutions` (e.g. "CSC213 Tutorial Sheet Solutions"). Path `/<course>-tutorial-solutions`, short links `/<course>` and `/<course>/quiz` in `next.config.ts`.
+
+**Content** (`src/content/<course>/`)
+- `questions.ts`: one item per sheet question with `id`, `topic` (sidebar label), `question` word for word from the sheet (typos included), a yellow "How to think about it" box (`think`), and a full worked `solution`. Maths as TeX in `\( \)` / `\[ \]`, rendered with KaTeX by `render.ts`. Keep the sheet's numbering; blank sheet questions stay as `blank` items.
+- Re-derive every numeric answer before publishing, and say clearly in the solution when the sheet has a typo or a missing part and what was assumed.
+- Illustrations as inline SVG in the book's paper palette (`#20242B` ink, `#15847B`, `#E2703A`, `#F3BF3F`, Fraunces titles), no `<text>` inside `opengraph-image.tsx` SVGs.
+
+**Wiring**
+- Register the book in `src/lib/books.ts` (`sections` in sheet order, `paywall: { freeSections: 15, priceFcfa: 200, invitesNeeded: 3 }`).
+- Page `src/app/<course>-tutorial-solutions/page.tsx` built like CSC211's: shared `BookReader`, cover, "What is inside", how-to-use box, key formulas, quick guide, `book.css` + a small book CSS file, KaTeX CSS.
+- Algo: public questions in `src/app/<course>-tutorial-solutions/quiz-questions.ts` (correct option listed first), answers server-only in `src/lib/quiz/answers-<course>.ts`, both added to `src/lib/quiz/bank.ts`.
+- Solutions API: locked solutions are served only by `/api/book/solutions` for unlocked readers, never in the page or a client bundle.
+- Dashboard: add the book to `LABELS`, `NUMBERS` and `VIEW_PATHS` in `src/app/book-insights/page.tsx`. Also `src/app/api/views/route.ts`, `sitemap.ts`, the Books page card, and the Navbar `match` list.
+
+**Money and gratitude**
+- Questions and hints all free; solutions 1–15 free; the rest unlock for 200 FCFA through Fapshi (code and invite paths as backup). Same unlock sheet, thank-you smiley and sidebar thank-you card.
+
+**Marketing**
+- `opengraph-image.tsx`: a pure marketing card. The title "<COURSE> Tutorial Sheet Solutions", a one-line promise, and the short link, in two fixed columns so art never covers text. No free/paid details.
+- Announcements to classmates: short, the promise and the link (tag it, e.g. `?ref=whatsapp`), with no free or paid details.
+
+**Before shipping**
+- `tsc` and ESLint on changed files, `next build`, check that no locked answer appears in the built HTML, and test the page, unlock and quiz against the Firestore emulator (never against the live database).
 
 ## Readers, insights and security model
 
@@ -96,6 +128,5 @@ Every question on the CSC211 probability tutorial sheet, solved, at `/csc211-tut
 ## Ideas not started yet
 
 - Past CA solutions, once the content is ready (CSC211 tutorial solutions are done).
-- Automatic Mobile Money unlocks through a payment API (NotchPay, Fapshi, Campay or PawaPay) instead of manual codes, once there is a merchant account. Orange Money support comes with it.
 - A "Revising for the CA? Start here" shortcut in the book.
 - Optionally show unique readers instead of page views in the public 👁 count.
