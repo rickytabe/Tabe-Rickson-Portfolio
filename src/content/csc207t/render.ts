@@ -27,6 +27,9 @@ export const CSC207T_NUMBERS: Record<string, string> = Object.fromEntries(
 
 export const CSC207T_SOLVED_COUNT = CSC207T_ITEMS.length;
 
+/** Tutorial Sheet 1 as a printable PDF (public/, free like the book). */
+export const CSC207T_PDF = "/csc207-tutorial-solutions/csc207-tutorial-sheet-1-solutions.pdf";
+
 // The last question of each exercise gets an inline support card after it (rendered by the reader).
 const EXERCISE_ENDS = new Set(
   (["I", "II", "III", "IV"] as const).map((part) => CSC207T_ITEMS.filter((i) => i.part === part).at(-1)!.id)
@@ -101,6 +104,15 @@ function coverHtml(): string {
     </svg>
   </div>
   <p class="byline">Based on CSC207 Tutorial Sheet 1, Branching and Looping Constructs.<br>${CSC207T_SOLVED_COUNT} questions, every one solved in full.</p>
+  <p class="dlwrap">
+    <a class="dl" href="${CSC207T_PDF}" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="M7 11l5 5l5-5"/><path d="M4 20h16"/>
+      </svg>
+      Download Tutorial Sheet 1 as a PDF
+    </a>
+  </p>
+  <p class="dlnote">A 22-page PDF with every question and solution. Print it, or read it offline on a phone.</p>
 </header>`;
 }
 

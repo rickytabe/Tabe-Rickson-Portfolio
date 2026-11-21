@@ -82,7 +82,7 @@ The CSC207 tutorial sheets, solved in the course pseudocode, at `/csc207-tutoria
 - Solutions are pre-rendered HTML pseudocode blocks (`pre.code` with tinted keywords). Ligatures are off for code, so `==` and `->` print as typed. Exercise IV-style questions end in an "Exact output" box.
 - The page reuses `csc211.css` (lock cards, unlock sheet) through the `book-csc211` class, and adds `csc207t.css`.
 - Code is mobile-first: each line is a `.ln` block with its indentation in `--ind`, and end-of-line comments are `.c-trail` spans. On phones (≤720px) lines wrap with a hanging indent and comments move onto their own line, so there is no sideways scroll.
-- The sheet's PDF version lives outside the repo (`csc207-tutorial-1-source/` next to the repo holds its build script).
+- The PDF of Tutorial Sheet 1 is published at `/csc207-tutorial-solutions/csc207-tutorial-sheet-1-solutions.pdf` (cover, sidebar, footer and Books page). Downloads go through the support ask, which always offers "Download free". Its build script (`build.py`, `to_ts.py`) is in `csc207-tutorial-1-source/` next to the repo: rebuild the PDF and `questions.ts` from it when the content changes.
 
 ## New books and solution sets: always this format
 

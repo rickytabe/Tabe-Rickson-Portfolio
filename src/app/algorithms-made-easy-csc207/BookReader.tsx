@@ -34,7 +34,7 @@ export type ReaderBook = {
   /** Paid books: the solutions after `freeSections` unlock. */
   paywall?: { priceFcfa: number; freeSections: number; lockedCount: number; invitesNeeded: number };
   /** Free books: the support prompt's ask in this book's words. */
-  support?: { title: string; text: string };
+  support?: { title: string; text: string; download?: string };
 };
 
 type Props = {

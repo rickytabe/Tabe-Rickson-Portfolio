@@ -66,7 +66,7 @@ type Props = {
   mode?: "support" | "download";
   pdf?: string;
   /** The ask in this book's words. Defaults to CSC207 Made Easy's. */
-  ask?: { title: string; text: string };
+  ask?: { title: string; text: string; download?: string };
   /** Open straight on the thank-you (back from checkout with a confirmed tip). */
   thanked?: boolean;
 };
@@ -209,7 +209,9 @@ export default function SupportModal({ bookId, onClose, mode = "support", pdf, a
               {isDownload ? "Before you download, one small ask" : (ask?.title ?? "Did this book make algorithms click?")}
             </h2>
             <p id="support-desc" className="support-text">
-              {isDownload ? (
+              {isDownload && ask?.download ? (
+                <>{ask.download}</>
+              ) : isDownload ? (
                 <>
                   The 68-page PDF is yours to keep, print and share, free. If it helps you pass, a small tip tells{" "}
                   <strong>Tabe</strong> it was worth it and helps the next free book get written.

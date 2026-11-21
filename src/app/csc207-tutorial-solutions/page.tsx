@@ -10,6 +10,7 @@ import {
   CSC207T_NUMBERS,
   CSC207T_PARTS,
   CSC207T_SOLVED_COUNT as SOLVED_COUNT,
+  CSC207T_PDF,
 } from "@/content/csc207t/render";
 import "../algorithms-made-easy-csc207/book.css";
 import "../csc211-tutorial-solutions/csc211.css";
@@ -132,6 +133,7 @@ const readerBook: ReaderBook = {
   support: {
     title: "Did these solutions help you?",
     text: "CSC207 Tutorial Sheet Solutions is every tutorial question solved in full, free for everyone, no ads. If it helped you, a small tip tells Tabe it was worth it and keeps new sheets coming before every CA.",
+    download: "The 22-page PDF of Tutorial Sheet 1 is yours to keep, print and share, free. If it helps you in the CA, a small tip tells Tabe it was worth it and keeps new sheets coming.",
   },
 };
 
@@ -143,6 +145,7 @@ export default function Csc207TutorialBook() {
       <BookReader
         book={readerBook}
         parts={parts}
+        pdf={CSC207T_PDF}
         className={fraunces.variable}
         about={`Every question on the CSC207 tutorial sheets, solved in full in the course pseudocode. Before each solution, a short box shows how to recognise the problem and which construct to use, so the method carries over to the CA and the exam.`}
         credits={
