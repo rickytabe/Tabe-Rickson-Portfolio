@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { insightsEnabled, readerFromRequest } from "@/lib/insights/server";
-import { bookFrom } from "@/lib/books";
+import { bookFrom, type BookId } from "@/lib/books";
 import { getUnlock } from "@/lib/unlock";
-import { lockedSolutions } from "@/content/csc211/render";
+import { lockedSolutions as csc211LockedSolutions } from "@/content/csc211/render";
+
+// Each paid book's locked solutions, by question id.
+const LOCKED: Partial<Record<BookId, () => Record<string, string>>> = {
+  csc211: csc211LockedSolutions,
+};
 
 /**
  * The locked solutions of a paid book (?book=), for readers who have unlocked it. They are never
@@ -11,12 +16,10 @@ import { lockedSolutions } from "@/content/csc211/render";
 export async function GET(request: Request) {
   if (!insightsEnabled()) return NextResponse.json({ error: "offline" }, { status: 503 });
   const book = bookFrom(new URL(request.url).searchParams.get("book"));
-  if (book.id !== "csc211") return NextResponse.json({ error: "Not a paid book" }, { status: 404 });
+  const solutions = LOCKED[book.id];
+  if (!book.paywall || !solutions) return NextResponse.json({ error: "Not a paid book" }, { status: 404 });
 
   const unlock = await getUnlock(readerFromRequest(request), book);
   if (!unlock) return NextResponse.json({ error: "Locked" }, { status: 402 });
-  return NextResponse.json(
-    { solutions: lockedSolutions() },
-    { headers: { "Cache-Control": "private, no-store" } }
-  );
+  return NextResponse.json({ solutions: solutions() }, { headers: { "Cache-Control": "private, no-store" } });
 }

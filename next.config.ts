@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
       // Link previews follow the redirect and show the book's own cover.
       { source: "/csc211", destination: "/csc211-tutorial-solutions", permanent: false },
       { source: "/csc211/quiz", destination: "/csc211-tutorial-solutions?quiz=1", permanent: false },
+      // CSC207 Tutorial Sheet Solutions: /csc207 and /csc207/quiz already belong to CSC207 Made Easy.
+      { source: "/csc207/tutorial", destination: "/csc207-tutorial-solutions", permanent: false },
+      { source: "/csc207/tutorial/quiz", destination: "/csc207-tutorial-solutions?quiz=1", permanent: false },
     ];
   },
 };

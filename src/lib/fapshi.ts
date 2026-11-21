@@ -45,8 +45,21 @@ function headers(): Record<string, string> {
 const payments = () => db().collection("payments");
 
 /** Create a hosted checkout link for this reader. Returns the URL to send them to. */
-export async function startPayment(book: BookInfo, rid: string, returnUrl: string): Promise<string> {
-  const price = book.paywall!.priceFcfa;
+/** A payment either unlocks a paid book or is a voluntary tip (any book). */
+export type PaymentKind = "unlock" | "tip";
+
+/** Tip amounts a reader can pick (FCFA). Fapshi's minimum is 100. */
+export const TIP_AMOUNTS = [200, 500, 1000] as const;
+
+/** Create a hosted checkout link for this reader. Returns the URL to send them to. */
+export async function startPayment(
+  book: BookInfo,
+  rid: string,
+  returnUrl: string,
+  { kind = "unlock", amount }: { kind?: PaymentKind; amount?: number } = {}
+): Promise<string> {
+  const price = kind === "tip" ? Number(amount) : book.paywall!.priceFcfa;
+  if (!Number.isInteger(price) || price < 100) throw new Error(`Invalid amount ${price}`);
   const res = await fetch(`${base()}/initiate-pay`, {
     method: "POST",
     headers: headers(),
@@ -54,8 +67,8 @@ export async function startPayment(book: BookInfo, rid: string, returnUrl: strin
       amount: price,
       redirectUrl: returnUrl,
       userId: rid,
-      externalId: `${book.id}-${Date.now()}`,
-      message: `${book.title}: unlock all solutions`,
+      externalId: `${book.id}-${kind}-${Date.now()}`,
+      message: kind === "tip" ? `Thank you for supporting ${book.title}` : `${book.title}: unlock all solutions`,
     }),
     cache: "no-store",
   });
@@ -65,6 +78,7 @@ export async function startPayment(book: BookInfo, rid: string, returnUrl: strin
   }
   await payments().doc(data.transId).set({
     book: book.id,
+    kind,
     rid,
     amount: price,
     status: "CREATED",
@@ -74,7 +88,10 @@ export async function startPayment(book: BookInfo, rid: string, returnUrl: strin
   await db()
     .collection("bookStats")
     .doc(book.id)
-    .set({ paywall: { paymentsStarted: FieldValue.increment(1) } }, { merge: true });
+    .set(
+      kind === "tip" ? { support: { tipsStarted: FieldValue.increment(1) } } : { paywall: { paymentsStarted: FieldValue.increment(1) } },
+      { merge: true }
+    );
   return data.link;
 }
 
@@ -88,8 +105,9 @@ async function fetchStatus(transId: string): Promise<FapshiPayment | null> {
 }
 
 /**
- * Ask Fapshi for a payment's status and record it. A SUCCESSFUL payment of the full price unlocks
- * the book for the reader who started it. Safe to call repeatedly: it unlocks and counts once.
+ * Ask Fapshi for a payment's status and record it. A SUCCESSFUL unlock payment of the full price
+ * unlocks the book for the reader who started it; a SUCCESSFUL tip marks the reader as a supporter.
+ * Safe to call repeatedly: it unlocks and counts once.
  */
 export async function settlePayment(transId: string): Promise<FapshiStatus | null> {
   if (!/^[A-Za-z0-9_-]{4,64}$/.test(transId)) return null;
@@ -118,6 +136,23 @@ export async function settlePayment(transId: string): Promise<FapshiStatus | nul
     });
     if (!paid) return;
     const reader = readerSnap.data() ?? {};
+    const via = p.medium === "orange money" ? "orange" : "mtn";
+    if (doc.kind === "tip") {
+      tx.set(readerRef, { supported: { [doc.book]: { at: Date.now(), amount: p.amount } } }, { merge: true });
+      tx.set(
+        store.collection("bookStats").doc(doc.book),
+        {
+          support: {
+            tips: FieldValue.increment(1),
+            tipsAmount: FieldValue.increment(p.amount),
+            tipsRevenue: FieldValue.increment(p.revenue ?? 0),
+            [`tipsBy_${via}`]: FieldValue.increment(1),
+          },
+        },
+        { merge: true }
+      );
+      return;
+    }
     if (!reader.unlocks?.[doc.book]) {
       tx.set(readerRef, { unlocks: { [doc.book]: { via: "payment", at: Date.now() } } }, { merge: true });
     }
@@ -137,17 +172,30 @@ export async function settlePayment(transId: string): Promise<FapshiStatus | nul
   return p.status;
 }
 
-/** Check this reader's recent unsettled payments (the return from checkout, or a missed webhook). */
-export async function settleReaderPayments(book: BookInfo, rid: string): Promise<boolean> {
+/** Settle this reader's open payments of one kind (the return from checkout, or a missed webhook). */
+async function settleOpen(book: BookInfo, rid: string, kind: PaymentKind): Promise<void> {
   const snap = await payments().where("rid", "==", rid).limit(20).get();
   const open = snap.docs
-    .filter((d) => d.data().book === book.id && ["CREATED", "PENDING"].includes(d.data().status))
+    .filter((d) => d.data().book === book.id && (d.data().kind ?? "unlock") === kind)
+    .filter((d) => ["CREATED", "PENDING"].includes(d.data().status))
     // A week: a paid checkout stays SUCCESSFUL at Fapshi, so a late return still unlocks.
     .filter((d) => Date.now() - Number(d.data().createdAt) < 7 * 24 * 60 * 60 * 1000);
   for (const d of open.slice(0, 3)) await settlePayment(d.id);
+}
+
+/** Settle open unlock payments; true when the book is unlocked for this reader. */
+export async function settleReaderPayments(book: BookInfo, rid: string): Promise<boolean> {
+  await settleOpen(book, rid, "unlock");
   // Report what was actually recorded: a SUCCESSFUL status alone may be an underpayment.
   const reader = (await db().collection("bookReaders").doc(rid).get()).data();
   return !!reader?.unlocks?.[book.id];
+}
+
+/** Settle open tips; true when this reader has a confirmed tip for this book. */
+export async function settleReaderTips(book: BookInfo, rid: string): Promise<boolean> {
+  await settleOpen(book, rid, "tip");
+  const reader = (await db().collection("bookReaders").doc(rid).get()).data();
+  return !!reader?.supported?.[book.id];
 }
 
 /** The webhook's x-wh-secret header against FAPSHI_WEBHOOK_SECRET, compared in constant time. */
@@ -159,7 +207,16 @@ export function webhookSecretOk(header: string | null): boolean {
   return timingSafeEqual(a, b);
 }
 
-export type PaymentRow = { id: string; status: string; medium: string | null; amount: number; revenue: number | null; createdAt: number; env: string };
+export type PaymentRow = {
+  id: string;
+  kind: PaymentKind;
+  status: string;
+  medium: string | null;
+  amount: number;
+  revenue: number | null;
+  createdAt: number;
+  env: string;
+};
 
 export async function listPayments(book: BookInfo, limit = 30): Promise<PaymentRow[]> {
   const snap = await payments().orderBy("createdAt", "desc").limit(200).get();
@@ -168,6 +225,15 @@ export async function listPayments(book: BookInfo, limit = 30): Promise<PaymentR
     .slice(0, limit)
     .map((d) => {
       const p = d.data();
-      return { id: d.id, status: p.status, medium: p.medium ?? null, amount: p.amount, revenue: p.revenue ?? null, createdAt: p.createdAt, env: p.env };
+      return {
+        id: d.id,
+        kind: (p.kind ?? "unlock") as PaymentKind,
+        status: p.status,
+        medium: p.medium ?? null,
+        amount: p.amount,
+        revenue: p.revenue ?? null,
+        createdAt: p.createdAt,
+        env: p.env,
+      };
     });
 }

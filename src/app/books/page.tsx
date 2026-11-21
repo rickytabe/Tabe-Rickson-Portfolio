@@ -14,6 +14,7 @@ import {
 } from "../algorithms-made-easy-csc207/book-meta";
 import { BOOKS } from "@/lib/books";
 import { LOCKED_COUNT, SOLVED_COUNT, bookHtml } from "@/content/csc211/render";
+import { CSC207T_PDF, CSC207T_SOLVED_COUNT, csc207tBookHtml } from "@/content/csc207t/render";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -63,11 +64,25 @@ const books: Book[] = [
     readTime: formatReadTime(readingMinutes(bookHtml())),
     topics: ["Probability", "Bayes", "Binomial", "Poisson", "Normal distribution", "Joint densities"],
   },
+  {
+    title: BOOKS.csc207t.title,
+    subtitle: "Branching, loops and output tracing, every question solved",
+    description: `Every question on CSC207 Tutorial Sheet 1 solved in the course pseudocode: ordered set Insert and Union, isPalindrome, ten branching programs, ten looping programs and the exact-output tracing questions. Each one starts with how to recognise the problem and which construct to use. Free to read.`,
+    href: BOOKS.csc207t.path,
+    pdf: CSC207T_PDF,
+    cover: `${BOOKS.csc207t.path}/opengraph-image`,
+    facts: [`${CSC207T_SOLVED_COUNT} QUESTIONS`, "22-PAGE PDF"],
+    price: "FREE",
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: formatReadTime(readingMinutes(csc207tBookHtml())),
+    topics: ["Pseudocode", "Branching", "Loops", "switch", "Tracing output", "Data structures"],
+  },
 ];
 
 const title = "Books | Tabe Rickson";
 const description =
-  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC211 Tutorial Sheet Solutions solves every probability tutorial question step by step.";
+  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC207 and CSC211 Tutorial Sheet Solutions solve every tutorial question step by step.";
 
 export const metadata: Metadata = {
   title,
@@ -76,6 +91,7 @@ export const metadata: Metadata = {
     "CSC207",
     "CSC211",
     "CSC211 tutorial solutions",
+    "CSC207 tutorial solutions",
     "Introduction to Algorithms",
     "algorithms in plain English",
     "free algorithms book",

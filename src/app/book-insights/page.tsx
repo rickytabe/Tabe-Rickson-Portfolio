@@ -6,6 +6,7 @@ import { dayKey, db, insightsEnabled } from "@/lib/insights/server";
 import { getPathViews } from "@/lib/vercel/analytics";
 import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
 import { CSC211_LABELS, CSC211_NUMBERS } from "@/content/csc211/render";
+import { CSC207T_LABELS, CSC207T_NUMBERS } from "@/content/csc207t/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
@@ -30,8 +31,9 @@ type Stats = {
   end?: Counts;
   clarity?: Counts;
   support_shown?: Counts;
-  support_copy?: Counts;
-  support_dial?: Counts;
+  tip_start?: Counts;
+  tip_return?: Counts;
+  support?: { tips?: number; tipsStarted?: number; tipsAmount?: number; tipsRevenue?: number; tipsBy_mtn?: number; tipsBy_orange?: number };
   download_free?: Counts;
   download_supported?: Counts;
   download_direct?: Counts;
@@ -51,9 +53,6 @@ type Stats = {
   quizQ?: Counts; // `${questionId}_seen` and `${questionId}_wrong`
   // Paid books.
   unlock_shown?: Counts;
-  unlock_copy?: Counts;
-  unlock_dial?: Counts;
-  unlock_whatsapp?: Counts;
   invite_share?: Counts;
   pay_start?: Counts;
   pay_return?: Counts;
@@ -86,15 +85,21 @@ const when = new Intl.DateTimeFormat("en-GB", {
 });
 
 // Sidebar labels and printed numbers per book, for the tables below.
-const LABELS: Record<BookInfo["id"], Record<string, string>> = { csc207: TOPIC_LABELS, csc211: CSC211_LABELS };
+const LABELS: Record<BookInfo["id"], Record<string, string>> = {
+  csc207: TOPIC_LABELS,
+  csc211: CSC211_LABELS,
+  csc207t: CSC207T_LABELS,
+};
 const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
   csc211: CSC211_NUMBERS,
+  csc207t: CSC207T_NUMBERS,
 };
 // Older URLs whose views still count toward a book.
 const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207: ["/algorithms-made-easy-csc207", "/algorithms"],
   csc211: ["/csc211-tutorial-solutions"],
+  csc207t: ["/csc207-tutorial-solutions"],
 };
 
 async function load(book: BookInfo) {
@@ -182,8 +187,11 @@ export default async function BookInsights({
   const readers = n(stats.readers);
   const finished = n(stats.end);
   const downloads = n(stats.download_free) + n(stats.download_supported) + n(stats.download_direct);
-  const copies = n(stats.support_copy);
-  const dials = n(stats.support_dial);
+  // Tips through Fapshi: started (tapped Support), confirmed by Fapshi, and what they are worth.
+  const sup = stats.support ?? {};
+  const tipsStarted = Number(sup.tipsStarted ?? 0);
+  const tips = Number(sup.tips ?? 0);
+  const tipsRevenue = Number(sup.tipsRevenue ?? 0);
   const shownBy = stats.support_shown ?? {};
   const shown = Object.values(shownBy).reduce((a, b) => a + Number(b), 0);
 
@@ -255,7 +263,7 @@ export default async function BookInsights({
   const codesUsed = Number(pw.codesUsed ?? 0);
   const byPayment = Number(pw.unlockedByPayment ?? 0);
   // Codes: what students sent you directly. Payments: what Fapshi pays out, after its 3% fee.
-  const revenue = codesUsed * (book.paywall?.priceFcfa ?? 0) + Number(pw.paymentsRevenue ?? 0);
+  const revenue = codesUsed * (book.paywall?.priceFcfa ?? 0) + Number(pw.paymentsRevenue ?? 0) + tipsRevenue;
 
   return (
     <main className="ins">
@@ -309,9 +317,9 @@ export default async function BookInsights({
           <>
             <Tile label="PDF downloads" value={fmt.format(downloads)} hint={`${fmt.format(n(stats.download_free))} chose free`} />
             <Tile
-              label="Copied or dialled code"
-              value={fmt.format(copies + dials)}
-              hint={`${pct(copies + dials, shown)}% of prompts shown`}
+              label="Tips (Fapshi)"
+              value={`${fmt.format(tipsRevenue)} FCFA`}
+              hint={`${fmt.format(tips)} confirmed · ${pct(tips, shown)}% of prompts shown`}
             />
           </>
         )}
@@ -431,15 +439,24 @@ export default async function BookInsights({
               <dd>{fmt.format(shown)}</dd>
             </div>
             <div>
-              <dt>Copied the code</dt>
+              <dt>Opened the checkout</dt>
               <dd>
-                {fmt.format(copies)} <small>{pct(copies, shown)}%</small>
+                {fmt.format(tipsStarted)} <small>{pct(tipsStarted, shown)}%</small>
               </dd>
             </div>
             <div>
-              <dt>Tapped Dial now</dt>
+              <dt>Tip confirmed by Fapshi</dt>
               <dd>
-                {fmt.format(dials)} <small>{pct(dials, shown)}%</small>
+                {fmt.format(tips)}{" "}
+                <small>
+                  MTN {fmt.format(Number(sup.tipsBy_mtn ?? 0))} · Orange {fmt.format(Number(sup.tipsBy_orange ?? 0))}
+                </small>
+              </dd>
+            </div>
+            <div>
+              <dt>Tips received</dt>
+              <dd>
+                {fmt.format(tipsRevenue)} FCFA <small>after Fapshi&apos;s 3%</small>
               </dd>
             </div>
           </dl>
@@ -459,7 +476,7 @@ export default async function BookInsights({
               <b>{fmt.format(n(stats.download_free))}</b>
             </li>
             <li>
-              <span>After copying / dialling</span>
+              <span>After a confirmed tip</span>
               <b>{fmt.format(n(stats.download_supported))}</b>
             </li>
             <li>
@@ -468,8 +485,7 @@ export default async function BookInsights({
             </li>
           </ul>
           <p className="ins-note">
-            Copying the code isn&apos;t the same as paying. Compare with the tips you actually received on Mobile
-            Money.
+            Tips are counted only when Fapshi confirms the payment. Each tip shows in the payments list of the book.
           </p>
         </section>
         )}
@@ -734,19 +750,6 @@ function PaywallPanel({
             </dd>
           </div>
           <div>
-            <dt>Copied or dialled MoMo</dt>
-            <dd>
-              {fmt.format(n(stats.unlock_copy) + n(stats.unlock_dial))}{" "}
-              <small>{pct(n(stats.unlock_copy) + n(stats.unlock_dial), shown)}%</small>
-            </dd>
-          </div>
-          <div>
-            <dt>Opened WhatsApp</dt>
-            <dd>
-              {fmt.format(n(stats.unlock_whatsapp))} <small>{pct(n(stats.unlock_whatsapp), shown)}%</small>
-            </dd>
-          </div>
-          <div>
             <dt>Unlocked with a code</dt>
             <dd>
               {fmt.format(Number(pw.unlockedByCode ?? 0))}{" "}
@@ -798,7 +801,7 @@ function PaywallPanel({
             {payments.map((p) => (
               <li key={p.id}>
                 <span>
-                  <b>{p.status}</b> · {p.amount} FCFA{p.medium ? ` · ${p.medium}` : ""}
+                  <b>{p.status}</b> · {p.kind === "tip" ? "tip" : "unlock"} · {p.amount} FCFA{p.medium ? ` · ${p.medium}` : ""}
                   {p.env === "sandbox" ? <span className="ins-muted"> · sandbox</span> : null}
                   <br />
                   <span className="ins-muted">
@@ -817,8 +820,9 @@ function PaywallPanel({
       <section className="ins-card" id="codes">
         <h2 className="ins-h2">Unlock codes</h2>
         <p className="ins-note">
-          When a payment screenshot arrives on WhatsApp, check it against your MoMo messages, make a code here and
-          send it back. Each code works on {2} devices. Codes are stored only as a fingerprint, so copy it now.
+          Gift codes: make one here for a student you want to give free access to, and send it to them. Payments
+          themselves go through Fapshi. Each code works on {2} devices and is stored only as a fingerprint, so copy
+          it now.
         </p>
         {newCode ? (
           <div className="ins-newcode" role="status">
@@ -926,8 +930,11 @@ async function bookSummary(book: BookInfo) {
     clearPct: up + down ? pct(up, up + down) : null,
     votes: up + down,
     unlocked: Number(pw.unlockedByCode ?? 0) + Number(pw.unlockedByInvite ?? 0) + Number(pw.unlockedByPayment ?? 0),
-    revenue: Number(pw.codesUsed ?? 0) * (book.paywall?.priceFcfa ?? 0) + Number(pw.paymentsRevenue ?? 0),
-    tips: n(stats.support_copy) + n(stats.support_dial),
+    revenue:
+      Number(pw.codesUsed ?? 0) * (book.paywall?.priceFcfa ?? 0) +
+      Number(pw.paymentsRevenue ?? 0) +
+      Number(stats.support?.tipsRevenue ?? 0),
+    tips: Number(stats.support?.tips ?? 0),
     downloads: n(stats.download_free) + n(stats.download_supported) + n(stats.download_direct),
     updated: stats.updatedAt?.toDate?.() ?? null,
   };
@@ -972,7 +979,7 @@ async function Overview() {
       <section className="ins-tiles" aria-label="All books together">
         <Tile label="Readers, all books" value={fmt.format(totalReaders)} hint={`${fmt.format(totalToday)} new today`} />
         <Tile label="Quizzes finished" value={fmt.format(totalQuizzes)} hint="across every book" />
-        <Tile label="Revenue" value={`${fmt.format(totalRevenue)} FCFA`} hint="paid unlocks, after fees" />
+        <Tile label="Revenue" value={`${fmt.format(totalRevenue)} FCFA`} hint="unlocks and tips, after fees" />
         <Tile label="Books" value={String(books.length)} hint={`${books.filter((b) => b.book.paywall).length} paid`} />
       </section>
 
