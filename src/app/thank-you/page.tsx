@@ -1,4 +1,3 @@
-import Navbar from "../components/Navbar";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import { AnimatedText } from "@/components/ui/animated-text";
 import Link from "next/link";
@@ -16,7 +15,6 @@ export default function ThankYou() {
   return (
     <InteractiveBackground>
       <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
-        <Navbar />
         
         <main className="flex-1 flex flex-col justify-center items-center py-32 px-6">
           <div className="text-center max-w-2xl mx-auto border border-foreground/30 dark:border-card-border bg-card-bg/50 p-10 shadow-sm relative group">
