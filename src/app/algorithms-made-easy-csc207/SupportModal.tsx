@@ -335,10 +335,15 @@ export default function SupportModal({ onClose, mode = "support", pdf }: Props) 
   );
 }
 
-function Smiley({ grin }: { grin: boolean }) {
+/** The book's smiley: smiles while asking, grins (with sparks) when thanking. */
+export function Smiley({ grin, size = 76, className = "" }: { grin: boolean; size?: number; className?: string }) {
   return (
-    <div className={`support-smiley ${grin ? "is-grin" : ""}`} aria-hidden>
-      <svg viewBox="0 0 96 96" width="76" height="76">
+    <div
+      className={`support-smiley ${grin ? "is-grin" : ""} ${className}`}
+      style={size === 76 ? undefined : { width: size, height: size }}
+      aria-hidden
+    >
+      <svg viewBox="0 0 96 96" width={size} height={size}>
         <circle cx="48" cy="48" r="44" className="sm-face" />
         <g className="sm-eyes">
           <ellipse cx="34" cy="40" rx="5" ry="6.5" className="sm-eye" />
