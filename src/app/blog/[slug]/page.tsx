@@ -2,7 +2,6 @@ import { client } from "@/lib/sanity/client";
 import { POST_QUERY, POSTS_SLUGS_QUERY } from "@/lib/sanity/queries";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Navbar from "../../components/Navbar";
 import { InteractiveBackground } from "../../components/InteractiveBackground";
 import PortableTextRenderer from "../../components/PortableTextRenderer";
 import Link from "next/link";
@@ -79,7 +78,6 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <InteractiveBackground>
       <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
-        <Navbar />
         
         <div className="flex-1 pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto w-full">
           <article className="bg-background/80 backdrop-blur-2xl border border-card-border rounded-3xl p-6 md:p-12 shadow-2xl">

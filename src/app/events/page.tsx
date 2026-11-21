@@ -1,7 +1,6 @@
 import { client } from "@/lib/sanity/client";
 import { EVENTS_QUERY } from "@/lib/sanity/queries";
 import { Metadata } from "next";
-import Navbar from "../components/Navbar";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import EventsListClient from "../components/EventsListClient";
 
@@ -21,7 +20,6 @@ export default async function EventsIndex() {
   return (
     <InteractiveBackground>
       <div className="flex flex-col min-h-screen overflow-x-clip relative z-10">
-        <Navbar />
         
         <main className="flex-1 pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto w-full">
           <div className="mb-16">
