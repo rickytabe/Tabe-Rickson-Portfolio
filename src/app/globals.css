@@ -69,213 +69,151 @@ body {
   overflow-x: clip;
 }
 
-/* First-screen hero reveal: CSS starts immediately, without waiting for hydration. */
-.hero-bg-reveal {
-  transform: translate3d(0, 100%, 0);
-  animation: hero-bg-rise 850ms cubic-bezier(0.16, 1, 0.3, 1) 60ms forwards;
-  will-change: transform;
-}
-
-.hero-line {
-  opacity: 0;
-  transform: translate3d(0, 100%, 0);
-  animation: hero-line-rise 680ms cubic-bezier(0.16, 1, 0.3, 1) var(--hero-delay, 0ms) forwards;
-  will-change: opacity, transform;
-}
-
-.hero-fade-down {
-  opacity: 0;
-  transform: translate3d(0, -16px, 0);
-  animation: hero-fade-down 560ms ease 90ms forwards;
-  will-change: opacity, transform;
-}
-
-.hero-fade-left {
-  opacity: 0;
-  transform: translate3d(16px, 0, 0);
-  animation: hero-fade-left 560ms ease 520ms forwards;
-  will-change: opacity, transform;
-}
-
-.hero-portrait-roll-in {
-  opacity: 0;
-  transform: translate3d(300px, 0, 0) rotate(90deg);
-  animation: hero-roll-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) 400ms forwards;
-  will-change: opacity, transform;
-}
-
-@keyframes hero-bg-rise {
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes hero-line-rise {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes hero-fade-down {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes hero-fade-left {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes hero-roll-in {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-}
-
 /* ==========================================================================
-   HERO PORTRAIT — Circle with Spiral Ring & Ambient Glow
+   HERO — name first, one focal point
+   The reveal is pure CSS so it starts at first paint, before hydration.
    ========================================================================== */
-.hero-portrait-wrapper {
-  position: relative;
-  width: 570px;
-  height: 570px;
-  display: flex;
+:root {
+  --hero-accent: #15803d;             /* readable green on white (5:1) */
+  --hero-accent-soft: rgba(22, 163, 74, 0.14);
+  --hero-photo-border: rgba(18, 18, 18, 0.1);
+}
+
+.dark {
+  --hero-accent: #39FF14;
+  --hero-accent-soft: rgba(57, 255, 20, 0.12);
+  --hero-photo-border: rgba(255, 255, 255, 0.1);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
+  gap: 4rem;
 }
 
-/* Soft ambient glow — a radial gradient behind the circle */
-.hero-portrait-glow {
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.hero-title {
+  font-size: clamp(2.75rem, 1rem + 5.2vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+
+.hero-accent {
+  color: var(--hero-accent);
+}
+
+.dark .hero-accent {
+  text-shadow: 0 0 18px rgba(57, 255, 20, 0.25);
+}
+
+/* Light and dark portraits are both in the page; CSS shows the right one,
+   so the server HTML always matches whatever theme the reader has. */
+.hero-img-dark { display: none; }
+.dark .hero-img-light { display: none; }
+.dark .hero-img-dark { display: block; }
+
+/* Large portrait (desktop) */
+.hero-portrait {
+  position: relative;
+  width: min(100%, 440px);
+  aspect-ratio: 4 / 5;
+  justify-self: end;
+}
+
+.hero-portrait::before {
+  content: "";
   position: absolute;
-  inset: -40px;
-  border-radius: 32px;
-  background: radial-gradient(circle,
-      rgba(57, 255, 20, 0.12) 0%,
-      rgba(57, 255, 20, 0.04) 40%,
-      transparent 70%);
-  pointer-events: none;
-  animation: hero-glow-pulse 4s ease-in-out infinite;
+  inset: 0;
+  transform: translate(18px, 18px);
+  border-radius: 24px;
+  background: var(--hero-accent-soft);
+  border: 1px solid var(--hero-accent);
+  opacity: 0.6;
 }
 
-@keyframes hero-glow-pulse {
-
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
-/* Dashed ring flowing around the border */
-.hero-dash-ring {
-  position: absolute;
-  width: 534px;
-  height: 534px;
-  pointer-events: none;
-}
-
-.hero-dash-ring rect {
-  animation: hero-dash-flow 80s linear infinite;
-}
-
-@keyframes hero-dash-flow {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: -2400;
-  }
-}
-
-/* Rounded square image frame */
 .hero-portrait-frame {
   position: relative;
-  width: 510px;
-  height: 510px;
-  border-radius: 32px;
-  overflow: hidden;
-  border: 2px solid rgba(57, 255, 20, 0.2);
-  box-shadow:
-    0 0 40px rgba(57, 255, 20, 0.08),
-    0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-.hero-portrait-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--hero-photo-border);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.45);
 }
 
-/* Responsive sizing for smaller screens */
-@media (max-width: 1023px) {
-  .hero-portrait-wrapper {
-    width: 420px;
-    height: 420px;
-  }
+/* Small round avatar next to the name (mobile and tablet) */
+.hero-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 2px solid var(--hero-accent);
+}
 
-  .hero-portrait-frame {
-    width: 375px;
-    height: 375px;
-    border-radius: 24px;
-  }
-  
-  .hero-portrait-glow {
-    border-radius: 24px;
-  }
+/* Reveal */
+.hero-rise {
+  animation: hero-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--hero-delay, 0ms) both;
+}
 
-  .hero-dash-ring {
-    width: 399px;
-    height: 399px;
+.hero-fade {
+  animation: hero-fade 900ms ease var(--hero-delay, 0ms) both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
   }
 }
 
-@media (max-width: 640px) {
-  .hero-portrait-wrapper {
-    width: 330px;
-    height: 330px;
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
   }
+}
 
-  .hero-portrait-frame {
-    width: 300px;
-    height: 300px;
-    border-radius: 20px;
-  }
-  
-  .hero-portrait-glow {
-    border-radius: 20px;
-  }
+/* Scroll cue: a short line that drips down */
+.hero-scroll-line {
+  position: relative;
+  width: 1px;
+  height: 40px;
+  overflow: hidden;
+  background: currentColor;
+  opacity: 0.25;
+}
 
-  .hero-dash-ring {
-    width: 324px;
-    height: 324px;
+.hero-scroll-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -40%;
+  width: 1px;
+  height: 40%;
+  background: var(--hero-accent);
+  animation: hero-scroll 2.2s ease-in-out infinite;
+}
+
+@keyframes hero-scroll {
+  to {
+    top: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-
-  .hero-bg-reveal,
-  .hero-line,
-  .hero-fade-down,
-  .hero-fade-left,
-  .hero-portrait-roll-in,
-  .hero-dash-ring,
-  .hero-dash-ring rect,
-  .hero-portrait-glow {
+  .hero-rise,
+  .hero-fade,
+  .hero-scroll-line::after {
     animation: none;
-    opacity: 1;
-    transform: none;
   }
 }
 
