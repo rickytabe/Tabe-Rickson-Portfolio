@@ -25,19 +25,23 @@ const about: NavLink = { label: "About", href: "/#about", sectionId: "about" };
 const books: NavLink = { label: "Books", href: "/books", match: BOOK_PATHS, dot: true };
 const events: NavLink = { label: "Events", href: "/events" };
 
-/** Desktop: five links. Home is the logo, Contact is the "Let's work" button. */
-const desktopLinks = [work, services, about, books, events];
+/**
+ * Desktop: five links. Home-page sections come first, in the order they scroll
+ * (About → Services → Work), so the underline moves left to right as you read down.
+ * Home is the logo, Contact is the "Let's work" button.
+ */
+const desktopLinks = [about, services, work, books, events];
 
-/** Phone menu: everything, in one list. */
+/** Phone menu: every home-page section in scroll order, then the other pages. */
 const mobileLinks: NavLink[] = [
-  work,
-  services,
   about,
+  services,
+  work,
   { label: "Experience", href: "/#experience", sectionId: "experience" },
+  { label: "Contact", href: "/#contact", sectionId: "contact" },
   books,
   events,
   { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/#contact", sectionId: "contact" },
 ];
 
 const SPY_SECTIONS = ["hero", "about", "services", "portfolio", "experience", "contact"];
