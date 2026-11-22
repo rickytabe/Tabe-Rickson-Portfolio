@@ -1,443 +1,274 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { ExternalLink, Plus, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, ArrowUpRight, Trophy } from "lucide-react";
 import portfolioData from "../../../portfolio-data.json";
-import { SECTION_STYLES } from "../utils/sectionStyles";
-import { AnimatedText } from "@/components/ui/animated-text";
 
-const GithubIcon = ({ size = 20, className }: { size?: number, className?: string }) => (
-  <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="currentColor">
+type Project = {
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  liveUrl?: string;
+  codeUrl?: string;
+  techIcons?: string[];
+  badge?: string;
+};
+
+const TECH_ICONS: Record<string, string> = {
+  "Next.js": "/nextdotjs.svg",
+  "Node.js": "/nodedotjs.svg",
+  Framer: "/framer.svg",
+  Firebase: "/firebase.svg",
+  Gemini: "/googlegemini.svg",
+  MongoDB: "/mongodb.svg",
+  HTML5: "/html5.svg",
+  JavaScript: "/javascript.svg",
+  React: "/react.svg",
+  TailwindCSS: "/tailwindcss.svg",
+  Supabase: "/supabase.svg",
+  OpenAI: "/openai.svg",
+  TypeScript: "/typescript.svg",
+  PostgreSQL: "/postgresql.svg",
+  Python: "/python.svg",
+};
+
+/** Every project uses Git and GitHub, so they say nothing. */
+const HIDDEN_TECH = new Set(["Git", "GitHub"]);
+
+const GithubIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
   </svg>
 );
 
-// Helper to generate a fallback SVG with an initial
-const FallbackIcon = ({ text, className }: { text: string, className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" strokeWidth="2" />
-    <text x="12" y="16" fontSize="12" fontWeight="bold" textAnchor="middle" fill="currentColor">{text}</text>
-  </svg>
-);
-
-const TechIcon = ({ name, className = "w-4 h-4" }: { name: string; className?: string }) => {
-  const iconMap: Record<string, string> = {
-    'Next.js': '/nextdotjs.svg',
-    'Node.js': '/nodedotjs.svg',
-    'Git': '/git.svg',
-    'GitHub': '/github.svg',
-    'Framer': '/framer.svg',
-    'Firebase': '/firebase.svg',
-    'Gemini': '/googlegemini.svg',
-    'MongoDB': '/mongodb.svg',
-    'HTML5': '/html5.svg',
-    'JavaScript': '/javascript.svg',
-    'React': '/react.svg',
-    'TailwindCSS': '/tailwindcss.svg',
-    'Supabase': '/supabase.svg',
-    'OpenAI': '/openai.svg',
-    'TypeScript': '/typescript.svg',
-    'PostgreSQL': '/postgresql.svg',
-    'Python': '/python.svg'
-  };
-
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (iconMap[name]) {
-    return (
-      <Image 
-        src={iconMap[name]} 
-        width={16} 
-        height={16} 
-        alt={name} 
-        className={`${className} opacity-80 ${mounted && resolvedTheme === "dark" ? "invert" : ""}`} 
-      />
-    );
-  }
-
-  switch (name) {
-    default:
-      return <FallbackIcon text={name.charAt(0)} className={className} />;
+const hostOf = (url?: string) => {
+  if (!url) return "";
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
   }
 };
 
-const cardAccents = [
-  "#39FF14", // neon green
-  "#00D4FF", // cyan
-  "#FF6B35", // orange
-  "#A855F7", // purple
-  "#FF3366", // rose
-  "#FACC15", // yellow
-  "#22D3EE", // sky
-  "#10B981", // emerald
-];
-
-
-const MobileProjectImage = ({ project, imageSrc }: { project: { name: string }, imageSrc: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
-
-  if (!imageSrc) return null;
-
+function BrowserFrame({ project, featured }: { project: Project; featured?: boolean }) {
   return (
-    <div ref={ref} className="block lg:hidden mt-8 relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden bg-card-bg border border-card-border group">
-      <motion.div style={{ y }} className="absolute -inset-8">
+    <div className="work-window">
+      <div className="flex items-center gap-3 px-3 h-8 border-b border-card-border bg-card-bg">
+        <span className="flex gap-1.5" aria-hidden="true">
+          <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
+          <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--hero-accent)] opacity-70" />
+        </span>
+        <span className="flex-1 min-w-0 truncate rounded-md bg-foreground/[0.06] px-2.5 py-0.5 font-mono text-[11px] text-foreground/55">
+          {hostOf(project.liveUrl) || `${project.slug}.app`}
+        </span>
+      </div>
+      <div className="relative aspect-[2/1] overflow-hidden bg-card-bg">
         <Image
-          src={imageSrc}
-          alt={project.name}
+          src={project.image}
+          alt={`${project.name} screenshot`}
           fill
-          sizes="(max-width: 1023px) calc(100vw - 4rem), 0px"
-          className="object-contain p-6 md:p-8 opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+          sizes={featured ? "(min-width: 1024px) 680px, 100vw" : "(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"}
+          className="work-shot object-cover object-top"
         />
-      </motion.div>
+      </div>
     </div>
   );
-};
+}
 
-const DesktopProjectDisplay = ({ activeProject, activeAccent, hoveredIdx }: { activeProject: { name: string, image: string } | undefined, activeAccent: string, hoveredIdx: number }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
-  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
-  
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
-  
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
+function TechList({ techs }: { techs: string[] }) {
+  const shown = techs.filter((t) => !HIDDEN_TECH.has(t));
+  if (!shown.length) return null;
   return (
-    <div className="hidden lg:block lg:col-span-5 relative perspective-[1200px]" ref={containerRef}>
-      <motion.div
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="sticky top-32 w-full aspect-square rounded-[2rem] overflow-hidden bg-card-bg border border-card-border shadow-2xl"
-      >
-        {/* Dynamic Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.05] transition-opacity duration-700"
-          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, var(--foreground) 1px, transparent 0)', backgroundSize: '24px 24px' }}
-        />
+    <ul className="flex flex-wrap gap-2" aria-label="Built with">
+      {shown.map((tech) => (
+        <li
+          key={tech}
+          className="inline-flex items-center gap-1.5 rounded-full border border-card-border px-2.5 py-1 font-mono text-[11px] text-foreground/70"
+        >
+          {TECH_ICONS[tech] && (
+            <Image src={TECH_ICONS[tech]} alt="" width={12} height={12} className="work-tech-icon opacity-80" />
+          )}
+          {tech}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
-        {/* Dynamic Gradient Background */}
-        <div 
-          className="absolute inset-0 opacity-30 transition-colors duration-700"
-          style={{ background: `radial-gradient(circle at center, ${activeAccent}40 0%, transparent 70%)` }}
-        />
-
-        {/* Crossfading Parallax Images */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={hoveredIdx}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            {activeProject && activeProject.image ? (
-              <motion.div style={{ y: parallaxY, translateZ: 50 }} className="relative w-full h-full drop-shadow-2xl">
-                <Image
-                  src={activeProject.image}
-                  alt={activeProject.name}
-                  fill
-                  sizes="(min-width: 1024px) 38vw, 0px"
-                  className="object-contain p-8"
-                />
-              </motion.div>
-            ) : (
-              <div className="flex items-center justify-center w-full h-full text-foreground/20 font-mono tracking-widest text-sm uppercase">
-                [ Visual Unavailable ]
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-        
-        {/* Corner Accent Glow */}
-        <div 
-          className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full blur-[80px] pointer-events-none transition-colors duration-700" 
-          style={{ backgroundColor: `${activeAccent}60` }} 
-        />
-        
-        {/* Shine effect */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 mix-blend-overlay opacity-30"
-          style={{
-            background: useTransform(
-              () => `radial-gradient(circle at ${(x.get() + 0.5) * 100}% ${(y.get() + 0.5) * 100}%, rgba(255,255,255,0.8), transparent 40%)`
-            )
-          }}
-        />
-      </motion.div>
+function ProjectLinks({ project }: { project: Project }) {
+  return (
+    <div className="relative z-10 flex items-center gap-1">
+      {project.liveUrl && (
+        <a
+          href={project.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open ${project.name} live site`}
+          className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold text-[var(--hero-accent)] hover:bg-foreground/5 transition-colors"
+        >
+          Live
+          <ArrowUpRight size={14} aria-hidden="true" />
+        </a>
+      )}
+      {project.codeUrl && (
+        <a
+          href={project.codeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`View ${project.name} source code on GitHub`}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-colors"
+        >
+          <GithubIcon />
+        </a>
+      )}
     </div>
   );
-};
+}
+
+function Hud() {
+  return (
+    <>
+      <span className="work-hud work-hud-tl" aria-hidden="true" />
+      <span className="work-hud work-hud-tr" aria-hidden="true" />
+      <span className="work-hud work-hud-bl" aria-hidden="true" />
+      <span className="work-hud work-hud-br" aria-hidden="true" />
+    </>
+  );
+}
+
+/** The card's title link is stretched over the whole card, so a click anywhere opens the project. */
+function TitleLink({ project, className }: { project: Project; className: string }) {
+  return (
+    <h3 className={className}>
+      <Link
+        href={`/projects/${project.slug}`}
+        className="after:absolute after:inset-0 after:rounded-[20px] after:content-[''] focus-visible:outline-none"
+      >
+        {project.name}
+      </Link>
+    </h3>
+  );
+}
 
 export default function ProjectsGallery() {
-  const projects = portfolioData.projects.slice(0, 4);
-  const [hoveredIdx, setHoveredIdx] = useState<number>(0);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const all = (portfolioData.projects as Project[]).slice(0, 4);
+  // The award-winning project leads; the rest keep their order.
+  const featured = all.find((p) => p.badge) ?? all[0];
+  const rest = all.filter((p) => p !== featured);
+  const ordered = [featured, ...rest];
+  const number = (p: Project) => String(ordered.indexOf(p) + 1).padStart(2, "0");
 
-  const handleMouseEnter = (idx: number) => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => {
-      setHoveredIdx(idx);
-    }, 150); // Delay allows fast scrolls to pass without triggering layout shifts
-  };
-
-  const activeProject = projects[hoveredIdx];
-  const activeAccent = cardAccents[hoveredIdx % cardAccents.length];
+  // Same props on server and client (no hydration mismatch); a short, small fade-up.
+  const reveal = (i: number) => ({
+    initial: { opacity: 0, y: 24 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-60px" },
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const, delay: i * 0.08 },
+  });
 
   return (
-    <section
-      id="portfolio"
-      className="relative border-t border-card-border bg-transparent py-32"
-    >
-      {/* Floating Code Symbol Background Illustration */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="sticky top-[30vh] mt-[15vh] md:mt-[20vh] left-0 right-0 mx-auto w-[250px] md:w-[400px] lg:w-[500px] opacity-[0.12] animate-float" style={{ animationDuration: '10s' }}>
-          <Image
-            src="/code-symbol.png"
-            alt="Decorative code symbol"
-            width={500}
-            height={500}
-            sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"
-            className="w-full h-auto object-contain block dark:hidden"
-          />
-          <Image
-            src="/code-symbol-light.png"
-            alt="Decorative code symbol"
-            width={500}
-            height={500}
-            sizes="(max-width: 767px) 250px, (max-width: 1023px) 400px, 500px"
-            className="w-full h-auto object-contain hidden dark:block"
-          />
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto w-full px-8 lg:px-16 relative z-10">
-        
-        {/* Backdrop text */}
-        <div className={SECTION_STYLES.backdropWrapper}>
-          <span className={SECTION_STYLES.backdropText}>PORTFOLIO</span>
-        </div>
-
+    <section id="portfolio" className="relative border-t border-card-border py-24 lg:py-32">
+      <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-16">
         {/* Header */}
-        <div className={SECTION_STYLES.headerBadgeWrapper}>
-          <span className={SECTION_STYLES.headerBadgeNumber}>04</span>
-          <span className={SECTION_STYLES.headerBadgeLine}></span>
-          <span className={SECTION_STYLES.headerBadgeText}>Portfolio</span>
-        </div>
-        
-        <div className="flex flex-col items-start mb-16">
-          <AnimatedText
-            as="h2"
-            text="Selected Works"
-            className="items-start mb-6"
-            textClassName={SECTION_STYLES.title}
-            underlineClassName="text-[#39FF14]"
-          />
-          <p className={SECTION_STYLES.description}>
-            Hover over each project to reveal its details. A minimalist collection of my best work.
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-12 lg:mb-16">
+          <div>
+            <p className="font-mono text-xs sm:text-sm tracking-[0.12em] uppercase text-foreground/65">
+              <span className="font-bold text-[var(--hero-accent)]">Selected work</span>
+              <span aria-hidden="true"> · </span>
+              {String(all.length).padStart(2, "0")} projects
+            </p>
+            <h2 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.02] text-foreground">
+              Things I&apos;ve shipped
+            </h2>
+          </div>
+          <p className="max-w-md font-inter text-base sm:text-lg leading-relaxed text-foreground/70">
+            Products I designed and built end to end, from the first idea to real people using them.
           </p>
         </div>
 
-        {/* Split Layout: List on Left, Image on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 relative mt-12">
-          
-          {/* Left Column: Interactive List */}
-          <div className="lg:col-span-7 flex flex-col z-20">
-            {projects.map((project, idx) => {
-              const accent = cardAccents[idx % cardAccents.length];
-              const isActive = hoveredIdx === idx;
-              const hasBadge = "badge" in project && project.badge;
-              const techIcons = "techIcons" in project ? project.techIcons as string[] : [];
-              
-              return (
-                <motion.div
-                  key={project.name}
-                  custom={idx}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                  variants={{
-                    hidden: () => ({
-                      opacity: 0,
-                      x: -60,
-                      y: 60,
-                      scale: 0.95
-                    }),
-                    visible: (i: number) => ({
-                      opacity: 1,
-                      x: 0,
-                      y: 0,
-                      scale: 1,
-                      transition: {
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 18,
-                        mass: 1,
-                        delay: i * 0.1
-                      }
-                    })
-                  }}
-                >
-                  <div
-                    onMouseEnter={() => handleMouseEnter(idx)}
-                    onClick={() => {
-                      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-                      setHoveredIdx(idx);
-                    }}
-                    className={`group relative flex flex-col py-8 border-b border-card-border transition-all duration-500 cursor-pointer ${
-                      isActive ? "pl-4 md:pl-8" : "hover:pl-2"
-                    }`}
-                    style={{ "--hover-accent": accent } as React.CSSProperties}
-                  >
-                    {/* Active Indicator Line */}
-                    <div 
-                      className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-full transition-all duration-500 ease-out ${isActive ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"}`}
-                      style={{ backgroundColor: accent }}
-                    />
-
-                    <div className={`flex items-center gap-4 mb-4 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-70"}`}>
-                      <span className="font-mono text-sm md:text-base font-bold tracking-widest transition-colors duration-500" style={{ color: isActive ? accent : "inherit" }}>
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                      {hasBadge && (
-                        <div 
-                          className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-mono font-bold tracking-widest uppercase transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
-                          style={{ borderColor: `${accent}40`, backgroundColor: `${accent}15`, color: accent }}
-                        >
-                          🏆 {project.badge}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-row items-center justify-between w-full gap-4">
-                      <h3 className="text-4xl md:text-5xl lg:text-6xl font-black font-sans tracking-tighter uppercase text-foreground">
-                        {project.name}
-                      </h3>
-                      <div className={`shrink-0 transition-transform duration-500 ${isActive ? 'rotate-45' : 'opacity-40 group-hover:opacity-100'}`} style={{ color: isActive ? accent : 'var(--foreground)' }}>
-                        <Plus size={32} strokeWidth={1.5} />
-                      </div>
-                    </div>
-
-                  {/* Expanded Content (Visible only when active or on mobile) */}
-                  <AnimatePresence>
-                    {(isActive) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-6 p-6 md:p-8 rounded-2xl bg-background/30 dark:bg-card-bg/40 backdrop-blur-[3px] border border-card-border/50 shadow-sm relative overflow-hidden">
-                          {/* Accent Gradient Glow inside the box */}
-                          <div 
-                            className="absolute top-0 left-0 w-full h-1 opacity-50"
-                            style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
-                          />
-                          
-                          {/* Tech Icons */}
-                          {techIcons.length > 0 && (
-                            <div className="flex items-center gap-3 mb-4 flex-wrap">
-                              {techIcons.map((tech) => (
-                                <div
-                                  key={tech}
-                                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card-bg border border-card-border/50 text-xs font-mono tracking-widest transition-colors hover:border-foreground/30 hover:bg-foreground/5"
-                                  title={tech}
-                                >
-                                  <TechIcon name={tech} className="w-4 h-4 text-foreground/70" />
-                                  <span className="text-foreground/70">{tech}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          <p className="text-foreground/60 font-inter text-sm md:text-base leading-relaxed max-w-lg mb-6">
-                            {project.description}
-                          </p>
-                          
-                          <div className="flex flex-wrap gap-4 md:gap-6 mt-4">
-                            <Link href={`/projects/${project.slug}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase transition-colors hover:opacity-70" style={{ color: accent }}>
-                              <ExternalLink size={16} /> See More
-                            </Link>
-                            {project.liveUrl && (
-                              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase transition-colors hover:opacity-70" style={{ color: accent }}>
-                                <ExternalLink size={16} /> Live Project
-                              </a>
-                            )}
-                            {project.codeUrl && (
-                              <a href={project.codeUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-xs md:text-sm font-mono font-bold tracking-widest uppercase text-foreground/50 hover:text-foreground transition-colors">
-                                <GithubIcon size={16} /> Source Code
-                              </a>
-                            )}
-                          </div>
-
-                          <MobileProjectImage 
-                            project={project} 
-                            imageSrc={project.image} 
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  </div>
-                </motion.div>
-              );
-            })}
+        {/* Featured project */}
+        <motion.article
+          {...reveal(0)}
+          className="work-card group grid gap-8 p-6 lg:grid-cols-12 lg:items-center lg:gap-10 lg:p-8"
+        >
+          <span className="work-card-grid" aria-hidden="true" />
+          <Hud />
+          <div className="lg:col-span-7">
+            <BrowserFrame project={featured} featured />
           </div>
+          <div className="flex flex-col gap-5 lg:col-span-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="font-mono text-sm font-bold text-[var(--hero-accent)]">{number(featured)}</span>
+              {featured.badge && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--hero-accent)]/40 bg-[var(--hero-accent-soft)] px-3 py-1 text-xs font-bold text-[var(--hero-accent)]">
+                  <Trophy size={13} aria-hidden="true" />
+                  {featured.badge}
+                </span>
+              )}
+            </div>
+            <TitleLink
+              project={featured}
+              className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
+            />
+            <p className="font-inter text-base leading-relaxed text-foreground/70 line-clamp-4 lg:line-clamp-none">
+              {featured.description}
+            </p>
+            <TechList techs={featured.techIcons ?? []} />
+            <div className="flex items-center justify-between border-t border-card-border pt-4">
+              <span className="inline-flex items-center gap-2 text-sm font-bold text-foreground group-hover:text-[var(--hero-accent)] transition-colors">
+                Case study
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </span>
+              <ProjectLinks project={featured} />
+            </div>
+          </div>
+        </motion.article>
 
-          {/* Right Column: Sticky Image Container (Desktop Only) with 3D Tilt & Parallax */}
-          <DesktopProjectDisplay 
-            activeProject={activeProject} 
-            activeAccent={activeAccent} 
-            hoveredIdx={hoveredIdx} 
-          />
-          
+        {/* The rest */}
+        <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {rest.map((project, i) => (
+            <motion.article
+              key={project.slug}
+              {...reveal(i + 1)}
+              className="work-card group flex flex-col gap-5 p-6"
+            >
+              <span className="work-card-grid" aria-hidden="true" />
+              <Hud />
+              <BrowserFrame project={project} />
+              <div className="flex flex-1 flex-col gap-3">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-xs font-bold text-[var(--hero-accent)]">{number(project)}</span>
+                  <TitleLink project={project} className="text-2xl font-bold tracking-tight text-foreground" />
+                </div>
+                <p className="font-inter text-sm leading-relaxed text-foreground/70 line-clamp-3">
+                  {project.description}
+                </p>
+                <div className="mt-auto pt-2">
+                  <TechList techs={project.techIcons ?? []} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-t border-card-border pt-3">
+                <span className="inline-flex items-center gap-2 text-sm font-bold text-foreground group-hover:text-[var(--hero-accent)] transition-colors">
+                  Case study
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </span>
+                <ProjectLinks project={project} />
+              </div>
+            </motion.article>
+          ))}
         </div>
 
-        {/* View All Projects Button */}
-        <div className="flex justify-center mt-20">
-          <Link href="/projects" className="group relative py-4 px-8 text-xs md:text-sm font-mono font-bold tracking-[0.2em] uppercase text-foreground border border-foreground/30 hover:border-[#39FF14]/50 transition-all duration-300 overflow-hidden bg-card-bg/50 backdrop-blur-sm shadow-lg">
-            <div className="absolute inset-0 bg-[#39FF14]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
-            <span className="relative z-10 flex items-center gap-3 group-hover:text-[#39FF14] transition-colors duration-300">
-              See All Projects
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </span>
+        <div className="mt-12 flex justify-center">
+          <Link
+            href="/projects"
+            className="group inline-flex h-12 items-center gap-2 px-7 text-sm font-bold text-foreground border border-foreground/25 hover:border-foreground/70 hover:bg-foreground/5 transition-colors"
+          >
+            See all projects
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
         </div>
       </div>
