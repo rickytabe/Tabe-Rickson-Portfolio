@@ -1,10 +1,10 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import { useRef, useState, useEffect } from "react";
+import { MotionConfig, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
-import { AnimatedText } from "@/components/ui/animated-text";
 
 const timelineData = [
   {
@@ -63,279 +63,186 @@ const timelineData = [
   }
 ];
 
-/* ── Single timeline entry ── */
-function TimelineEntry({ item, index }: { item: typeof timelineData[0]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [currentImgIndex, setCurrentImgIndex] = useState(0);
+type Entry = (typeof timelineData)[number];
 
-  const images = item.image ? item.image.split(',').map(s => s.trim()).filter(Boolean) : [];
+const photosOf = (item: Entry) =>
+  item.image ? item.image.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentImgIndex(prev => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [images.length]);
+// Critically damped (no overshoot): content arriving on scroll isn't a flick.
+const SPRING = { type: "spring", bounce: 0, duration: 0.5 } as const;
 
-  const isEven = index % 2 === 0;
+function JourneyCard({ item, index }: { item: Entry; index: number }) {
+  const photos = photosOf(item);
+  const [shown, setShown] = useState(0);
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 60 }}
+    <motion.li
+      className="journey-item"
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative"
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ ...SPRING, delay: Math.min(index, 3) * 0.05 }}
     >
-      
-      {/* ── Desktop layout (md+) ── */}
-      <div className={`hidden md:grid md:grid-cols-[1fr_auto_1fr] gap-0 items-start`}>
-
-        {/* Left column */}
-        <div className={`flex ${isEven ? 'justify-end pr-12' : 'justify-start pl-12'} ${isEven ? 'order-1' : 'order-3'}`}>
-          <div className={`max-w-md transition-transform duration-500 group-hover:-translate-y-2 ${isEven ? 'text-right' : 'text-left'}`}>
-            {/* Year chip */}
-            <motion.span
-              className="inline-block font-mono text-xs tracking-[0.3em] uppercase px-3 py-1 mb-5 border border-[#39FF14]/30 text-[#39FF14] bg-black"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              {item.year}
-            </motion.span>
-
-            {/* Title */}
-            <h3 className="text-2xl lg:text-3xl font-bold font-sans text-foreground mb-4 tracking-tight leading-tight group-hover:text-[#39FF14] transition-colors duration-500 neon-text">
-              {item.title}
-            </h3>
-
-            {/* Accent line */}
-            <div className={`h-[2px] bg-linear-to-r ${isEven ? 'from-transparent via-[#39FF14]/40 to-[#39FF14]' : 'from-[#39FF14] via-[#39FF14]/40 to-transparent'} mb-5 w-0 group-hover:w-full transition-all duration-700 ease-out`} />
-
-            {/* Description */}
-            <p className="text-foreground/55 font-inter text-sm leading-relaxed">
-              {item.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Center dot + connector */}
-        <div className="order-2 flex flex-col items-center relative z-10">
-          {/* The dot */}
-          <div className="relative">
-            <div className={`w-4 h-4 rounded-full border-[3px] transition-all duration-500 ${isHovered ? 'border-[#39FF14] bg-[#39FF14] shadow-[0_0_20px_rgba(57,255,20,0.6)]' : 'border-[#39FF14]/50 bg-background'}`} />
-            {/* Ping animation on hover */}
-            {isHovered && (
-              <div className="absolute inset-0 rounded-full border-2 border-[#39FF14] animate-ping opacity-40" />
-            )}
-          </div>
-        </div>
-
-        {/* Right column — image reveal */}
-        <div className={`flex ${isEven ? 'justify-start pl-12' : 'justify-end pr-12'} ${isEven ? 'order-3' : 'order-1'}`}>
-          <div className={`relative w-full max-w-sm aspect-[4/3] overflow-hidden ${!isEven ? 'text-right' : ''}`}>
-            {images.length > 0 ? (
-              <div className="relative w-full h-full overflow-hidden group/img">
-                <div className="absolute inset-0 w-full h-full transition-transform duration-700 scale-100 group-hover:scale-110">
-                  {images.map((src, i) => (
-                    <Image
-                      key={i}
-                      src={src}
-                      alt={`Rickson ${item.year} - ${i + 1}`}
-                      fill
-                      sizes="384px"
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                        i === currentImgIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                      }`}
-                    />
-                  ))}
-                </div>
-                {/* Corner accent */}
-                <div className={`absolute z-20 ${isEven ? 'top-0 left-0' : 'top-0 right-0'} w-8 h-8 pointer-events-none`}>
-                  <div className={`absolute top-0 ${isEven ? 'left-0' : 'right-0'} w-full h-[2px] bg-[#39FF14] opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                  <div className={`absolute top-0 ${isEven ? 'left-0' : 'right-0'} w-[2px] h-full bg-[#39FF14] opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                </div>
-              </div>
-            ) : (
-              /* No-image placeholder with styled treatment */
-              <div className="w-full h-full flex items-center justify-center border border-dashed border-card-border bg-card-bg/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(57,255,20,0.03)_0%,transparent_70%)]" />
-                <span className="font-mono text-[11px] tracking-[0.3em] text-foreground/15 uppercase">No Visual</span>
-              </div>
-            )}
-          </div>
-
-          {/* For the non-even side that shows text instead of image, 
-              we need to show text on the right. Handled by the swap of order above. */}
-        </div>
+      <div className="journey-track" aria-hidden="true">
+        <span className="journey-dot" />
+        <span className="journey-year">{item.year}</span>
       </div>
 
-      {/* ── Mobile layout (below md) ── */}
-      <div className="md:hidden relative pl-10">
-        {/* Left dot */}
-        <div className="absolute left-0 top-1 -translate-x-1/2 z-10">
-          <div className={`w-3.5 h-3.5 rounded-full border-[3px] transition-all duration-500 ${isHovered ? 'border-[#39FF14] bg-[#39FF14] shadow-[0_0_14px_rgba(57,255,20,0.5)]' : 'border-[#39FF14]/50 bg-background'}`} />
-        </div>
-
-        {/* Year */}
-        <span className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase px-2 py-0.5 mb-3 border border-[#39FF14]/30 text-[#39FF14] bg-black">
-          {item.year}
-        </span>
-
-        {/* Title */}
-        <h3 className="text-xl font-bold font-sans text-foreground mb-3 tracking-tight leading-tight group-hover:text-[#39FF14] transition-colors duration-500 neon-text">
-          {item.title}
-        </h3>
-
-        {/* Mobile image reveal */}
-        {images.length > 0 && (
-          <div className="relative w-full aspect-video overflow-hidden mb-5 rounded-sm border border-card-border/50 group/img">
-            <div className="absolute inset-0 w-full h-full transition-transform duration-700 scale-100 group-hover:scale-105">
-              {images.map((src, i) => (
-                <Image
-                  key={i}
-                  src={src}
-                  alt={`Rickson ${item.year} - ${i + 1}`}
-                  fill
-                  sizes="(max-width: 767px) calc(100vw - 5rem), 0px"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                    i === currentImgIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                />
-              ))}
-            </div>
+      <article className="journey-card" aria-label={`${item.year}: ${item.title}`}>
+        {photos.length > 0 && (
+          <div className="journey-photo bg-card-bg">
+            {photos.map((src, i) => (
+              <Image
+                key={src}
+                src={src}
+                alt={photos.length > 1 ? `${item.title}, photo ${i + 1} of ${photos.length}` : item.title}
+                fill
+                sizes="(max-width: 640px) 82vw, 360px"
+                className={`object-cover ${i === shown ? "opacity-100" : "opacity-0"}`}
+                aria-hidden={i !== shown}
+              />
+            ))}
+            {photos.length > 1 && (
+              <div className="journey-photo-dots">
+                {photos.map((src, i) => (
+                  <button
+                    key={src}
+                    type="button"
+                    className="journey-photo-dot"
+                    aria-label={`Show photo ${i + 1} of ${photos.length}`}
+                    aria-pressed={i === shown}
+                    onPointerDown={() => setShown(i)}
+                    onClick={() => setShown(i)}
+                  >
+                    <span />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Description */}
-        <p className="text-foreground/55 font-inter text-sm leading-relaxed transition-transform duration-500 group-hover:-translate-y-1">
-          {item.description}
-        </p>
-      </div>
-    </motion.div>
+        <div className="flex flex-1 flex-col px-6 pt-5 pb-6">
+          <h3 className="journey-title text-foreground">{item.title}</h3>
+          <p className="mt-3 font-inter text-[15px] leading-relaxed text-foreground/75">{item.description}</p>
+        </div>
+      </article>
+    </motion.li>
   );
 }
 
 export default function Experience() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start center", "end end"]
-  });
+  const scrollerRef = useRef<HTMLOListElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
-  // Grow the vertical line based on scroll
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const update = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setProgress(max > 0 ? el.scrollLeft / max : 1);
+    setAtStart(el.scrollLeft <= 4);
+    setAtEnd(el.scrollLeft >= max - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const frame = requestAnimationFrame(update);
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      cancelAnimationFrame(frame);
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [update]);
+
+  // Move by one card; the snap points finish the landing.
+  const step = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    const card = el?.querySelector<HTMLElement>(".journey-item");
+    if (!el || !card) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollBy({ left: dir * (card.offsetWidth + 20), behavior: reduce ? "auto" : "smooth" });
+  };
 
   return (
-    <section
-      id="experience"
-      ref={containerRef}
-      className="min-h-screen py-24 px-8 lg:px-16 border-t border-card-border relative bg-transparent overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto w-full relative z-10">
-
-        {/* ── Header Section ── */}
-        <div className="mb-24 relative">
-          <div className={SECTION_STYLES.backdropWrapper}>
-            <span className={SECTION_STYLES.backdropText}>JOURNEY</span>
-          </div>
-
-          <div className={SECTION_STYLES.headerBadgeWrapper}>
-            <span className={SECTION_STYLES.headerBadgeNumber}>05</span>
-            <span className={SECTION_STYLES.headerBadgeLine} />
-            <span className={SECTION_STYLES.headerBadgeText}>
-              The Story So Far
-            </span>
-          </div>
-
-          <AnimatedText
-            as="h2"
-            text="Experience & Timeline"
-            className="items-start mb-6"
-            textClassName={SECTION_STYLES.title}
-            underlineClassName="text-[#39FF14]"
-          />
-          <p className={SECTION_STYLES.description}>
-            The path hasn&apos;t always been clean, but it&apos;s been real. Here is the timeline of my journey.
-          </p>
-
-          {/* Decorative stats row */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex gap-12 mt-10 font-mono text-xs tracking-widest"
-          >
-            <div>
-              <span className="block text-3xl font-bold text-foreground mb-1">4+</span>
-              <span className="text-foreground/40 uppercase">Years Coding</span>
+    <MotionConfig reducedMotion="user">
+      <section
+        id="experience"
+        className="relative overflow-x-clip border-t border-card-border px-8 lg:px-16 py-24 lg:py-32"
+      >
+        <div className="max-w-7xl mx-auto w-full">
+          <header className="relative mb-12 lg:mb-14">
+            <div className={SECTION_STYLES.backdropWrapper} aria-hidden="true">
+              <span className={SECTION_STYLES.backdropText}>JOURNEY</span>
             </div>
-            <div>
-              <span className="block text-3xl font-bold text-foreground mb-1">15+</span>
-              <span className="text-foreground/40 uppercase">Projects</span>
+
+            <div className="relative z-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div className="max-w-3xl">
+                <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">The story so far</p>
+                <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
+                  How I got here.
+                </h2>
+                <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
+                  The path hasn&apos;t always been clean, but it&apos;s been real. Swipe through the years.
+                </p>
+              </div>
+
+              <dl className="flex gap-10">
+                <div className="flex flex-col">
+                  <dt className="order-2 mt-1 text-[13px] text-foreground/60">years coding</dt>
+                  <dd className="text-4xl font-bold tracking-[-0.03em] text-foreground">4+</dd>
+                </div>
+                <div className="flex flex-col">
+                  <dt className="order-2 mt-1 text-[13px] text-foreground/60">projects</dt>
+                  <dd className="text-4xl font-bold tracking-[-0.03em] text-foreground">15+</dd>
+                </div>
+              </dl>
             </div>
-            <div>
-              <span className="block text-3xl font-bold text-foreground mb-1">∞</span>
-              <span className="text-foreground/40 uppercase">Curiosity</span>
-            </div>
-          </motion.div>
+          </header>
         </div>
 
-        {/* ── Timeline ── */}
-        <div className="relative">
+        {/* Full-bleed carousel whose first card lines up with the content column */}
+        <ol
+          ref={scrollerRef}
+          className="journey-scroller"
+          tabIndex={0}
+          aria-label="Timeline from 2022 to today. Scroll sideways or use the arrow keys."
+        >
+          {timelineData.map((item, index) => (
+            <JourneyCard key={item.title} item={item} index={index} />
+          ))}
+        </ol>
 
-          {/* Desktop: centre vertical line */}
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2">
-            {/* Background track */}
-            <div className="w-[1px] h-full bg-card-border" />
-            {/* Animated fill */}
-            <motion.div
-              className="absolute top-0 left-0 w-[1px] bg-linear-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
-              style={{ height: lineHeight }}
-            />
+        <div className="max-w-7xl mx-auto w-full mt-8 flex items-center gap-6">
+          <div className="journey-progress flex-1" aria-hidden="true">
+            <span style={{ transform: `scaleX(${Math.max(0.08, progress)})` }} />
           </div>
-
-          {/* Mobile: left vertical line */}
-          <div className="md:hidden absolute left-0 top-0 bottom-0">
-            <div className="w-[1px] h-full bg-card-border" />
-            <motion.div
-              className="absolute top-0 left-0 w-[1px] bg-linear-to-b from-[#39FF14] via-[#39FF14]/60 to-[#39FF14]/10 origin-top"
-              style={{ height: lineHeight }}
-            />
+          <div className="flex gap-3">
+            <button
+              type="button"
+              className="journey-nav"
+              onClick={() => step(-1)}
+              disabled={atStart}
+              aria-label="Previous"
+            >
+              <ChevronLeft size={20} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="journey-nav"
+              onClick={() => step(1)}
+              disabled={atEnd}
+              aria-label="Next"
+            >
+              <ChevronRight size={20} aria-hidden="true" />
+            </button>
           </div>
-
-          {/* Entries */}
-          <div className="space-y-20 md:space-y-28">
-            {timelineData.map((item, index) => (
-              <TimelineEntry key={index} item={item} index={index} />
-            ))}
-          </div>
-
-          {/* End marker */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="flex justify-center mt-16"
-          >
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-3 h-3 rotate-45 border-2 border-[#39FF14] bg-[#39FF14]/20" />
-              <span className="font-mono text-[10px] tracking-[0.4em] text-foreground/30 uppercase">
-                More to come
-              </span>
-            </div>
-          </motion.div>
         </div>
-
-      </div>
-    </section>
+      </section>
+    </MotionConfig>
   );
 }
