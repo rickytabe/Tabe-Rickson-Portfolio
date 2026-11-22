@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MotionConfig, motion } from "framer-motion";
 import portfolioData from "../../../portfolio-data.json";
+import { SECTION_STYLES } from "../utils/sectionStyles";
 
 type Project = {
   name: string;
@@ -46,7 +47,7 @@ function Tile({ project, index }: { project: Project; index: number }) {
       className="h-full"
     >
       <article className="work-tile group h-full">
-        <div className="px-7 pt-8 pb-7 sm:px-10 sm:pt-10">
+        <div className="px-6 pt-7 pb-7 sm:px-10 sm:pt-10">
           {techs.length > 0 && (
             <p className="text-[13px] tracking-[0.01em] text-foreground/55">{techs.join(" · ")}</p>
           )}
@@ -65,7 +66,7 @@ function Tile({ project, index }: { project: Project; index: number }) {
             {TAGLINES[project.slug] ?? project.description}
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[15px]">
+          <div className="mt-6 flex flex-wrap items-center gap-x-3.5 sm:gap-x-6 gap-y-2 text-[15px]">
             <span className="work-link" aria-hidden="true">
               Case study ›
             </span>
@@ -118,16 +119,24 @@ export default function ProjectsGallery() {
   return (
     // reducedMotion="user": with reduced motion on, tiles fade in without moving.
     <MotionConfig reducedMotion="user">
-      <section id="portfolio" className="relative border-t border-card-border py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-16">
-          <header className="mb-12 lg:mb-16 max-w-3xl">
-            <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">Selected work</p>
-            <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
-              Things I&apos;ve shipped.
-            </h2>
-            <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
-              Products I designed and built end to end, from the first idea to real people using them.
-            </p>
+      <section id="portfolio" className="relative overflow-x-clip border-t border-card-border px-8 lg:px-16 py-24 lg:py-32">
+        {/* Same frame as the other sections: padding on the section, a full max-w-7xl container */}
+        <div className="max-w-7xl mx-auto w-full">
+          <header className="relative mb-12 lg:mb-16">
+            {/* Backdrop text, shared with the other sections (ABOUT-ME, JOURNEY) */}
+            <div className={SECTION_STYLES.backdropWrapper} aria-hidden="true">
+              <span className={SECTION_STYLES.backdropText}>PORTFOLIO</span>
+            </div>
+
+            <div className="relative z-10 max-w-3xl">
+              <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">Selected work</p>
+              <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
+                Things I&apos;ve shipped.
+              </h2>
+              <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
+                Products I designed and built end to end, from the first idea to real people using them.
+              </p>
+            </div>
           </header>
 
           {/* Liquid-glass distortion for the tiles' backdrop (used by .work-tile where supported) */}
