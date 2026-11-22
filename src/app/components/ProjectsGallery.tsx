@@ -61,7 +61,7 @@ function Tile({ project, index }: { project: Project; index: number }) {
             </Link>
           </h3>
 
-          <p className="work-tagline mt-3 max-w-md text-foreground/70">
+          <p className="work-tagline mt-3 max-w-md text-foreground/80">
             {TAGLINES[project.slug] ?? project.description}
           </p>
 
@@ -94,13 +94,15 @@ function Tile({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
 
-        <div className="mt-auto px-7 sm:px-10">
-          <div className="work-shot-frame aspect-[2/1] bg-background">
+        {/* The screenshot drawer: slides further out of the tile on hover */}
+        <div className="work-drawer">
+          <span className="work-drawer-handle" aria-hidden="true" />
+          <div className="work-drawer-shot aspect-[2/1] bg-background">
             <Image
               src={project.image}
               alt={`${project.name} home page`}
               fill
-              sizes="(min-width: 1280px) 560px, (min-width: 768px) 45vw, 92vw"
+              sizes="(min-width: 1280px) 600px, (min-width: 768px) 48vw, 95vw"
               className="object-cover object-top"
             />
           </div>
@@ -127,6 +129,15 @@ export default function ProjectsGallery() {
               Products I designed and built end to end, from the first idea to real people using them.
             </p>
           </header>
+
+          {/* Liquid-glass distortion for the tiles' backdrop (used by .work-tile where supported) */}
+          <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
+            <filter id="work-glass" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="7" result="noise" />
+              <feGaussianBlur in="noise" stdDeviation="2" result="soft" />
+              <feDisplacementMap in="SourceGraphic" in2="soft" scale="38" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </svg>
 
           <div className="grid gap-5 md:grid-cols-2">
             {projects.map((project, i) => (
