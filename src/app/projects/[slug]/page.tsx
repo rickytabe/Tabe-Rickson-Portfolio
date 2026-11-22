@@ -107,11 +107,6 @@ export default async function ProjectPage({ params }: Props) {
                 <h1 className="text-4xl md:text-6xl font-black font-sans tracking-tighter uppercase text-foreground">
                   {project.name}
                 </h1>
-                {"badge" in project && project.badge && (
-                  <span className="px-3 py-1 border border-[#39FF14]/40 bg-[#39FF14]/10 text-[#39FF14] text-xs uppercase tracking-wider rounded-full font-mono">
-                    🏆 {project.badge}
-                  </span>
-                )}
               </div>
               
               <p className="text-xl text-foreground/60 font-light font-inter max-w-3xl leading-relaxed">
