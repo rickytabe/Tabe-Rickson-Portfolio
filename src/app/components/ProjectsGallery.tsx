@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Trophy } from "lucide-react";
-import type { PointerEvent } from "react";
 import portfolioData from "../../../portfolio-data.json";
 
 type Project = {
@@ -52,13 +51,6 @@ const hostOf = (url?: string) => {
   } catch {
     return "";
   }
-};
-
-/** Spotlight position for the card's CSS (`--mx`, `--my`). */
-const trackPointer = (e: PointerEvent<HTMLElement>) => {
-  const r = e.currentTarget.getBoundingClientRect();
-  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
-  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
 };
 
 function BrowserFrame({ project, featured }: { project: Project; featured?: boolean }) {
@@ -201,7 +193,6 @@ export default function ProjectsGallery() {
         {/* Featured project */}
         <motion.article
           {...reveal(0)}
-          onPointerMove={trackPointer}
           className="work-card group grid gap-8 p-6 lg:grid-cols-12 lg:items-center lg:gap-10 lg:p-8"
         >
           <span className="work-card-grid" aria-hidden="true" />
@@ -243,7 +234,6 @@ export default function ProjectsGallery() {
             <motion.article
               key={project.slug}
               {...reveal(i + 1)}
-              onPointerMove={trackPointer}
               className="work-card group flex flex-col gap-5 p-6"
             >
               <span className="work-card-grid" aria-hidden="true" />

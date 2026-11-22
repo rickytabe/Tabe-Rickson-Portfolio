@@ -219,27 +219,29 @@ body {
 
 /* ==========================================================================
    SELECTED WORK — "mission control" cards
-   Spotlight follows the cursor (--mx/--my set from JS), a green line traces
-   the border on hover, HUD brackets sit in the corners. All CSS.
+   Restrained on purpose: no glow, no looping animation. Hover answers with a
+   tinted border and a small lift of the screenshot; press gives instant
+   feedback; keyboard focus gets a clear ring.
    ========================================================================== */
-@property --work-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
 .work-card {
-  --mx: 50%;
-  --my: 50%;
   position: relative;
   isolation: isolate;
   border-radius: 20px;
   border: 1px solid var(--card-border);
   background: color-mix(in srgb, var(--card-bg) 85%, transparent);
-  transition: border-color 300ms ease, transform 300ms ease;
+  transition: border-color 300ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Faint grid texture */
+.work-card:hover {
+  border-color: color-mix(in srgb, var(--hero-accent) 30%, var(--card-border));
+}
+
+.work-card:has(a:focus-visible) {
+  outline: 2px solid var(--hero-accent);
+  outline-offset: 3px;
+}
+
+/* Faint, static grid texture */
 .work-card-grid {
   position: absolute;
   inset: 0;
@@ -247,62 +249,10 @@ body {
   border-radius: inherit;
   pointer-events: none;
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse at 70% 0%, #000 0%, transparent 70%);
-}
-
-/* Spotlight that follows the cursor */
-.work-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(420px circle at var(--mx) var(--my), var(--hero-accent-soft), transparent 65%);
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
-
-/* Border trace */
-.work-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: conic-gradient(from var(--work-angle), transparent 0deg 250deg, var(--hero-accent) 320deg, transparent 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
-
-.work-card:hover,
-.work-card:focus-within {
-  border-color: color-mix(in srgb, var(--hero-accent) 35%, transparent);
-}
-
-.work-card:hover::after,
-.work-card:focus-within::after,
-.work-card:hover::before,
-.work-card:focus-within::before {
-  opacity: 1;
-}
-
-.work-card:hover::before,
-.work-card:focus-within::before {
-  animation: work-trace 3.2s linear infinite;
-}
-
-@keyframes work-trace {
-  to {
-    --work-angle: 360deg;
-  }
 }
 
 /* HUD corner brackets */
@@ -312,19 +262,15 @@ body {
   height: 12px;
   pointer-events: none;
   border-color: var(--hero-accent);
-  opacity: 0.55;
-  transition: opacity 300ms ease, transform 300ms ease;
+  opacity: 0.35;
+  transition: opacity 300ms cubic-bezier(0.2, 0, 0, 1);
 }
 .work-hud-tl { top: 8px; left: 8px; border-top: 1.5px solid; border-left: 1.5px solid; border-top-left-radius: 6px; }
 .work-hud-tr { top: 8px; right: 8px; border-top: 1.5px solid; border-right: 1.5px solid; border-top-right-radius: 6px; }
 .work-hud-bl { bottom: 8px; left: 8px; border-bottom: 1.5px solid; border-left: 1.5px solid; border-bottom-left-radius: 6px; }
 .work-hud-br { bottom: 8px; right: 8px; border-bottom: 1.5px solid; border-right: 1.5px solid; border-bottom-right-radius: 6px; }
 
-.work-card:hover .work-hud { opacity: 1; }
-.work-card:hover .work-hud-tl { transform: translate(-2px, -2px); }
-.work-card:hover .work-hud-tr { transform: translate(2px, -2px); }
-.work-card:hover .work-hud-bl { transform: translate(-2px, 2px); }
-.work-card:hover .work-hud-br { transform: translate(2px, 2px); }
+.work-card:hover .work-hud { opacity: 0.8; }
 
 /* Browser-window frame around each screenshot */
 .work-window {
@@ -332,21 +278,27 @@ body {
   border-radius: 12px;
   border: 1px solid var(--card-border);
   background: var(--background);
-  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.5);
-  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 500ms ease;
+  box-shadow: 0 12px 28px -20px rgba(0, 0, 0, 0.45);
+  transition: transform 300ms cubic-bezier(0.2, 0, 0, 1), box-shadow 300ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .work-card:hover .work-window {
-  transform: translateY(-4px);
-  box-shadow: 0 28px 50px -24px rgba(0, 0, 0, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 32px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* Press: instant, small */
+.work-card:active .work-window {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 100ms;
 }
 
 .work-shot {
-  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 400ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .work-card:hover .work-shot {
-  transform: scale(1.03);
+  transform: scale(1.015);
 }
 
 /* Tech logos are black SVGs: flip them in dark mode */
@@ -355,18 +307,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .work-card:hover::before,
-  .work-card:focus-within::before {
-    animation: none;
-  }
   .work-window,
-  .work-shot,
-  .work-hud {
+  .work-shot {
     transition: none;
   }
   .work-card:hover .work-window,
-  .work-card:hover .work-shot,
-  .work-card:hover .work-hud {
+  .work-card:active .work-window,
+  .work-card:hover .work-shot {
     transform: none;
   }
 }
