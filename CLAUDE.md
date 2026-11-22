@@ -7,6 +7,7 @@ Next.js 16 App Router (Turbopack), deployed on Vercel from `master`. Content for
 
 - Every change goes on its own branch and ships as a pull request against `master`; Vercel builds a preview for each PR.
 - Before pushing to a branch, check its PR has not already merged. If it has, start a fresh branch from `origin/master`.
+- For any UI or motion work, use the `apple-design` skill (`.claude/skills/apple-design/SKILL.md`): restraint over decoration, no glow or looping animation for its own sake, instant press feedback, size-specific type tracking, and reduced-motion fallbacks.
 - Run `npx tsc --noEmit` and `npx eslint` on the changed files before committing.
 - Keep the tone of anything students see warm and voluntary. CSC207 Made Easy and CSC207 Tutorial Sheet Solutions are fully free: support is always optional, no guilt, no paywall. CSC211 Tutorial Sheet Solutions is the one paid book (see below), and even there every question and hint is free, the first 15 solutions are free, and inviting classmates unlocks the rest at no cost.
 - **Every payment goes through Fapshi** (tips and unlocks). Never show a USSD dial code (`*126*…#`) or ask for payment screenshots: Tabe asked for that to be removed everywhere.
