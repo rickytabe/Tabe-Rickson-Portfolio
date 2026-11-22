@@ -39,11 +39,6 @@ export default function ProjectsIndex() {
             <div className="p-6 flex flex-col flex-grow">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-2xl font-bold font-sans text-foreground">{project.name}</h2>
-                {"badge" in project && project.badge && (
-                  <span className="px-2 py-0.5 border border-[#39FF14]/40 bg-[#39FF14]/10 text-[#39FF14] text-[10px] uppercase tracking-wider rounded-full font-mono whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]" title={project.badge}>
-                    Award
-                  </span>
-                )}
               </div>
               <p className="text-sm text-foreground/60 font-inter line-clamp-3 mb-6 flex-grow">
                 {project.description}
