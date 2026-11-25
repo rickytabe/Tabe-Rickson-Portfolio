@@ -16,6 +16,7 @@ import { BOOKS } from "@/lib/books";
 import { LOCKED_COUNT, SOLVED_COUNT, bookHtml } from "@/content/csc211/render";
 import { CSC207T_PDF, CSC207T_SOLVED_COUNT, csc207tBookHtml } from "@/content/csc207t/render";
 import { CSC207TEST1_COUNT, CSC207TEST1_PDF, csc207test1BookHtml } from "@/content/csc207test1/render";
+import { CSC207CA24_COUNT, CSC207CA24_PDF, csc207ca24BookHtml } from "@/content/csc207ca24/render";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -81,9 +82,9 @@ const books: Book[] = [
   },
   {
     title: BOOKS.csc207test1.title,
-    subtitle: "CA 2024: every question solved",
+    subtitle: "CA 2025: every question solved",
     description:
-      "Every question on the CSC207 Introduction to Algorithms CA 2024 paper, solved: ordered set initSet and contains, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Free to read.",
+      "Every question on the CSC207 Introduction to Algorithms CA 2025 paper, solved: ordered set initSet and contains, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Free to read.",
     href: BOOKS.csc207test1.path,
     pdf: CSC207TEST1_PDF,
     cover: `${BOOKS.csc207test1.path}/opengraph-image`,
@@ -93,6 +94,21 @@ const books: Book[] = [
     avatar: BOOK_AUTHOR_AVATAR,
     readTime: formatReadTime(readingMinutes(csc207test1BookHtml())),
     topics: ["Pseudocode", "Flowchart", "Tracing output", "Ordered set", "Palindrome"],
+  },
+  {
+    title: BOOKS.csc207ca24.title,
+    subtitle: "CA 2024: every question solved",
+    description:
+      "Every question on the CSC207 Introduction to Algorithms CA 2024 paper (20/11/2024), solved: reverseList, arrays versus files, exact-output tracing with continue and break, and the auto teller algorithm with its flowchart. Free to read.",
+    href: BOOKS.csc207ca24.path,
+    pdf: CSC207CA24_PDF,
+    cover: `${BOOKS.csc207ca24.path}/opengraph-image`,
+    facts: [`${CSC207CA24_COUNT} QUESTIONS`, "9-PAGE PDF"],
+    price: "FREE",
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: formatReadTime(readingMinutes(csc207ca24BookHtml())),
+    topics: ["Pseudocode", "Flowchart", "Tracing output", "Arrays", "ATM"],
   },
 ];
 

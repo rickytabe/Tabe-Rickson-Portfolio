@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/algorithms-made-easy-csc207',
     '/csc211-tutorial-solutions',
     '/csc207-tutorial-solutions',
+    '/csc207-ca-2025-solutions',
     '/csc207-ca-2024-solutions',
   ].map((route) => ({
     url: `${baseUrl}${route}`,

@@ -1,17 +1,17 @@
 // Algo's questions for CSC207 CA 2024 (public: no answers here).
-// Answers and explanations live server-side in src/lib/quiz/answers-csc207test1.ts. The correct option
+// Answers and explanations live server-side in src/lib/quiz/answers-csc207ca24.ts. The correct option
 // is always listed first there; the quiz shuffles the options. Keep ids stable: stats use them.
 import type { QuizQuestion } from "@/app/algorithms-made-easy-csc207/quiz-questions";
 
-export const CSC207TEST1_QUESTIONS: QuizQuestion[] = [
-  { id: "x1", chapter: "a1", q: "initSet() must clear the ordered set. Which line does it?", options: ["set->size = 0;", "set->data[0] = 0;", "set->size = MAX_SIZE;", "return false;"] },
-  { id: "x2", chapter: "a1", q: "In contains(), what goes inside the for loop?", options: ["if (set->data[i] == value) return true;", "return set->data[i] == value;", "if (set->data[i] != value) return false;", "set->size++;"] },
-  { id: "x3", chapter: "a2", q: "isPalindrome starts by comparing which two characters?", options: ["elements[0] and elements[length - 1]", "elements[0] and elements[1]", "elements[length] and elements[0]", "Only the middle one"] },
-  { id: "x4", chapter: "a2", q: "isPalindrome(\"grace\") returns…", options: ["false: g and e differ", "true", "false: it has 5 letters", "true: it ends with a vowel"] },
-  { id: "x5", chapter: "a3a", q: "today = 5 and the switch has cases 1, 2, 3 and default: print(today). Output?", options: ["5", "Nothing", "stay home", "mathematics"] },
-  { id: "x6", chapter: "a3b", q: "i = 1; for(j=1; j<10; j=j+2) println(i); then println(j). The last line printed is…", options: ["11", "9", "10", "1"] },
-  { id: "x7", chapter: "a3c", q: "i goes from 1 to 10 and is printed when i%3 == 0. Output?", options: ["3, 6, 9", "3, 6, 9, 12", "1, 4, 7, 10", "0, 3, 6, 9"] },
-  { id: "x8", chapter: "b1", q: "A student registered 5 courses. What does the program do?", options: ["Tells them to drop the excess courses", "Ranks them as Failed", "Reads their average", "Ends with no output"] },
-  { id: "x9", chapter: "b1", q: "avg = 85. Which rank is displayed?", options: ["Very Good", "Excellent", "Good", "Failed"] },
-  { id: "x10", chapter: "b1", q: "In the flowchart, which shape holds the test avg > 90 ?", options: ["A diamond (decision)", "A rectangle (process)", "A parallelogram (input/output)", "An oval (start/end)"] },
+export const CSC207CA24_QUESTIONS: QuizQuestion[] = [
+  { id: "y1", chapter: "a1a", q: "reverseList() should start its loop at which index?", options: ["list->size - 1", "0", "list->size", "MAX"] },
+  { id: "y2", chapter: "a1a", q: "Reversing the display of 2, 3, 10, 23, 50 gives…", options: ["50, 23, 10, 3, 2", "2, 3, 10, 23, 50", "50, 2, 23, 3, 10", "2, 50, 3, 23, 10"] },
+  { id: "y3", chapter: "a1b", q: "The main disadvantage of an array is…", options: ["Its size is fixed in advance", "It can only hold strings", "It is stored on disk", "It cannot be read in a loop"] },
+  { id: "y4", chapter: "a1c", q: "The main advantage of a file over an array is…", options: ["Its data stays after the program ends", "It is faster to read", "It has a fixed size", "It needs no name"] },
+  { id: "y5", chapter: "a2a", q: "today = 3 and case 3 prints \"mathematics\" then breaks. Output?", options: ["mathematics", "3", "mathematics then 3", "programing"] },
+  { id: "y6", chapter: "a2b", q: "for(j=1; j<10; j=j+1) println(i); with i = 1. How many lines of 1?", options: ["9", "10", "1", "8"] },
+  { id: "y7", chapter: "a2c", q: "n = 8, and i is printed with printf(i) when i%2 == 0. Output?", options: ["2468", "2 4 6 8 on four lines", "1357", "02468"] },
+  { id: "y8", chapter: "a2d", q: "for(k=1; k<20; k+=4) with k++ inside and continue when k%4 == 0. What does the last println(k) print?", options: ["20", "17", "16", "21"] },
+  { id: "y9", chapter: "b1", q: "The customer gets the PIN wrong three times. The machine…", options: ["Ends without ejecting the card", "Ejects the card", "Asks for a fourth try", "Shows the balance"] },
+  { id: "y10", chapter: "b1", q: "Which flow construct fits the three tries at the PIN?", options: ["Iteration (a loop)", "Sequence only", "A switch", "No construct is needed"] },
 ];

@@ -8,6 +8,7 @@ import { TOPIC_LABELS } from "../algorithms-made-easy-csc207/book-info";
 import { CSC211_LABELS, CSC211_NUMBERS } from "@/content/csc211/render";
 import { CSC207T_LABELS, CSC207T_NUMBERS } from "@/content/csc207t/render";
 import { CSC207TEST1_LABELS, CSC207TEST1_NUMBERS } from "@/content/csc207test1/render";
+import { CSC207CA24_LABELS, CSC207CA24_NUMBERS } from "@/content/csc207ca24/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
@@ -91,19 +92,22 @@ const LABELS: Record<BookInfo["id"], Record<string, string>> = {
   csc211: CSC211_LABELS,
   csc207t: CSC207T_LABELS,
   csc207test1: CSC207TEST1_LABELS,
+  csc207ca24: CSC207CA24_LABELS,
 };
 const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
   csc211: CSC211_NUMBERS,
   csc207t: CSC207T_NUMBERS,
   csc207test1: CSC207TEST1_NUMBERS,
+  csc207ca24: CSC207CA24_NUMBERS,
 };
 // Older URLs whose views still count toward a book.
 const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207: ["/algorithms-made-easy-csc207", "/algorithms"],
   csc211: ["/csc211-tutorial-solutions"],
   csc207t: ["/csc207-tutorial-solutions"],
-  csc207test1: ["/csc207-ca-2024-solutions", "/csc207-test-1-solutions"],
+  csc207test1: ["/csc207-ca-2025-solutions", "/csc207-test-1-solutions"],
+  csc207ca24: ["/csc207-ca-2024-solutions"],
 };
 
 async function load(book: BookInfo) {
