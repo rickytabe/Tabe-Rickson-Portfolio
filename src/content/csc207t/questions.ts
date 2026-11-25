@@ -6,7 +6,7 @@
 export type Csc207tItem = {
   id: string; // section id, e.g. "s1-e2-3" (sheet 1, exercise II, question 3)
   label: string; // printed number, e.g. "II.3"
-  part: "I" | "II" | "III" | "IV";
+  part: "I" | "II" | "III" | "IV" | "T1"; // T1: Test 1 (November 2025)
   topic: string; // sidebar label
   question: string;
   think: string;

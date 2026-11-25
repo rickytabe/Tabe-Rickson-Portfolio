@@ -3,9 +3,9 @@ import { fraunces } from "../fonts/fraunces";
 import BookReader, { type BookPart, type ReaderBook } from "../algorithms-made-easy-csc207/BookReader";
 import { BOOK_AUTHOR, BOOK_AUTHOR_AVATAR, formatReadTime, readingMinutes } from "../algorithms-made-easy-csc207/book-meta";
 import { BOOKS, sectionLabel } from "@/lib/books";
-import { CSC207T_ITEMS } from "@/content/csc207t/questions";
 import {
   csc207tBookHtml as bookHtml,
+  CSC207T_ITEMS,
   CSC207T_LABELS,
   CSC207T_NUMBERS,
   CSC207T_PARTS,
@@ -21,7 +21,7 @@ const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
 const title = "CSC207 Tutorial Sheet Solutions: Branching and Looping, Every Question Solved";
-const description = `All ${SOLVED_COUNT} questions on CSC207 Tutorial Sheet 1 solved in full pseudocode: ordered set Insert and Union, isPalindrome, branching programs (grades, leap year, BMI, calculator), looping programs (factorial, Fibonacci, primes, patterns) and exact-output tracing. Each one starts with how to recognise the problem.`;
+const description = `CSC207 Test 1 (November 2025) and all ${SOLVED_COUNT} questions on CSC207 Tutorial Sheet 1 solved in full pseudocode: ordered set Insert and Union, isPalindrome, branching programs (grades, leap year, BMI, calculator), looping programs (factorial, Fibonacci, primes, patterns) and exact-output tracing. Each one starts with how to recognise the problem.`;
 
 export const metadata: Metadata = {
   title,
