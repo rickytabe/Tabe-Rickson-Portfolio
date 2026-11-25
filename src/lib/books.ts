@@ -1,7 +1,7 @@
 // The books on the site. Plain data, safe to import from client components and the server.
 // Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
 
-export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1";
+export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24";
 
 export type BookInfo = {
   id: BookId;
@@ -62,13 +62,24 @@ export const BOOKS: Record<BookId, BookInfo> = {
   },
   csc207test1: {
     id: "csc207test1",
+    title: "CSC207 CA 2025",
+    path: "/csc207-ca-2025-solutions",
+    quizLink: "https://taberickson.com/csc207/ca2025/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc207/ca2025",
+    sectionNoun: "question",
+    // CA 2025: Section A 1, 2, 3a-c; Section B 1.
+    sections: ["a1", "a2", "a3a", "a3b", "a3c", "b1"],
+    // Free for everyone, like the other CSC207 books: supported by voluntary tips.
+  },
+  csc207ca24: {
+    id: "csc207ca24",
     title: "CSC207 CA 2024",
     path: "/csc207-ca-2024-solutions",
     quizLink: "https://taberickson.com/csc207/ca2024/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc207/ca2024",
     sectionNoun: "question",
-    // CA 2024: Section A 1, 2, 3a-c; Section B 1.
-    sections: ["a1", "a2", "a3a", "a3b", "a3c", "b1"],
+    // CA 2024 (20/11/2024): Section A 1a-c, 2a-d; Section B the auto teller.
+    sections: ["a1a", "a1b", "a1c", "a2a", "a2b", "a2c", "a2d", "b1"],
     // Free for everyone, like the other CSC207 books: supported by voluntary tips.
   },
 };
@@ -103,7 +114,7 @@ export function sectionLabel(book: BookInfo, section: string): string {
     const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
     return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
   }
-  // CSC207 CA 2024: "a3b" -> "A3b", "b1" -> "B1"
-  if (book.id === "csc207test1") return `${section[0].toUpperCase()}${section.slice(1)}`;
+  // CSC207 CA 2025 and CA 2024: "a3b" -> "A3b", "b1" -> "B1"
+  if (book.id === "csc207test1" || book.id === "csc207ca24") return `${section[0].toUpperCase()}${section.slice(1)}`;
   return section.startsWith("b") ? `B${section.slice(1)}` : section.slice(1);
 }

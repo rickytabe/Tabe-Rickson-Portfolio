@@ -1,0 +1,34 @@
+/* CSC207 CA 2024: on top of book.css, csc211.css and csc207t.css (code blocks, output boxes). */
+
+/* The B1 flowchart: a tall figure, capped so it stays readable on desktop. */
+.book-content.book-csc207ca24 figure.flow svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* The auto teller console from the paper (Section B). */
+.book-content.book-csc207ca24 figure.console {
+  margin: 16px 0;
+  text-align: center;
+}
+.book-content.book-csc207ca24 table.console-t {
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.book-content.book-csc207ca24 table.console-t td {
+  border: 1px solid currentColor;
+  padding: 6px 10px;
+  min-width: 34px;
+  text-align: center;
+}
+.book-content.book-csc207ca24 table.console-t td.gap {
+  border: none;
+}
+.book-content.book-csc207ca24 figure.console figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+}

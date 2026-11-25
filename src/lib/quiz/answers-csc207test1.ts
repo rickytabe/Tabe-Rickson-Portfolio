@@ -1,5 +1,5 @@
 // Server-only: correct option (index into the question's `options`) and explanation per id, for
-// CSC207 CA 2024. Never import this from a client component.
+// CSC207 CA 2025. Never import this from a client component.
 
 export const CSC207TEST1_ANSWERS: Record<string, { answer: number; explain: string }> = {
   x1: { answer: 0, explain: "The set holds size elements. Setting size to 0 means it holds none: cleared." },

@@ -3,26 +3,26 @@ import { fraunces } from "../fonts/fraunces";
 import BookReader, { type BookPart, type ReaderBook } from "../algorithms-made-easy-csc207/BookReader";
 import { BOOK_AUTHOR, BOOK_AUTHOR_AVATAR, formatReadTime, readingMinutes } from "../algorithms-made-easy-csc207/book-meta";
 import { BOOKS, sectionLabel } from "@/lib/books";
-import { CSC207TEST1_ITEMS } from "@/content/csc207test1/questions";
+import { CSC207CA24_ITEMS } from "@/content/csc207ca24/questions";
 import {
-  csc207test1BookHtml as bookHtml,
-  CSC207TEST1_COUNT as COUNT,
-  CSC207TEST1_LABELS,
-  CSC207TEST1_NUMBERS,
-  CSC207TEST1_PARTS,
-  CSC207TEST1_PDF,
-} from "@/content/csc207test1/render";
+  csc207ca24BookHtml as bookHtml,
+  CSC207CA24_COUNT as COUNT,
+  CSC207CA24_LABELS,
+  CSC207CA24_NUMBERS,
+  CSC207CA24_PARTS,
+  CSC207CA24_PDF,
+} from "@/content/csc207ca24/render";
 import "../algorithms-made-easy-csc207/book.css";
 import "../csc211-tutorial-solutions/csc211.css";
 import "../csc207-tutorial-solutions/csc207t.css";
-import "./csc207test1.css";
+import "./csc207ca24.css";
 
-const book = BOOKS.csc207test1;
+const book = BOOKS.csc207ca24;
 const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
 const title = "CSC207 CA 2024 Solutions: Every Question Solved";
-const description = `All ${COUNT} questions on the CSC207 Introduction to Algorithms CA 2024 solved: ordered set initSet and contains, isPalindrome, exact-output tracing of switch, for and while, and the course registration pseudocode with its flowchart.`;
+const description = `All ${COUNT} questions on the CSC207 Introduction to Algorithms CA 2024 solved: reverseList, arrays versus files, exact-output tracing of switch, for, while, continue and break, and the auto teller (ATM) algorithm with its flowchart.`;
 
 export const metadata: Metadata = {
   title,
@@ -95,13 +95,13 @@ function statsHtml(): string {
   </div>`;
 }
 
-const parts: BookPart[] = CSC207TEST1_PARTS.map((p) => ({
+const parts: BookPart[] = CSC207CA24_PARTS.map((p) => ({
   name: p.name,
   chapters: p.ids.map((id) => ({
     id,
     num: book.sections.indexOf(id) + 1,
     tag: sectionLabel(book, id),
-    title: CSC207TEST1_ITEMS.find((i) => i.id === id)!.topic,
+    title: CSC207CA24_ITEMS.find((i) => i.id === id)!.topic,
     subs: [],
   })),
 }));
@@ -115,19 +115,19 @@ const readerBook: ReaderBook = {
     title: book.title,
     quizLink: book.quizLink,
     sectionNoun: "question",
-    labels: CSC207TEST1_LABELS,
-    numbers: CSC207TEST1_NUMBERS,
+    labels: CSC207CA24_LABELS,
+    numbers: CSC207CA24_NUMBERS,
     introLine: "Short questions on the CA 2024 topics. Pick A, B, C or D.",
   },
-  feedback: { noun: "solution", example: "e.g. I didn't get why the for loop prints 11 at the end" },
+  feedback: { noun: "solution", example: "e.g. I didn't get why the last loop prints 20" },
   support: {
     title: "Did these solutions help you?",
     text: "CSC207 CA 2024 is every question on the paper solved in full, free for everyone, no ads. If it helped you, a small tip tells Tabe it was worth it and keeps solved papers coming before every exam.",
-    download: "The 8-page PDF of the CA 2024 solutions is yours to keep, print and share, free. If it helps you in the exam, a small tip tells Tabe it was worth it and keeps solved papers coming.",
+    download: "The 9-page PDF of the CA 2024 solutions is yours to keep, print and share, free. If it helps you in the exam, a small tip tells Tabe it was worth it and keeps solved papers coming.",
   },
 };
 
-export default function Csc207Test1Book() {
+export default function Csc207Ca24Book() {
   const page = html.replace("<!--book-stats-->", statsHtml());
   return (
     <>
@@ -135,7 +135,7 @@ export default function Csc207Test1Book() {
       <BookReader
         book={readerBook}
         parts={parts}
-        pdf={CSC207TEST1_PDF}
+        pdf={CSC207CA24_PDF}
         className={fraunces.variable}
         about="Every question on the CSC207 Introduction to Algorithms CA 2024 paper, solved in the course pseudocode, straight to the answers."
         credits={
@@ -145,7 +145,7 @@ export default function Csc207Test1Book() {
           </p>
         }
       >
-        <article className="book-content book-csc211 book-csc207t book-csc207test1" dangerouslySetInnerHTML={{ __html: page }} />
+        <article className="book-content book-csc211 book-csc207t book-csc207ca24" dangerouslySetInnerHTML={{ __html: page }} />
       </BookReader>
     </>
   );
