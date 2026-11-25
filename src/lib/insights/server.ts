@@ -99,6 +99,30 @@ export function dayKey(date = new Date()): string {
   return `d${local.toISOString().slice(0, 10).replace(/-/g, "")}`;
 }
 
+/** The mark that says a reader has been counted as a reader of this book (one per reader and book). */
+export function readerMarkId(book: BookInfo): string {
+  return fieldKey(book.id === "csc207" ? "reader" : `${book.id}-reader`);
+}
+
+/**
+ * Count an existing reader (cookie already set) the first time they open this book. Readers used to
+ * be counted only in the first book they ever opened, so a student who came from another book never
+ * showed up in this one's Readers, while their chapters and "finished" marks did. Returns whether
+ * this call counted them, so the caller can add `readers`, `refs` and `daily` to its stats write.
+ */
+export async function claimBookReader(rid: string, book: BookInfo): Promise<boolean> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  const reader = db().collection("bookReaders").doc(rid);
+  try {
+    await reader.collection("marks").doc(readerMarkId(book)).create({ at: FieldValue.serverTimestamp() });
+  } catch {
+    return false; // already counted in this book
+  }
+  // Readers created before this mark existed were counted in their first book when they were created.
+  const first = (await reader.get()).data()?.book ?? BOOKS.csc207.id;
+  return first !== book.id;
+}
+
 /**
  * The reader behind a request: the signed cookie's id, or a new reader (recorded in Firestore and
  * counted in the stats). When `isNew` is true, set `readerCookie(rid)` on the response.
@@ -113,6 +137,7 @@ export async function ensureReader(
   const { FieldValue } = await import("firebase-admin/firestore");
   const store = db();
   await store.collection("bookReaders").doc(rid).set({ book: book.id, firstSeen: FieldValue.serverTimestamp(), ref: null });
+  await store.collection("bookReaders").doc(rid).collection("marks").doc(readerMarkId(book)).set({ at: FieldValue.serverTimestamp() });
   await store
     .collection("bookStats")
     .doc(book.id)

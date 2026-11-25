@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import {
+  claimBookReader,
   cleanRef,
   dayKey,
   db,
@@ -10,6 +11,7 @@ import {
   newReaderId,
   readerCookie,
   readerFromRequest,
+  readerMarkId,
   sameOrigin,
 } from "@/lib/insights/server";
 import { bookFrom, scoped, type BookInfo } from "@/lib/books";
@@ -90,8 +92,15 @@ export async function POST(request: Request) {
         ref: invite ? "invite" : (ref ?? null),
         ...(inviter ? { invitedBy: { [book.id]: inviter } } : {}),
       });
+      await reader.collection("marks").doc(readerMarkId(book)).set({ at: FieldValue.serverTimestamp() });
       bump("readers", "total");
       bump("refs", invite ? "invite" : (ref ?? "direct"));
+      bump("daily", dayKey());
+    } else if (await claimBookReader(rid, book)) {
+      // A returning reader (from another book) opening this book for the first time.
+      const ref = cleanRef(body.ref);
+      bump("readers", "total");
+      bump("refs", ref && !INVITE_REF.test(ref) ? ref : "direct");
       bump("daily", dayKey());
     }
 
