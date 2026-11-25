@@ -3,7 +3,8 @@
 // Until the fix, a reader was counted only in the first book they ever opened. Readers who came
 // from another book never showed up in a later book's Readers, while their chapter, finish and
 // download marks did (hence "Finished the book: 300%"). This rebuilds `bookStats/{book}.readers.total`
-// as the number of distinct readers with any activity in that book, and writes each reader's
+// as the number of distinct readers with any activity in that book, rebuilds the 14-day "new readers"
+// graph (`daily`) from the day each reader first did something in that book, and writes each reader's
 // per-book "reader" mark so the live counter does not count them a second time.
 //
 // Dry run (reads only, changes nothing):   node --env-file=.env.local scripts/backfill-book-readers.mjs
@@ -38,10 +39,21 @@ const bookOfMark = (key) => PREFIXED.find((id) => key.startsWith(`${id}-`)) ?? "
 const readerMarkId = (book) => (book === "csc207" ? "reader" : `${book}-reader`);
 
 const perBook = Object.fromEntries(ALL.map((id) => [id, new Set()]));
+// The first moment each reader did anything in each book: book -> rid -> ms.
+const firstAt = Object.fromEntries(ALL.map((id) => [id, new Map()]));
+const seenAt = (book, rid, ts) => {
+  const ms = ts?.toMillis?.();
+  if (!ms || !firstAt[book]) return;
+  const prev = firstAt[book].get(rid);
+  if (prev === undefined || ms < prev) firstAt[book].set(rid, ms);
+};
+// Same day key as the site (Africa/Douala, UTC+1): "d20261126".
+const dayKey = (ms) => `d${new Date(ms + 3600000).toISOString().slice(0, 10).replace(/-/g, "")}`;
 const readers = await db.collection("bookReaders").get();
 for (const doc of readers.docs) {
   const first = doc.get("book") ?? "csc207";
   if (perBook[first]) perBook[first].add(doc.id);
+  seenAt(first, doc.id, doc.get("firstSeen"));
 }
 const marks = await db.collectionGroup("marks").get();
 const hasMark = new Set();
@@ -51,14 +63,22 @@ for (const m of marks.docs) {
   hasMark.add(`${rid}/${m.id}`);
   const book = bookOfMark(m.id);
   perBook[book]?.add(rid);
+  seenAt(book, rid, m.get("at"));
 }
+const dailyOf = (id) => {
+  const days = {};
+  for (const ms of firstAt[id].values()) days[dayKey(ms)] = (days[dayKey(ms)] ?? 0) + 1;
+  return days;
+};
 
 console.log(`${readers.size} people (reader ids), ${marks.size} marks${APPLY ? "" : "  (dry run: nothing written)"}`);
-console.log("book          now  recounted");
+console.log("book          now  recounted  last 3 days (recounted)");
 for (const id of ALL) {
   const stats = (await db.collection("bookStats").doc(id).get()).data() ?? {};
   const now = Number(stats.readers?.total ?? 0);
-  console.log(`${id.padEnd(12)} ${String(now).padStart(4)}  ${String(perBook[id].size).padStart(9)}`);
+  const days = dailyOf(id);
+  const last3 = [2, 1, 0].map((k) => days[dayKey(Date.now() - k * 86400000)] ?? 0).join(" / ");
+  console.log(`${id.padEnd(12)} ${String(now).padStart(4)}  ${String(perBook[id].size).padStart(9)}  ${last3}`);
 }
 
 if (APPLY) {
@@ -78,7 +98,12 @@ if (APPLY) {
       writes += 1;
       await flush();
     }
-    batch.set(db.collection("bookStats").doc(id), { readers: { total: perBook[id].size } }, { merge: true });
+    // mergeFields replaces the whole daily map (old per-day counts were wrong) and leaves the rest.
+    batch.set(
+      db.collection("bookStats").doc(id),
+      { readers: { total: perBook[id].size }, daily: dailyOf(id) },
+      { mergeFields: ["readers.total", "daily"] }
+    );
     writes += 1;
     await flush();
   }
