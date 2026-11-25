@@ -17,7 +17,7 @@ type NavLink = {
   dot?: boolean;
 };
 
-const BOOK_PATHS = ["/algorithms-made-easy-csc207", "/csc211-tutorial-solutions", "/csc207-tutorial-solutions"];
+const BOOK_PATHS = ["/algorithms-made-easy-csc207", "/csc211-tutorial-solutions", "/csc207-tutorial-solutions", "/csc207-test-1-solutions"];
 
 const work: NavLink = { label: "Work", href: "/#portfolio", sectionId: "portfolio" };
 const services: NavLink = { label: "Services", href: "/#services", sectionId: "services" };

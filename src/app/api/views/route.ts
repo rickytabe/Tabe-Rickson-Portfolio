@@ -6,6 +6,7 @@ const COUNTED: Record<string, string[]> = {
   "/algorithms-made-easy-csc207": ["/algorithms-made-easy-csc207", "/algorithms"],
   "/csc211-tutorial-solutions": ["/csc211-tutorial-solutions"],
   "/csc207-tutorial-solutions": ["/csc207-tutorial-solutions"],
+  "/csc207-test-1-solutions": ["/csc207-test-1-solutions"],
 };
 
 export async function GET(request: Request) {
