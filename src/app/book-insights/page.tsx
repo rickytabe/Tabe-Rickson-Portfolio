@@ -12,7 +12,7 @@ import { CSC207CA24_LABELS, CSC207CA24_NUMBERS } from "@/content/csc207ca24/rend
 import { CSC205_LABELS, CSC205_NUMBERS } from "@/content/csc205/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
-import { BOOK_IDS, BOOKS, bookFrom, sectionLabel, type BookInfo } from "@/lib/books";
+import { BOOK_IDS, bookFrom, type BookInfo, BOOKS, booksByCourse, sectionLabel, titleInCourse } from "@/lib/books";
 import { listCodes, type CodeRow } from "@/lib/unlock";
 import { fapshiEnabled, listPayments, type PaymentRow } from "@/lib/fapshi";
 import { NEW_CODE_COOKIE } from "@/lib/insights/admin-auth";
@@ -895,16 +895,33 @@ function PaywallPanel({
 }
 
 /** "All books" plus one tab per book. */
+/**
+ * Book navigation, one row per course: the course code on the left, its books on the right. A new
+ * book joins its course's row and a new course adds a row, so the list never turns into one long,
+ * wrapping strip of near-identical "CSC207 …" pills.
+ */
 function BookTabs({ current }: { current: BookInfo["id"] | null }) {
   return (
     <nav className="ins-tabs" aria-label="Books">
-      <a href="/book-insights" aria-current={current === null ? "page" : undefined}>
+      <a href="/book-insights" className="ins-tabs-all" aria-current={current === null ? "page" : undefined}>
         All books
       </a>
-      {BOOK_IDS.map((id) => (
-        <a key={id} href={`/book-insights?book=${id}`} aria-current={id === current ? "page" : undefined}>
-          {BOOKS[id].title}
-        </a>
+      {booksByCourse().map((g) => (
+        <div key={g.course} className="ins-tabs-group">
+          <span className="ins-tabs-course">{g.course}</span>
+          <div className="ins-tabs-row">
+            {g.ids.map((id) => (
+              <a
+                key={id}
+                href={`/book-insights?book=${id}`}
+                aria-current={id === current ? "page" : undefined}
+                title={BOOKS[id].title}
+              >
+                {titleInCourse(BOOKS[id])}
+              </a>
+            ))}
+          </div>
+        </div>
       ))}
     </nav>
   );
@@ -1009,15 +1026,29 @@ async function Overview() {
         <Tile label="Books" value={String(books.length)} hint={`${books.filter((b) => b.book.paywall).length} paid`} />
       </section>
 
-      <section className="ins-books" aria-label="Books">
-        {books.map((b) => {
+      {booksByCourse().map((group) => {
+        const inCourse = books.filter((b) => group.ids.includes(b.book.id));
+        const courseReaders = inCourse.reduce((a, b) => a + b.readers, 0);
+        return (
+          <section key={group.course} className="ins-course" aria-labelledby={`course-${group.course}`}>
+            <header className="ins-course-head">
+              <h2 id={`course-${group.course}`} className="ins-course-title">
+                {group.course}
+              </h2>
+              <p className="ins-muted">
+                {inCourse.length} {inCourse.length === 1 ? "book" : "books"} · {fmt.format(courseReaders)}{" "}
+                {courseReaders === 1 ? "book reader" : "book readers"}
+              </p>
+            </header>
+            <div className="ins-books">
+        {inCourse.map((b) => {
           const max = Math.max(...b.days, 1);
           return (
             <a key={b.book.id} href={`/book-insights?book=${b.book.id}`} className="ins-card ins-book">
               <div className="ins-book-head">
                 <div>
                   <p className="ins-kicker">{b.book.paywall ? `Paid · ${b.book.paywall.priceFcfa} FCFA` : "Free"}</p>
-                  <h2 className="ins-h2">{b.book.title}</h2>
+                  <h3 className="ins-h2">{titleInCourse(b.book)}</h3>
                   <p className="ins-muted">{b.book.path}</p>
                 </div>
                 <span className="ins-book-go" aria-hidden>
@@ -1079,7 +1110,10 @@ async function Overview() {
             </a>
           );
         })}
-      </section>
+            </div>
+          </section>
+        );
+      })}
     </main>
   );
 }

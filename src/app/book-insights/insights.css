@@ -540,11 +540,33 @@
 }
 
 /* Book tabs, and unlock codes for paid books */
+/* One row per course: a fixed course column, then that course's books. Scales by adding rows. */
 .ins-tabs {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ins-tabs-all {
+  justify-self: start;
+}
+.ins-tabs-group {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 10px;
+}
+.ins-tabs-course {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+.ins-tabs-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 12px;
+  min-width: 0;
 }
 .ins-tabs a {
   padding: 6px 12px;
@@ -594,10 +616,31 @@
   opacity: 0.5;
 }
 
-/* All-books board */
+/* All-books board: one section per course, each with its own grid of book cards. */
+.ins-course {
+  margin-top: 36px;
+}
+.ins-course-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card-border, rgba(127, 127, 127, 0.25));
+}
+.ins-course-head .ins-muted {
+  margin: 0;
+}
+.ins-course-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
 .ins-books {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  /* auto-fill (not auto-fit): a course with one book keeps a card-sized column, not the full width. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
   gap: 16px;
   margin-top: 16px;
 }

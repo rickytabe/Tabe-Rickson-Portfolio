@@ -97,6 +97,32 @@ export const BOOKS: Record<BookId, BookInfo> = {
 
 export const BOOK_IDS = Object.keys(BOOKS) as BookId[];
 
+/** The course a book belongs to, read from its title: "CSC207 CA 2025" -> "CSC207". */
+export function courseOf(book: BookInfo): string {
+  return /^[A-Z]{2,4}\s?\d{3}/.exec(book.title)?.[0].replace(/\s/, "") ?? "Other";
+}
+
+/** A book's name inside its course: "CSC207 CA 2025" -> "CA 2025". */
+export function titleInCourse(book: BookInfo): string {
+  return book.title.replace(/^[A-Z]{2,4}\s?\d{3}\s*/, "") || book.title;
+}
+
+/**
+ * Every book grouped by course, courses in code order and books in the order they are listed in
+ * BOOKS. New books join their course's group, and a new course becomes a new group, so lists built
+ * from this stay organised however many books there are.
+ */
+export function booksByCourse(ids: readonly BookId[] = BOOK_IDS): { course: string; ids: BookId[] }[] {
+  const groups = new Map<string, BookId[]>();
+  for (const id of ids) {
+    const course = courseOf(BOOKS[id]);
+    groups.set(course, [...(groups.get(course) ?? []), id]);
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "en", { numeric: true }))
+    .map(([course, list]) => ({ course, ids: list }));
+}
+
 /** The book a request is about. Requests from pages built before there were two books say nothing: CSC207. */
 export function bookFrom(value: unknown): BookInfo {
   return typeof value === "string" && value in BOOKS ? BOOKS[value as BookId] : BOOKS.csc207;
