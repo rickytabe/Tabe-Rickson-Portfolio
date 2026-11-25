@@ -53,6 +53,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
     sectionNoun: "question",
     // Tutorial Sheet 1: Exercise I (1a, 1b, 2), II (1-10), III (1-10), IV (a-d). Later sheets append here.
     sections: [
+      "t1-a1", "t1-a2", "t1-a3a", "t1-a3b", "t1-a3c", "t1-b1",
       "s1-e1-1a", "s1-e1-1b", "s1-e1-2",
       ...range("s1-e2-", 1, 10),
       ...range("s1-e3-", 1, 10),
@@ -88,7 +89,9 @@ export function scoped(book: BookInfo, key: string): string {
 export function sectionLabel(book: BookInfo, section: string): string {
   if (book.id === "csc207") return String(Number(section.slice(1)));
   if (book.id === "csc207t") {
-    // "s1-e2-3" -> "II.3", "s1-e4-a" -> "IV.a"
+    // "s1-e2-3" -> "II.3", "s1-e4-a" -> "IV.a"; Test 1: "t1-a3b" -> "A3b", "t1-b1" -> "B1"
+    const t = /^t\d+-([ab])(\w+)$/.exec(section);
+    if (t) return `${t[1].toUpperCase()}${t[2]}`;
     const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
     return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
   }
