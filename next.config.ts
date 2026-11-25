@@ -26,6 +26,9 @@ const nextConfig: NextConfig = {
       // CSC207 Tutorial Sheet Solutions: /csc207 and /csc207/quiz already belong to CSC207 Made Easy.
       { source: "/csc207/tutorial", destination: "/csc207-tutorial-solutions", permanent: false },
       { source: "/csc207/tutorial/quiz", destination: "/csc207-tutorial-solutions?quiz=1", permanent: false },
+      // CSC207 Test 1 Solutions (Test 1, November 2025).
+      { source: "/csc207/test1", destination: "/csc207-test-1-solutions", permanent: false },
+      { source: "/csc207/test1/quiz", destination: "/csc207-test-1-solutions?quiz=1", permanent: false },
     ];
   },
 };

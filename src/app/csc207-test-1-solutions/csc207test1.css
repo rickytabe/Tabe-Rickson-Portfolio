@@ -1,0 +1,10 @@
+/* CSC207 Test 1 Solutions: on top of book.css, csc211.css and csc207t.css (code blocks, output boxes). */
+
+/* The B1 flowchart: a tall figure, capped so it stays readable on desktop. */
+.book-content.book-csc207test1 figure.flow svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 auto;
+}

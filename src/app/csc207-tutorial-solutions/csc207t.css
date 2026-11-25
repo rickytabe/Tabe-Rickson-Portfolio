@@ -178,33 +178,3 @@
 .book-csc207t table.trace {
   font-size: 14px;
 }
-
-/* Cover link to the newest solved paper (Test 1). */
-.book-csc207t .test-callout {
-  margin: 14px 0 0;
-}
-.book-csc207t .test-callout a {
-  display: inline-block;
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: #fdf1cf;
-  border: 1.5px solid #F3BF3F;
-  color: #20242B;
-  font-weight: 600;
-  text-decoration: none;
-}
-.book-csc207t .test-callout a:hover {
-  background: #fbe7ae;
-}
-.book-csc207t .test-callout a:active {
-  transform: scale(0.98);
-}
-
-/* Test 1 flowchart: a tall figure, capped so it stays readable on desktop. */
-.book-content.book-csc207t figure.flow svg {
-  display: block;
-  width: 100%;
-  max-width: 560px;
-  height: auto;
-  margin: 0 auto;
-}

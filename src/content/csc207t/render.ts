@@ -1,16 +1,11 @@
 // Server-only: turns the CSC207 tutorial content into the book's HTML. Built like
 // src/content/csc211/render.ts (the template for every solutions book), with pseudocode in place of maths.
 import { BOOKS, sectionLabel } from "@/lib/books";
-import { CSC207T_ITEMS as SHEET1_ITEMS, CSC207T_QUICK_GUIDE, type Csc207tItem } from "./questions";
-import { TEST1_ITEMS } from "./test1";
+import { CSC207T_ITEMS, CSC207T_QUICK_GUIDE, type Csc207tItem } from "./questions";
 
 const BOOK = BOOKS.csc207t;
 
-/** Every item in page order: Test 1 first (straight to the answers), then Tutorial Sheet 1. */
-export const CSC207T_ITEMS: Csc207tItem[] = [...TEST1_ITEMS, ...SHEET1_ITEMS];
-
 const PART_NAMES: Record<Csc207tItem["part"], string> = {
-  T1: "Test 1 · November 2025",
   I: "Sheet 1 · Exercise I · Data structures",
   II: "Sheet 1 · Exercise II · Branching",
   III: "Sheet 1 · Exercise III · Looping",
@@ -30,16 +25,14 @@ export const CSC207T_NUMBERS: Record<string, string> = Object.fromEntries(
   CSC207T_ITEMS.map((i) => [i.id, sectionLabel(BOOK, i.id)])
 );
 
-/** Tutorial Sheet 1 questions (Test 1 is counted on its own). */
-export const CSC207T_SOLVED_COUNT = SHEET1_ITEMS.length;
-export const CSC207T_TEST_COUNT = TEST1_ITEMS.length;
+export const CSC207T_SOLVED_COUNT = CSC207T_ITEMS.length;
 
 /** Tutorial Sheet 1 as a printable PDF (public/, free like the book). */
 export const CSC207T_PDF = "/csc207-tutorial-solutions/csc207-tutorial-sheet-1-solutions.pdf";
 
 // The last question of each exercise gets an inline support card after it (rendered by the reader).
 const EXERCISE_ENDS = new Set(
-  (["T1", "I", "II", "III", "IV"] as const).map((part) => CSC207T_ITEMS.filter((i) => i.part === part).at(-1)!.id)
+  (["I", "II", "III", "IV"] as const).map((part) => CSC207T_ITEMS.filter((i) => i.part === part).at(-1)!.id)
 );
 
 function sectionHtml(item: Csc207tItem): string {
@@ -48,11 +41,7 @@ function sectionHtml(item: Csc207tItem): string {
     <div class="ch-num">${num}</div>
     <div>
       <h3>${item.topic}</h3>
-      <p class="oneline">${
-        item.part === "T1"
-          ? `Test 1 &middot; November 2025 &middot; Section ${num[0]} &middot; Question ${num.slice(1)}`
-          : `Tutorial Sheet 1 &middot; Exercise ${item.part} &middot; Question ${num}`
-      }</p>
+      <p class="oneline">Tutorial Sheet 1 &middot; Exercise ${item.part} &middot; Question ${num}</p>
     </div>
   </div>`;
   const support = EXERCISE_ENDS.has(item.id)
@@ -61,7 +50,7 @@ function sectionHtml(item: Csc207tItem): string {
   return `<section class="ch" id="${item.id}">
   ${head}
   <div class="box note q-box"><div class="lab">Question ${num}</div>${item.question}</div>
-  ${item.think ? `<div class="box stick"><div class="lab">How to think about it</div>${item.think}</div>` : ""}
+  <div class="box stick"><div class="lab">How to think about it</div>${item.think}</div>
   <h4 class="sol-h">Solution</h4>
   <div class="sol">${item.solution}</div>
   <div class="ch-feedback" data-chapter="${item.id}"></div>
@@ -114,8 +103,7 @@ function coverHtml(): string {
       <text x="550" y="186" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#15847B">repeat: for i</text>
     </svg>
   </div>
-  <p class="byline">Based on CSC207 Tutorial Sheet 1, Branching and Looping Constructs, and Test 1 (November 2025).<br>${CSC207T_SOLVED_COUNT + CSC207T_TEST_COUNT} questions, every one solved in full.</p>
-  <p class="test-callout"><a href="#t1-a1"><b>New:</b> CSC207 Test 1 (November 2025), solved &rarr;</a></p>
+  <p class="byline">Based on CSC207 Tutorial Sheet 1, Branching and Looping Constructs.<br>${CSC207T_SOLVED_COUNT} questions, every one solved in full.</p>
   <p class="dlwrap">
     <a class="dl" href="${CSC207T_PDF}" download>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -131,7 +119,7 @@ function coverHtml(): string {
 function introHtml(): string {
   return `<div class="box note">
   <div class="lab">How to use this book</div>
-  <p>Each question has three parts. The <b>blue box</b> is the question exactly as it is on the sheet. The <b>yellow box</b> tells you how to recognise the type of problem and which tool to use. Read it before the solution. If you can explain the yellow box in your own words, you can solve any problem of the same type in the CA. Test 1 goes straight to the answers.</p>
+  <p>Each question has three parts. The <b>blue box</b> is the question exactly as it is on the sheet. The <b>yellow box</b> tells you how to recognise the type of problem and which tool to use. Read it before the solution. If you can explain the yellow box in your own words, you can solve any problem of the same type in the CA.</p>
   <p>The sheet says "Program here refers to pseudocodes", so the solutions are pseudocode in the course style: curly braces, typed functions, <code>*</code> and <code>-&gt;</code> for the struct, and <code>//</code> comments.</p>
 </div>
 <div class="box real free-note">
