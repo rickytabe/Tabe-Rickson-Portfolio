@@ -1,4 +1,4 @@
-// Server-only: turns CSC207 Test 1 (November 2025) into the book's HTML. Built like
+// Server-only: turns CSC207 CA 2024 into the book's HTML. Built like
 // src/content/csc207t/render.ts, but straight to the solutions: no "How to think about it" box.
 import { BOOKS, sectionLabel } from "@/lib/books";
 import { CSC207TEST1_ITEMS, type Csc207Test1Item } from "./questions";
@@ -29,6 +29,9 @@ export const CSC207TEST1_NUMBERS: Record<string, string> = Object.fromEntries(
 
 export const CSC207TEST1_COUNT = CSC207TEST1_ITEMS.length;
 
+/** The whole paper, solved, as a printable PDF (public/, free like the book). */
+export const CSC207TEST1_PDF = "/csc207-ca-2024-solutions/csc207-ca-2024-solutions.pdf";
+
 // The last question of each section gets an inline support card after it (rendered by the reader).
 const SECTION_ENDS = new Set(
   (["A", "B"] as const).map((s) => CSC207TEST1_ITEMS.filter((i) => i.section === s).at(-1)!.id)
@@ -44,7 +47,7 @@ function sectionHtml(item: Csc207Test1Item): string {
     <div class="ch-num">${num}</div>
     <div>
       <h3>${item.topic}</h3>
-      <p class="oneline">Test 1 &middot; November 2025 &middot; Section ${item.section} &middot; Question ${num.slice(1)}</p>
+      <p class="oneline">CA 2024 &middot; Section ${item.section} &middot; Question ${num.slice(1)}</p>
     </div>
   </div>
   <div class="box note q-box"><div class="lab">Question ${num}</div>${item.question}</div>
@@ -72,11 +75,20 @@ function tocHtml(): string {
 
 function coverHtml(): string {
   return `<header class="cover">
-  <div class="kicker">Introduction to algorithms &middot; Test 1 &middot; November 2025</div>
-  <h1 class="title">CSC207 <em>Test 1 Solutions</em></h1>
-  <p class="sub">Every question on the CSC207 Test 1 paper (November 2025), solved: ordered set snippets, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Straight to the answers.</p>
+  <div class="kicker">Introduction to algorithms &middot; CA 2024</div>
+  <h1 class="title">CSC207 <em>CA 2024</em></h1>
+  <p class="sub">Every question on the CSC207 CA 2024 paper, solved: ordered set snippets, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Straight to the answers.</p>
   <!--book-stats-->
-  <p class="byline">CSC207 Introduction to Algorithms, Test 1, 26/11/2025.<br>${CSC207TEST1_COUNT} questions, every one solved in full.</p>
+  <p class="byline">CSC207 Introduction to Algorithms, CA 2024.<br>${CSC207TEST1_COUNT} questions, every one solved in full.</p>
+  <p class="dlwrap">
+    <a class="dl" href="${CSC207TEST1_PDF}" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="M7 11l5 5l5-5"/><path d="M4 20h16"/>
+      </svg>
+      Download CA 2024 Solutions
+    </a>
+  </p>
+  <p class="dlnote">An 8-page PDF with every question and solution. Print it, or read it offline on a phone.</p>
 </header>`;
 }
 

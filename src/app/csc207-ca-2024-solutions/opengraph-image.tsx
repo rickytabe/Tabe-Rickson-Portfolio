@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 // The cover for link previews (WhatsApp, X) and the Books page, drawn at build time.
 // Two fixed columns (text 640px, picture 380px) so the art can never sit on the words.
-export const alt = "CSC207 Test 1 Solutions: every question on the paper, solved.";
+export const alt = "CSC207 CA 2024: every question on the paper, solved.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -22,10 +22,10 @@ export default function Image() {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", width: 640 }}>
-          <div style={{ fontSize: 24, letterSpacing: 5, color: "#137a35" }}>INTRODUCTION TO ALGORITHMS · TEST 1</div>
+          <div style={{ fontSize: 24, letterSpacing: 5, color: "#137a35" }}>INTRODUCTION TO ALGORITHMS · CA 2024</div>
           <div style={{ display: "flex", flexDirection: "column", marginTop: 22, lineHeight: 1.02 }}>
             <span style={{ fontSize: 92, fontWeight: 800 }}>CSC207</span>
-            <span style={{ fontSize: 64, fontWeight: 800, color: "#15847B" }}>Test 1</span>
+            <span style={{ fontSize: 64, fontWeight: 800, color: "#15847B" }}>CA 2024</span>
             <span style={{ fontSize: 64, fontWeight: 800, color: "#15847B" }}>Solutions</span>
           </div>
           <div style={{ fontSize: 32, marginTop: 28, color: "#52555b", lineHeight: 1.3 }}>
@@ -43,7 +43,7 @@ export default function Image() {
                 fontWeight: 700,
               }}
             >
-              taberickson.com/csc207/test1
+              taberickson.com/csc207/ca2024
             </div>
           </div>
         </div>

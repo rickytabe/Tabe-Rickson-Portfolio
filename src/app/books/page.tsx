@@ -15,7 +15,7 @@ import {
 import { BOOKS } from "@/lib/books";
 import { LOCKED_COUNT, SOLVED_COUNT, bookHtml } from "@/content/csc211/render";
 import { CSC207T_PDF, CSC207T_SOLVED_COUNT, csc207tBookHtml } from "@/content/csc207t/render";
-import { CSC207TEST1_COUNT, csc207test1BookHtml } from "@/content/csc207test1/render";
+import { CSC207TEST1_COUNT, CSC207TEST1_PDF, csc207test1BookHtml } from "@/content/csc207test1/render";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -81,12 +81,13 @@ const books: Book[] = [
   },
   {
     title: BOOKS.csc207test1.title,
-    subtitle: "Test 1, November 2025: every question solved",
+    subtitle: "CA 2024: every question solved",
     description:
-      "Every question on the CSC207 Introduction to Algorithms Test 1 paper (November 2025), solved: ordered set initSet and contains, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Free to read.",
+      "Every question on the CSC207 Introduction to Algorithms CA 2024 paper, solved: ordered set initSet and contains, isPalindrome, exact-output tracing, and the course registration pseudocode with its flowchart. Free to read.",
     href: BOOKS.csc207test1.path,
+    pdf: CSC207TEST1_PDF,
     cover: `${BOOKS.csc207test1.path}/opengraph-image`,
-    facts: [`${CSC207TEST1_COUNT} QUESTIONS`, "ALGO QUIZ BOT"],
+    facts: [`${CSC207TEST1_COUNT} QUESTIONS`, "8-PAGE PDF"],
     price: "FREE",
     author: BOOK_AUTHOR,
     avatar: BOOK_AUTHOR_AVATAR,

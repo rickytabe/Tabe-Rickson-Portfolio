@@ -62,12 +62,12 @@ export const BOOKS: Record<BookId, BookInfo> = {
   },
   csc207test1: {
     id: "csc207test1",
-    title: "CSC207 Test 1 Solutions",
-    path: "/csc207-test-1-solutions",
-    quizLink: "https://taberickson.com/csc207/test1/quiz?ref=quiz-share",
-    shortLink: "https://taberickson.com/csc207/test1",
+    title: "CSC207 CA 2024",
+    path: "/csc207-ca-2024-solutions",
+    quizLink: "https://taberickson.com/csc207/ca2024/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc207/ca2024",
     sectionNoun: "question",
-    // Test 1 (November 2025): Section A 1, 2, 3a-c; Section B 1.
+    // CA 2024: Section A 1, 2, 3a-c; Section B 1.
     sections: ["a1", "a2", "a3a", "a3b", "a3c", "b1"],
     // Free for everyone, like the other CSC207 books: supported by voluntary tips.
   },
@@ -103,7 +103,7 @@ export function sectionLabel(book: BookInfo, section: string): string {
     const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
     return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
   }
-  // CSC207 Test 1: "a3b" -> "A3b", "b1" -> "B1"
+  // CSC207 CA 2024: "a3b" -> "A3b", "b1" -> "B1"
   if (book.id === "csc207test1") return `${section[0].toUpperCase()}${section.slice(1)}`;
   return section.startsWith("b") ? `B${section.slice(1)}` : section.slice(1);
 }
