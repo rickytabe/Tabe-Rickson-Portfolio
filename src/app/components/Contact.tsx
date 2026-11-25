@@ -68,23 +68,17 @@ export default function Contact() {
     });
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/rickytabe2@gmail.com", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          _subject: "New Message — Portfolio",
-          _captcha: "false",
-          _template: "table",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, kind: "message" }),
       });
 
-      const result = await response.json();
+      const result: { ok?: boolean; error?: string } = await response
+        .json()
+        .catch(() => ({}));
 
-      if (response.ok && result.success === "true") {
+      if (response.ok && result.ok === true) {
         toast.success("Message sent successfully!");
         form.reset();
         setIsSubmitted(true);
@@ -93,11 +87,14 @@ export default function Contact() {
           router.push("/thank-you");
         }, 2000);
       } else {
-        toast.error("Failed to send message. Please try again.");
+        toast.error(
+          `${result.error ?? "Your message couldn't be sent."} Please try again, or email rickytabe2@gmail.com.`,
+          { duration: 8000 },
+        );
         setIsSubmitting(false);
       }
     } catch {
-      toast.error("Failed to send message. Please check your connection.");
+      toast.error("Couldn't reach the server. Check your connection and try again.");
       setIsSubmitting(false);
     }
   };
@@ -294,11 +291,15 @@ export default function Contact() {
                       onSubmit={handleSubmit}
                       className="space-y-6"
                     >
-                      {/* FormSubmit config */}
-                      <input type="hidden" name="_captcha" value="false" />
-                      <input type="hidden" name="_template" value="table" />
-                      <input type="hidden" name="_subject" value="New Message — Portfolio" />
-                      <input type="hidden" name="inquiry_type" value="General Message" />
+                      {/* Honeypot: hidden from people, bots fill it in */}
+                      <input
+                        type="text"
+                        name="company"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        aria-hidden="true"
+                        className="hidden"
+                      />
 
                       {/* Name + Email row */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

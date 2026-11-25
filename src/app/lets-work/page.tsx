@@ -56,23 +56,17 @@ export default function LetsWorkPage() {
     });
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/rickytabe2@gmail.com", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          _subject: "New Project Inquiry — Portfolio",
-          _captcha: "false",
-          _template: "table",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, kind: "project" }),
       });
 
-      const result = await response.json();
+      const result: { ok?: boolean; error?: string } = await response
+        .json()
+        .catch(() => ({}));
 
-      if (response.ok && result.success === "true") {
+      if (response.ok && result.ok === true) {
         toast.success("Inquiry sent successfully!");
         form.reset();
         setIsSubmitted(true);
@@ -80,11 +74,14 @@ export default function LetsWorkPage() {
           router.push("/thank-you");
         }, 2000);
       } else {
-        toast.error("Failed to send inquiry. Please try again.");
+        toast.error(
+          `${result.error ?? "Your inquiry couldn't be sent."} Please try again, or reach me on WhatsApp or email.`,
+          { duration: 8000 },
+        );
         setIsSubmitting(false);
       }
     } catch {
-      toast.error("Failed to send inquiry. Please check your connection.");
+      toast.error("Couldn't reach the server. Check your connection and try again.");
       setIsSubmitting(false);
     }
   };
@@ -273,9 +270,15 @@ export default function LetsWorkPage() {
                     onSubmit={handleSubmit}
                     className="space-y-8"
                   >
-                    <input type="hidden" name="_captcha" value="false" />
-                    <input type="hidden" name="_template" value="table" />
-                    <input type="hidden" name="_subject" value="New Project Inquiry — Portfolio" />
+                    {/* Honeypot: hidden from people, bots fill it in */}
+                    <input
+                      type="text"
+                      name="company"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="hidden"
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div>
