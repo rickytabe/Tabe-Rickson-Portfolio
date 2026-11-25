@@ -663,7 +663,8 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
       <button
         type="button"
         className={`book-quiz-fab ${
-          showFab && !drawerOpen && !supportOpen && !quizOpen && !unlockOpen ? "is-on" : ""
+          // Always on (not only after scrolling), so Quiz me is one tap away from the first screen.
+          !drawerOpen && !supportOpen && !quizOpen && !unlockOpen ? "is-on" : ""
         } ${
           showTop ? "is-raised" : ""
         }`}
