@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    url: "https://taberickson.com/csc207/quiz",
+    url: "https://www.taberickson.com/csc207/quiz",
     siteName: "taberickson.com",
     type: "website",
     locale: "en_US",

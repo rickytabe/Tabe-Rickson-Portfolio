@@ -85,11 +85,11 @@ export default async function ProjectPage({ params }: Props) {
               "@type": "CreativeWork",
               "name": project.name,
               "description": project.description,
-              "url": project.liveUrl || `https://taberickson.com/projects/${project.slug}`,
+              "url": project.liveUrl || `https://www.taberickson.com/projects/${project.slug}`,
               "author": {
-                "@id": "https://taberickson.com/#person"
+                "@id": "https://www.taberickson.com/#person"
               },
-              "image": `https://taberickson.com${project.image}`
+              "image": `https://www.taberickson.com${project.image}`
             })
           }}
         />

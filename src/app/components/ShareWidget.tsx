@@ -19,7 +19,7 @@ export default function ShareWidget({ url, title }: ShareWidgetProps) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(fullUrl || `https://taberickson.com${url}`);
+      await navigator.clipboard.writeText(fullUrl || `https://www.taberickson.com${url}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -27,7 +27,7 @@ export default function ShareWidget({ url, title }: ShareWidgetProps) {
     }
   };
 
-  const shareUrl = fullUrl || `https://taberickson.com${url}`;
+  const shareUrl = fullUrl || `https://www.taberickson.com${url}`;
 
   const shareLinks = [
     {

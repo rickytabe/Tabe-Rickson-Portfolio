@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       }
     ],
-    sitemap: 'https://taberickson.com/sitemap.xml',
+    sitemap: 'https://www.taberickson.com/sitemap.xml',
   };
 }

@@ -16,10 +16,10 @@ import "../algorithms-made-easy-csc207/book.css";
 import "./csc205.css";
 
 const book = BOOKS.csc205;
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
-const title = "CSC205 All-In-One Revision: Notes and Past Papers in One PDF";
+const title = "CSC205 All-In-One Revision: Notes and Past Papers in One PDF | Tabe Rickson";
 const description = `CSC205 revision notes in one ${CSC205_PAGES}-page PDF, built from the lecture notes and the 2022, 2023 and 2024 past papers: number base conversions, signed numbers and 2's complement, IEEE 754, computer ethics, operating systems, Windows and GUIs, and the history of computing. With ${CSC205_QUESTIONS.length} quiz questions.`;
 
 export const metadata: Metadata = {
@@ -61,7 +61,7 @@ const jsonLd = {
       inLanguage: "en",
       bookFormat: "https://schema.org/EBook",
       numberOfPages: CSC205_PAGES,
-      author: { "@type": "Person", name: BOOK_AUTHOR, url: siteUrl },
+      author: { "@type": "Person", "@id": `${siteUrl}/#person`, name: BOOK_AUTHOR, url: siteUrl },
       isAccessibleForFree: true,
     },
     {

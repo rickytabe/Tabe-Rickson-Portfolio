@@ -20,8 +20,9 @@ import { CSC207CA24_COUNT, CSC207CA24_PDF, csc207ca24BookHtml } from "@/content/
 import { CSC205_PAGES, CSC205_PDF } from "@/content/csc205/render";
 import { CSC205_QUESTIONS } from "../csc205-revision/quiz-questions";
 import { InteractiveBackground } from "../components/InteractiveBackground";
+import BookSearch from "./BookSearch";
 
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 
 type Book = {
   title: string;
@@ -129,9 +130,9 @@ const books: Book[] = [
   },
 ];
 
-const title = "Books | Tabe Rickson";
+const title = "My Books | Tabe Rickson";
 const description =
-  "Books by Tabe Rickson. CSC207 Made Easy rewrites Introduction to Algorithms in plain English. CSC207 and CSC211 Tutorial Sheet Solutions solve every tutorial question step by step.";
+  "Free books by Tabe Rickson for University of Buea computer science students: CSC207 Made Easy, CSC207 and CSC211 Tutorial Sheet Solutions, solved CSC207 CA papers (2024 and 2025), and CSC205 All-In-One Revision.";
 
 export const metadata: Metadata = {
   title,
@@ -217,17 +218,20 @@ export default function BooksIndex() {
         <main className="flex-1 pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto w-full">
           <div className="mb-16">
             <h1 className="text-4xl md:text-6xl font-black font-sans tracking-tighter uppercase mb-4 text-foreground">
-              The <span className="text-[#39FF14]">Books</span>
+              My <span className="text-[#39FF14]">Books</span>
             </h1>
             <p className="text-foreground/60 text-lg max-w-2xl font-inter">
               Hard subjects, rewritten in plain English, and tutorial sheets solved step by step.
             </p>
           </div>
 
+          <BookSearch total={books.length} />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {books.map((book) => (
               <article
                 key={book.href}
+                data-book-search={[book.title, book.subtitle, book.description, ...book.topics].join(" ").toLowerCase()}
                 className="group flex flex-col bg-card-bg border border-foreground/10 rounded-2xl overflow-hidden hover:border-[#39FF14]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#39FF14]/5"
               >
                 <Link href={book.href} className="relative block w-full aspect-[1200/630] bg-foreground/5 overflow-hidden">

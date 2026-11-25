@@ -11,10 +11,10 @@ import "./csc211.css";
 
 const book = BOOKS.csc211;
 const wall = book.paywall!;
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
-const title = "CSC211 Tutorial Solutions: Every Probability Question Solved Step by Step";
+const title = "CSC211 Tutorial Solutions: Every Probability Question Solved Step by Step | Tabe Rickson";
 const description = `All ${SOLVED_COUNT} CSC211 tutorial questions solved in full: sample spaces, conditional probability, Bayes, counting, binomial, Poisson, geometric and normal distributions, and joint densities. Each one starts with how to recognise the problem. Questions 1 to ${wall.freeSections} free.`;
 
 export const metadata: Metadata = {
@@ -57,7 +57,7 @@ const jsonLd = {
       description,
       url: pageUrl,
       inLanguage: "en",
-      author: { "@type": "Person", name: BOOK_AUTHOR, url: siteUrl },
+      author: { "@type": "Person", "@id": `${siteUrl}/#person`, name: BOOK_AUTHOR, url: siteUrl },
       isAccessibleForFree: false,
       hasPart: CSC211_ITEMS.filter((i) => i.solution && isLocked(book, i.id)).length
         ? { "@type": "WebPageElement", isAccessibleForFree: false, cssSelector: ".sol-lock" }
