@@ -103,7 +103,7 @@ const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207: ["/algorithms-made-easy-csc207", "/algorithms"],
   csc211: ["/csc211-tutorial-solutions"],
   csc207t: ["/csc207-tutorial-solutions"],
-  csc207test1: ["/csc207-test-1-solutions"],
+  csc207test1: ["/csc207-ca-2024-solutions", "/csc207-test-1-solutions"],
 };
 
 async function load(book: BookInfo) {

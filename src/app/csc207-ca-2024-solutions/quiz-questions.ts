@@ -1,4 +1,4 @@
-// Algo's questions for CSC207 Test 1 Solutions (public: no answers here).
+// Algo's questions for CSC207 CA 2024 (public: no answers here).
 // Answers and explanations live server-side in src/lib/quiz/answers-csc207test1.ts. The correct option
 // is always listed first there; the quiz shuffles the options. Keep ids stable: stats use them.
 import type { QuizQuestion } from "@/app/algorithms-made-easy-csc207/quiz-questions";

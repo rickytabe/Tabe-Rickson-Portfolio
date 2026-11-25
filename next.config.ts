@@ -26,9 +26,13 @@ const nextConfig: NextConfig = {
       // CSC207 Tutorial Sheet Solutions: /csc207 and /csc207/quiz already belong to CSC207 Made Easy.
       { source: "/csc207/tutorial", destination: "/csc207-tutorial-solutions", permanent: false },
       { source: "/csc207/tutorial/quiz", destination: "/csc207-tutorial-solutions?quiz=1", permanent: false },
-      // CSC207 Test 1 Solutions (Test 1, November 2025).
-      { source: "/csc207/test1", destination: "/csc207-test-1-solutions", permanent: false },
-      { source: "/csc207/test1/quiz", destination: "/csc207-test-1-solutions?quiz=1", permanent: false },
+      // CSC207 CA 2024. It was first published as "Test 1" at /csc207-test-1-solutions and /csc207/test1:
+      // those links were shared, so keep them forever.
+      { source: "/csc207/ca2024", destination: "/csc207-ca-2024-solutions", permanent: false },
+      { source: "/csc207/ca2024/quiz", destination: "/csc207-ca-2024-solutions?quiz=1", permanent: false },
+      { source: "/csc207-test-1-solutions", destination: "/csc207-ca-2024-solutions", permanent: true },
+      { source: "/csc207/test1", destination: "/csc207-ca-2024-solutions", permanent: false },
+      { source: "/csc207/test1/quiz", destination: "/csc207-ca-2024-solutions?quiz=1", permanent: false },
     ];
   },
 };

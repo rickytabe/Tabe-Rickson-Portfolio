@@ -10,6 +10,7 @@ import {
   CSC207TEST1_LABELS,
   CSC207TEST1_NUMBERS,
   CSC207TEST1_PARTS,
+  CSC207TEST1_PDF,
 } from "@/content/csc207test1/render";
 import "../algorithms-made-easy-csc207/book.css";
 import "../csc211-tutorial-solutions/csc211.css";
@@ -20,15 +21,16 @@ const book = BOOKS.csc207test1;
 const siteUrl = "https://taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
-const title = "CSC207 Test 1 Solutions: November 2025, Every Question Solved";
-const description = `All ${COUNT} questions on the CSC207 Introduction to Algorithms Test 1 (November 2025) solved: ordered set initSet and contains, isPalindrome, exact-output tracing of switch, for and while, and the course registration pseudocode with its flowchart.`;
+const title = "CSC207 CA 2024 Solutions: Every Question Solved";
+const description = `All ${COUNT} questions on the CSC207 Introduction to Algorithms CA 2024 solved: ordered set initSet and contains, isPalindrome, exact-output tracing of switch, for and while, and the course registration pseudocode with its flowchart.`;
 
 export const metadata: Metadata = {
   title,
   description,
   keywords: [
     "CSC207",
-    "CSC207 Test 1",
+    "CSC207 CA 2024",
+    "CSC207 CA",
     "CSC207 test solutions",
     "CSC207 past questions",
     "pseudocode",
@@ -39,14 +41,14 @@ export const metadata: Metadata = {
   alternates: { canonical: book.path },
   openGraph: {
     type: "book",
-    title: "CSC207 Test 1 Solutions",
-    description: "Every question on CSC207 Test 1, solved. Pseudocode, flowchart and exact outputs.",
+    title: "CSC207 CA 2024",
+    description: "Every question on the CSC207 CA 2024, solved. Pseudocode, flowchart and exact outputs.",
     url: pageUrl,
   },
   twitter: {
     card: "summary_large_image",
-    title: "CSC207 Test 1 Solutions",
-    description: "Every question on CSC207 Test 1, solved. Pseudocode, flowchart and exact outputs.",
+    title: "CSC207 CA 2024",
+    description: "Every question on the CSC207 CA 2024, solved. Pseudocode, flowchart and exact outputs.",
   },
 };
 
@@ -57,7 +59,7 @@ const jsonLd = {
       "@type": "Book",
       "@id": `${pageUrl}#book`,
       name: book.title,
-      alternativeHeadline: "CSC207 Test 1 (November 2025), solved",
+      alternativeHeadline: "CSC207 CA 2024, solved",
       description,
       url: pageUrl,
       inLanguage: "en",
@@ -115,12 +117,13 @@ const readerBook: ReaderBook = {
     sectionNoun: "question",
     labels: CSC207TEST1_LABELS,
     numbers: CSC207TEST1_NUMBERS,
-    introLine: "Short questions on the Test 1 topics. Pick A, B, C or D.",
+    introLine: "Short questions on the CA 2024 topics. Pick A, B, C or D.",
   },
   feedback: { noun: "solution", example: "e.g. I didn't get why the for loop prints 11 at the end" },
   support: {
     title: "Did these solutions help you?",
-    text: "CSC207 Test 1 Solutions is every question on the paper solved in full, free for everyone, no ads. If it helped you, a small tip tells Tabe it was worth it and keeps solved papers coming before every exam.",
+    text: "CSC207 CA 2024 is every question on the paper solved in full, free for everyone, no ads. If it helped you, a small tip tells Tabe it was worth it and keeps solved papers coming before every exam.",
+    download: "The 8-page PDF of the CA 2024 solutions is yours to keep, print and share, free. If it helps you in the exam, a small tip tells Tabe it was worth it and keeps solved papers coming.",
   },
 };
 
@@ -132,11 +135,12 @@ export default function Csc207Test1Book() {
       <BookReader
         book={readerBook}
         parts={parts}
+        pdf={CSC207TEST1_PDF}
         className={fraunces.variable}
-        about="Every question on the CSC207 Introduction to Algorithms Test 1 paper (November 2025), solved in the course pseudocode, straight to the answers."
+        about="Every question on the CSC207 Introduction to Algorithms CA 2024 paper, solved in the course pseudocode, straight to the answers."
         credits={
           <p className="book-foot-credit">
-            Questions are reproduced word for word from the CSC207 Test 1 paper (University of Buea, November 2025) so
+            Questions are reproduced word for word from the CSC207 CA 2024 paper (University of Buea) so
             you can match them to your copy. Where the paper leaves a choice open, the solution says what was assumed.
           </p>
         }

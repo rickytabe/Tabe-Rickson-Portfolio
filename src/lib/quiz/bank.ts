@@ -3,7 +3,7 @@ import type { BookInfo } from "@/lib/books";
 import { QUIZ_QUESTIONS as CSC207_QUESTIONS, type QuizQuestion } from "@/app/algorithms-made-easy-csc207/quiz-questions";
 import { CSC211_QUESTIONS } from "@/app/csc211-tutorial-solutions/quiz-questions";
 import { CSC207T_QUESTIONS } from "@/app/csc207-tutorial-solutions/quiz-questions";
-import { CSC207TEST1_QUESTIONS } from "@/app/csc207-test-1-solutions/quiz-questions";
+import { CSC207TEST1_QUESTIONS } from "@/app/csc207-ca-2024-solutions/quiz-questions";
 import { QUIZ_ANSWERS as CSC207_ANSWERS } from "./answers";
 import { CSC211_ANSWERS } from "./answers-csc211";
 import { CSC207T_ANSWERS } from "./answers-csc207t";
