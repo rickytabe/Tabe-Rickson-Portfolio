@@ -17,10 +17,10 @@ import "../csc211-tutorial-solutions/csc211.css";
 import "./csc207t.css";
 
 const book = BOOKS.csc207t;
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
-const title = "CSC207 Tutorial Sheet Solutions: Branching and Looping, Every Question Solved";
+const title = "CSC207 Tutorial Sheet Solutions: Branching and Looping, Every Question Solved | Tabe Rickson";
 const description = `All ${SOLVED_COUNT} questions on CSC207 Tutorial Sheet 1 solved in full pseudocode: ordered set Insert and Union, isPalindrome, branching programs (grades, leap year, BMI, calculator), looping programs (factorial, Fibonacci, primes, patterns) and exact-output tracing. Each one starts with how to recognise the problem.`;
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ const jsonLd = {
       description,
       url: pageUrl,
       inLanguage: "en",
-      author: { "@type": "Person", name: BOOK_AUTHOR, url: siteUrl },
+      author: { "@type": "Person", "@id": `${siteUrl}/#person`, name: BOOK_AUTHOR, url: siteUrl },
       isAccessibleForFree: true,
     },
     {

@@ -33,8 +33,8 @@ export async function POST(req: Request) {
     const snippet = excerpt || description || 'Check out the latest update on the site.';
     
     const linkUrl = _type === 'post' 
-      ? `https://taberickson.com/blog/${slug?.current || ''}` 
-      : `https://taberickson.com/events`;
+      ? `https://www.taberickson.com/blog/${slug?.current || ''}` 
+      : `https://www.taberickson.com/events`;
 
     // Send email via Resend
     // Resend allows up to 50 BCCs per request. We batch them.

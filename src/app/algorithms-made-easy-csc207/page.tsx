@@ -14,13 +14,13 @@ import {
 } from "./book-meta";
 import "./book.css";
 
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const pageUrl = `${siteUrl}${BOOK_PATH}`;
 const minutes = readingMinutes(readBookHtml());
 const pdfPath = "/algorithms-made-easy-csc207/csc207-made-easy.pdf";
 const ogImage = "/algorithms-made-easy-csc207/og.png";
 
-const title = "CSC207 Made Easy: Introduction to Algorithms in Plain English";
+const title = "CSC207 Made Easy: Introduction to Algorithms in Plain English | Tabe Rickson";
 const description =
   "CSC207 Introduction to Algorithms, rewritten in plain English. 24 illustrated chapters covering pseudocode, flowcharts, Euclid's algorithm, greedy methods, divide and conquer, dynamic programming and Big O notation, each with a real life example. Free to read, with a downloadable PDF.";
 const shortDescription =

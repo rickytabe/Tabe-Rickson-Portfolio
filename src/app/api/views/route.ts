@@ -8,6 +8,7 @@ const COUNTED: Record<string, string[]> = {
   "/csc207-tutorial-solutions": ["/csc207-tutorial-solutions"],
   "/csc207-ca-2025-solutions": ["/csc207-ca-2025-solutions", "/csc207-test-1-solutions"],
   "/csc207-ca-2024-solutions": ["/csc207-ca-2024-solutions"],
+  "/csc205-revision": ["/csc205-revision"],
 };
 
 export async function GET(request: Request) {

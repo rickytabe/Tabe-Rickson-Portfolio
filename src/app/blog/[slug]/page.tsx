@@ -89,11 +89,11 @@ export default async function BlogPostPage({ params }: Props) {
                   "@type": "BlogPosting",
                   "headline": post.title,
                   "description": post.excerpt,
-                  "image": post.mainImage ? urlFor(post.mainImage).url() : "https://taberickson.com/opengraph-image.png",
+                  "image": post.mainImage ? urlFor(post.mainImage).url() : "https://www.taberickson.com/opengraph-image.png",
                   "datePublished": post.publishedAt,
-                  "url": `https://taberickson.com/blog/${slug}`,
+                  "url": `https://www.taberickson.com/blog/${slug}`,
                   "author": {
-                    "@id": "https://taberickson.com/#person"
+                    "@id": "https://www.taberickson.com/#person"
                   }
                 })
               }}

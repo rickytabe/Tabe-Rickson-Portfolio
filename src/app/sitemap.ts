@@ -4,7 +4,7 @@ import portfolioData from '../../portfolio-data.json';
 import { client } from '@/lib/sanity/client';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://taberickson.com";
+  const baseUrl = "https://www.taberickson.com";
 
   // Fetch all blog posts to generate dynamic routes
   const posts = await client.fetch(`*[_type == "post"]{ "slug": slug.current, _updatedAt }`);
@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/csc207-tutorial-solutions',
     '/csc207-ca-2025-solutions',
     '/csc207-ca-2024-solutions',
+    '/csc205-revision',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),

@@ -18,10 +18,10 @@ import "../csc207-tutorial-solutions/csc207t.css";
 import "./csc207ca24.css";
 
 const book = BOOKS.csc207ca24;
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const pageUrl = `${siteUrl}${book.path}`;
 
-const title = "CSC207 CA 2024 Solutions: Every Question Solved";
+const title = "CSC207 CA 2024 Solutions: Every Question Solved | Tabe Rickson";
 const description = `All ${COUNT} questions on the CSC207 Introduction to Algorithms CA 2024 solved: reverseList, arrays versus files, exact-output tracing of switch, for, while, continue and break, and the auto teller (ATM) algorithm with its flowchart.`;
 
 export const metadata: Metadata = {
@@ -63,7 +63,7 @@ const jsonLd = {
       description,
       url: pageUrl,
       inLanguage: "en",
-      author: { "@type": "Person", name: BOOK_AUTHOR, url: siteUrl },
+      author: { "@type": "Person", "@id": `${siteUrl}/#person`, name: BOOK_AUTHOR, url: siteUrl },
       isAccessibleForFree: true,
     },
     {

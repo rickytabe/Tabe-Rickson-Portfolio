@@ -8,7 +8,7 @@ import { Toaster } from "react-hot-toast";
 import portfolioData from "../../portfolio-data.json";
 
 
-const siteUrl = "https://taberickson.com";
+const siteUrl = "https://www.taberickson.com";
 const title = "Tabe Rickson - Full-Stack & AI Developer";
 const description = "I'm Tabe Rickson, and I build web and mobile apps that solve real problems.";
 
@@ -75,11 +75,11 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
-              "@id": "https://taberickson.com/#person",
+              "@id": "https://www.taberickson.com/#person",
               "name": "Tabe Rickson",
               "jobTitle": "Full-Stack Web & Mobile Software Engineer",
-              "url": "https://taberickson.com",
-              "image": "https://taberickson.com/my-pic1.png",
+              "url": "https://www.taberickson.com",
+              "image": "https://www.taberickson.com/my-pic1.png",
               "address": {
                 "@type": "PostalAddress",
                 "addressLocality": "Buea",

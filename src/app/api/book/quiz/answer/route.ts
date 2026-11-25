@@ -4,6 +4,7 @@ import { dayKey, db, insightsEnabled, readerFromRequest, sameOrigin } from "@/li
 import { bookFrom } from "@/lib/books";
 import { boardDocId, DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
 import { quizBank } from "@/lib/quiz/bank";
+import { QUIZ_SEEN_FIELD } from "@/lib/quiz/server";
 
 type Session = {
   book?: string; // missing on sessions started before there were two books: CSC207
@@ -113,10 +114,16 @@ export async function POST(request: Request) {
         );
       }
       tx.update(ref, update);
-      return { status: 200 as const, correct, done, score, ranked, points, quizzes, key };
+      return { status: 200 as const, correct, done, score, ranked, points, quizzes, key, bookId: book.id };
     });
 
     if (result.status !== 200) return NextResponse.json({ error: "Not allowed" }, { status: result.status });
+    // Rotation: this question counts as seen, so the next quizzes draw from the ones not yet answered.
+    await store
+      .collection("bookReaders")
+      .doc(rid)
+      .set({ [QUIZ_SEEN_FIELD]: { [result.bookId]: FieldValue.arrayUnion(qid) } }, { merge: true })
+      .catch((error) => console.error("Quiz rotation not saved", error));
     return NextResponse.json(
       {
         correct: result.correct,

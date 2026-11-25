@@ -48,24 +48,46 @@ export function cleanName(input: unknown): NameCheck {
   return { ok: true, name };
 }
 
-/** Draw a quiz on the server: questions from different sections where possible, in book order. */
-export function drawQuestionIds(book: BookInfo, count = QUIZ_LENGTH): string[] {
+/**
+ * Draw a quiz on the server: questions from different sections where possible, in book order.
+ *
+ * Rotation: `seen` is the questions this reader has already answered in the current cycle. They are
+ * left out until every question in the bank has been answered once, so the same reader does not get
+ * the same questions again before they have seen them all. When fewer than `count` unseen questions
+ * remain, the quiz takes all of them, tops up from the rest, and `reset` says the cycle starts again.
+ */
+export function drawQuestions(
+  book: BookInfo,
+  seen: readonly string[] = [],
+  count = QUIZ_LENGTH
+): { ids: string[]; reset: boolean } {
   const { questions } = quizBank(book);
-  const shuffled = [...questions].sort(() => Math.random() - 0.5);
+  const seenSet = new Set(seen);
+  const fresh = questions.filter((q) => !seenSet.has(q.id));
+  const reset = fresh.length < count;
+  const shuffle = <T,>(list: T[]) => [...list].sort(() => Math.random() - 0.5);
+  // Unseen questions first; on a reset, every one of them is in, and the rest of the bank fills up.
+  const pools = reset ? [fresh, questions.filter((q) => seenSet.has(q.id))] : [fresh];
   const picked: typeof questions = [];
-  const chapters = new Set<string>();
-  for (const q of shuffled) {
-    if (picked.length >= count) break;
-    if (!chapters.has(q.chapter)) {
-      picked.push(q);
-      chapters.add(q.chapter);
+  for (const pool of pools) {
+    const shuffled = shuffle(pool);
+    const chapters = new Set(picked.map((q) => q.chapter));
+    for (const q of shuffled) {
+      if (picked.length >= count) break;
+      if (!chapters.has(q.chapter)) {
+        picked.push(q);
+        chapters.add(q.chapter);
+      }
     }
-  }
-  for (const q of shuffled) {
-    if (picked.length >= count) break;
-    if (!picked.includes(q)) picked.push(q);
+    for (const q of shuffled) {
+      if (picked.length >= count) break;
+      if (!picked.includes(q)) picked.push(q);
+    }
   }
   const order = (q: (typeof questions)[number]) => book.sections.indexOf(q.chapter);
   picked.sort((a, b) => order(a) - order(b));
-  return picked.map((q) => q.id);
+  return { ids: picked.map((q) => q.id), reset };
 }
+
+/** Reader field that holds the question ids answered in the current rotation, per book. */
+export const QUIZ_SEEN_FIELD = "quizSeen";
