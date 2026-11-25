@@ -952,11 +952,25 @@ async function bookSummary(book: BookInfo) {
   };
 }
 
+/**
+ * People, not book readers: a student who reads three books is one person here. Counts reader
+ * documents (one per anonymous reader id), and those first seen since midnight in Cameroon.
+ */
+async function peopleCounts(now = new Date()): Promise<{ people: number; today: number }> {
+  const readers = db().collection("bookReaders");
+  const local = new Date(now.getTime() + 3600000); // Africa/Douala is UTC+1 all year
+  const startOfToday = new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) - 3600000);
+  const [people, today] = await Promise.all([
+    readers.count().get(),
+    readers.where("firstSeen", ">=", startOfToday).count().get(),
+  ]);
+  return { people: people.data().count, today: today.data().count };
+}
+
 /** The board: every book at a glance. Each card opens that book's insights. */
 async function Overview() {
   const books = await Promise.all(BOOK_IDS.map((id) => bookSummary(BOOKS[id])));
-  const totalReaders = books.reduce((a, b) => a + b.readers, 0);
-  const totalToday = books.reduce((a, b) => a + b.today, 0);
+  const { people: totalReaders, today: totalToday } = await peopleCounts();
   const totalRevenue = books.reduce((a, b) => a + b.revenue, 0);
   const totalQuizzes = books.reduce((a, b) => a + b.quizFinished, 0);
   const latest = books
@@ -989,7 +1003,7 @@ async function Overview() {
       </header>
 
       <section className="ins-tiles" aria-label="All books together">
-        <Tile label="Readers, all books" value={fmt.format(totalReaders)} hint={`${fmt.format(totalToday)} new today`} />
+        <Tile label="People, all books" value={fmt.format(totalReaders)} hint={`${fmt.format(totalToday)} new today · each counted once`} />
         <Tile label="Quizzes finished" value={fmt.format(totalQuizzes)} hint="across every book" />
         <Tile label="Revenue" value={`${fmt.format(totalRevenue)} FCFA`} hint="unlocks and tips, after fees" />
         <Tile label="Books" value={String(books.length)} hint={`${books.filter((b) => b.book.paywall).length} paid`} />
