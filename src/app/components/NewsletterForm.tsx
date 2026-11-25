@@ -42,8 +42,11 @@ export default function NewsletterForm() {
         body: JSON.stringify({ email, firstName }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send emails');
+      const result: { ok?: boolean; error?: string } = await response
+        .json()
+        .catch(() => ({}));
+      if (!response.ok || result.ok !== true) {
+        throw new Error(result.error ?? "We couldn't sign you up just now.");
       }
 
       setIsSuccess(true);
@@ -52,7 +55,11 @@ export default function NewsletterForm() {
       setFirstName("");
     } catch (error) {
       console.error("Error subscribing:", error);
-      toast.error("Something went wrong. Please try again.");
+      const msg =
+        error instanceof Error && error.message !== "Failed to fetch"
+          ? error.message
+          : "Couldn't reach the server. Check your connection.";
+      toast.error(`${msg} Please try again.`, { duration: 8000 });
     } finally {
       setIsSubmitting(false);
     }

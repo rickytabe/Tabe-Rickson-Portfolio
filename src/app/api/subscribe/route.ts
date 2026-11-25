@@ -1,28 +1,80 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Newsletter sign-up. Returns ok only when both emails were accepted by
+// Resend: the notification to Tabe (sent first, so a failure leaves nothing
+// half-done for the reader) and the welcome email to the subscriber.
+
+const FROM = 'Tabe Rickson <hello@taberickson.com>';
+const NOTIFY = 'rickytabe2@gmail.com';
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function fail(error: string, status: number) {
+  return NextResponse.json({ ok: false, error }, { status });
+}
 
 export async function POST(req: Request) {
+  let body: { email?: unknown; firstName?: unknown };
   try {
-    const { email, firstName } = await req.json();
+    body = await req.json();
+  } catch {
+    return fail('Invalid request.', 400);
+  }
 
-    if (!email || !firstName) {
-      return NextResponse.json({ error: 'Email and firstName are required' }, { status: 400 });
+  const email = typeof body.email === 'string' ? body.email.trim().slice(0, 200) : '';
+  const firstName = typeof body.firstName === 'string' ? body.firstName.trim().slice(0, 80) : '';
+  if (!email || !firstName) return fail('Please enter your first name and email.', 400);
+  if (!EMAIL_RE.test(email)) return fail("That email address doesn't look right.", 400);
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error('[subscribe] RESEND_API_KEY is not set');
+    return fail("Sign-up isn't available right now.", 503);
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const safeName = escapeHtml(firstName);
+  const safeEmail = escapeHtml(email);
+
+  try {
+    // 1. Tell Tabe about the new subscriber.
+    const notification = await resend.emails.send({
+      from: FROM,
+      to: NOTIFY,
+      replyTo: email,
+      subject: `🎉 New Newsletter Subscriber: ${firstName}`,
+      html: `
+        <div style="font-family: sans-serif;">
+          <h2>New Subscriber Alert!</h2>
+          <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+        </div>
+      `,
+      text: `New subscriber\n\nName: ${firstName}\nEmail: ${email}`,
+    });
+    if (notification.error) {
+      console.error('[subscribe] notification rejected:', notification.error);
+      return fail("We couldn't sign you up just now.", 502);
     }
 
-    // 1. Send Welcome Email via Resend
-    // We assume hello@taberickson.com is verified on Resend.
-    const resendResult = await resend.emails.send({
-      from: 'Tabe Rickson <hello@taberickson.com>',
+    // 2. Welcome the subscriber.
+    const welcome = await resend.emails.send({
+      from: FROM,
       to: email,
       subject: `Hey ${firstName}, great to connect!`,
       html: `
         <div style="background-color: #121212; padding: 40px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e5e5e5; line-height: 1.6;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #1a1a1a; padding: 40px; border-radius: 8px; border-top: 4px solid #39FF14;">
             
-            <p style="font-size: 18px; color: #ffffff; margin-bottom: 24px;">Hi ${firstName},</p>
+            <p style="font-size: 18px; color: #ffffff; margin-bottom: 24px;">Hi ${safeName},</p>
             
             <p style="font-size: 16px; margin-bottom: 20px;">
               Thanks for dropping by and connecting. I'm excited to share this space with you.
@@ -51,32 +103,15 @@ export async function POST(req: Request) {
         </div>
       `,
     });
-
-    if (resendResult.error) {
-      console.error('Resend Error:', resendResult.error);
+    if (welcome.error) {
+      console.error('[subscribe] welcome email rejected:', welcome.error);
+      return fail("We couldn't send the welcome email to that address.", 502);
     }
 
-    // 2. Send Notification to you via Resend (Much more reliable than FormSubmit for server-to-server)
-    const notificationResult = await resend.emails.send({
-      from: 'Tabe Rickson <hello@taberickson.com>',
-      to: 'rickytabe2@gmail.com',
-      subject: '🎉 New Newsletter Subscriber!',
-      html: `
-        <div style="font-family: sans-serif;">
-          <h2>New Subscriber Alert!</h2>
-          <p><strong>Name:</strong> ${firstName}</p>
-          <p><strong>Email:</strong> ${email}</p>
-        </div>
-      `,
-    });
-
-    if (notificationResult.error) {
-      console.error('Notification Error:', notificationResult.error);
-    }
-
-    return NextResponse.json({ success: true, message: 'Subscribed successfully' });
+    console.log('[subscribe] ok', notification.data?.id, welcome.data?.id);
+    return NextResponse.json({ ok: true, success: true, message: 'Subscribed successfully' });
   } catch (error) {
-    console.error('Subscribe Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('[subscribe] send failed:', error);
+    return fail("We couldn't sign you up just now.", 502);
   }
 }
