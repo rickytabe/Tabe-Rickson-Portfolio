@@ -33,6 +33,9 @@ const nextConfig: NextConfig = {
       { source: "/csc207-test-1-solutions", destination: "/csc207-ca-2025-solutions", permanent: true },
       { source: "/csc207/test1", destination: "/csc207-ca-2025-solutions", permanent: false },
       { source: "/csc207/test1/quiz", destination: "/csc207-ca-2025-solutions?quiz=1", permanent: false },
+      // CSC205 All-In-One Revision (a PDF-only book).
+      { source: "/csc205", destination: "/csc205-revision", permanent: false },
+      { source: "/csc205/quiz", destination: "/csc205-revision?quiz=1", permanent: false },
       // CSC207 CA 2024 (the 20/11/2024 paper).
       { source: "/csc207/ca2024", destination: "/csc207-ca-2024-solutions", permanent: false },
       { source: "/csc207/ca2024/quiz", destination: "/csc207-ca-2024-solutions?quiz=1", permanent: false },

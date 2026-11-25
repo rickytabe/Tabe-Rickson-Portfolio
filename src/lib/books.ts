@@ -1,7 +1,7 @@
 // The books on the site. Plain data, safe to import from client components and the server.
 // Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
 
-export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24";
+export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24" | "csc205";
 
 export type BookInfo = {
   id: BookId;
@@ -81,6 +81,17 @@ export const BOOKS: Record<BookId, BookInfo> = {
     // CA 2024 (20/11/2024): Section A 1a-c, 2a-d; Section B the auto teller.
     sections: ["a1a", "a1b", "a1c", "a2a", "a2b", "a2c", "a2d", "b1"],
     // Free for everyone, like the other CSC207 books: supported by voluntary tips.
+  },
+  csc205: {
+    id: "csc205",
+    title: "CSC205 All-In-One Revision",
+    path: "/csc205-revision",
+    quizLink: "https://taberickson.com/csc205/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc205",
+    sectionNoun: "part",
+    // A PDF-only book: the page lists the parts of the notes, and Algo quizzes each one.
+    sections: ["p1", "p2", "p3", "p4", "p5", "p6"],
+    // Free for everyone: supported by voluntary tips when the PDF is downloaded.
   },
 };
 

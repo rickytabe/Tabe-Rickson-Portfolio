@@ -17,6 +17,8 @@ import { LOCKED_COUNT, SOLVED_COUNT, bookHtml } from "@/content/csc211/render";
 import { CSC207T_PDF, CSC207T_SOLVED_COUNT, csc207tBookHtml } from "@/content/csc207t/render";
 import { CSC207TEST1_COUNT, CSC207TEST1_PDF, csc207test1BookHtml } from "@/content/csc207test1/render";
 import { CSC207CA24_COUNT, CSC207CA24_PDF, csc207ca24BookHtml } from "@/content/csc207ca24/render";
+import { CSC205_PAGES, CSC205_PDF } from "@/content/csc205/render";
+import { CSC205_QUESTIONS } from "../csc205-revision/quiz-questions";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 
 const siteUrl = "https://taberickson.com";
@@ -109,6 +111,21 @@ const books: Book[] = [
     avatar: BOOK_AUTHOR_AVATAR,
     readTime: formatReadTime(readingMinutes(csc207ca24BookHtml())),
     topics: ["Pseudocode", "Flowchart", "Tracing output", "Arrays", "ATM"],
+  },
+  {
+    title: BOOKS.csc205.title,
+    subtitle: "Lecture notes and past papers in one PDF",
+    description:
+      "CSC205 revision notes built from the lecture notes and the 2022, 2023 and 2024 past papers, ordered by how often each topic comes up: base conversions, signed numbers and 2's complement, IEEE 754, ethics, operating systems, Windows and GUIs, and history. Free to download.",
+    href: BOOKS.csc205.path,
+    pdf: CSC205_PDF,
+    cover: `${BOOKS.csc205.path}/opengraph-image`,
+    facts: [`${CSC205_PAGES}-PAGE PDF`, `${CSC205_QUESTIONS.length} QUIZ QUESTIONS`],
+    price: "FREE",
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: `${CSC205_PAGES} pages`,
+    topics: ["Number bases", "2's complement", "IEEE 754", "Ethics", "Operating systems", "GUIs"],
   },
 ];
 

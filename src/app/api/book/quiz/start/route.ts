@@ -3,7 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { dayKey, db, ensureReader, insightsEnabled, readerCookie, sameOrigin } from "@/lib/insights/server";
 import { bookFrom } from "@/lib/books";
 import { boardDocId, DAILY_COUNTED, readEntry } from "@/lib/quiz/board";
-import { drawQuestionIds, weekKey } from "@/lib/quiz/server";
+import { drawQuestions, QUIZ_SEEN_FIELD, weekKey } from "@/lib/quiz/server";
 import { quizBank } from "@/lib/quiz/bank";
 
 /**
@@ -19,7 +19,13 @@ export async function POST(request: Request) {
   const { rid, isNew } = await ensureReader(request, book);
   const store = db();
   const week = weekKey();
-  const ids = drawQuestionIds(book);
+  // Rotate through the whole bank: leave out what this reader already answered in this cycle.
+  const readerRef = store.collection("bookReaders").doc(rid);
+  const seenMap = ((await readerRef.get()).data()?.[QUIZ_SEEN_FIELD] ?? {}) as Record<string, unknown>;
+  const seen = Array.isArray(seenMap[book.id]) ? (seenMap[book.id] as unknown[]).filter((x): x is string => typeof x === "string") : [];
+  const { ids, reset } = drawQuestions(book, seen);
+  // Every question has been answered once: start a new cycle (this quiz's answers will be its first).
+  if (reset) await readerRef.set({ [QUIZ_SEEN_FIELD]: { [book.id]: [] } }, { merge: true });
   const entry = readEntry((await store.collection("quizBoard").doc(boardDocId(book, week, rid)).get()).data());
   const countedToday = entry.days[dayKey()] ?? 0;
   // A hint for the intro: whether this quiz will add to the weekly points (decided at the finish).

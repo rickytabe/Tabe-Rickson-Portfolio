@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/csc207-tutorial-solutions',
     '/csc207-ca-2025-solutions',
     '/csc207-ca-2024-solutions',
+    '/csc205-revision',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
