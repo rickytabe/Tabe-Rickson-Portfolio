@@ -35,7 +35,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex items-center min-h-svh px-6 sm:px-8 lg:px-16 pt-28 pb-16 lg:pt-32 lg:pb-24"
+      className="relative flex items-center min-h-svh lg:min-h-[calc(100svh-5rem)] px-6 sm:px-8 lg:px-16 pt-28 pb-16 lg:pt-32 lg:pb-16"
     >
       <div className="hero-grid w-full max-w-7xl mx-auto">
         {/* Copy */}
