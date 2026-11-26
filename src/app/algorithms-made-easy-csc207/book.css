@@ -654,6 +654,14 @@ a.is-active .book-toc-num {
   background: var(--foreground);
   color: var(--background);
 }
+/* A download button inside a section (e.g. a paper card) must beat `.book-content .ch a`,
+   which would paint the text in the accent green, the same as the button. */
+.book-content .ch a.dl {
+  color: #121212;
+}
+.book-content .ch a.dl:hover {
+  color: var(--background);
+}
 .book-content .dl svg {
   width: 16px;
   height: 16px;
@@ -2907,4 +2915,209 @@ a.is-active .book-toc-num {
   margin: 8px 0 0;
   font-size: 13.5px;
   color: var(--b-trap);
+}
+
+/* ---------- unlock sheet (paid books) ---------- */
+.unlock-card {
+  max-width: 480px;
+  text-align: left;
+}
+.unlock-card .support-kicker,
+.unlock-card .support-title,
+.unlock-card .support-text {
+  text-align: center;
+}
+.unlock-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+  color: #121212;
+  background: #f3bf3f;
+  box-shadow: 0 8px 26px rgba(243, 191, 63, 0.35);
+}
+.unlock-badge.is-open {
+  background: var(--neon-green);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--neon-green) 35%, transparent);
+}
+.unlock-steps {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.unlock-steps > li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.unlock-steps > li > div,
+.unlock-steps > li > form {
+  flex: 1;
+  min-width: 0;
+}
+.unlock-step-n {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1px solid var(--b-line);
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.unlock-step-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 10px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.unlock-step-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--b-soft);
+}
+.unlock-code {
+  margin: 0 0 10px;
+}
+.unlock-code .support-code-value {
+  font-size: 17px;
+}
+.unlock-wa {
+  width: 100%;
+}
+.unlock-form-row {
+  display: flex;
+  gap: 10px;
+}
+.unlock-form-row .support-btn {
+  flex: 0 0 auto;
+}
+.unlock-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--b-line);
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--foreground);
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 16px; /* 16px stops iOS zooming in on focus */
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.unlock-input::placeholder {
+  color: var(--b-faint);
+  opacity: 1;
+}
+.unlock-input:focus {
+  border-color: var(--b-accent);
+  outline: 3px solid color-mix(in srgb, var(--b-accent) 25%, transparent);
+  outline-offset: 0;
+}
+.unlock-error {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  color: var(--b-trap);
+}
+.unlock-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 16px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--b-faint);
+}
+.unlock-or::before,
+.unlock-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--b-line);
+}
+.unlock-invite {
+  padding: 14px;
+  border: 1px solid var(--b-line);
+  border-radius: 12px;
+  background: var(--b-wash);
+}
+.unlock-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+.unlock-meter span {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--b-line);
+  transition: background 0.3s;
+}
+.unlock-meter span.is-on {
+  background: var(--neon-green);
+}
+.unlock-meter b {
+  margin-left: 6px;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--foreground);
+}
+
+/* ---------- instant Mobile Money checkout ---------- */
+.unlock-pay {
+  margin: 26px 0 4px;
+  text-align: center;
+}
+.unlock-pay-btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: 13px;
+}
+.unlock-pay-note {
+  justify-content: center;
+  margin: 14px 0 0;
+  line-height: 1.5;
+  text-align: center;
+}
+.unlock-code-btn {
+  flex: 0 0 auto;
+  min-height: 50px;
+  padding-inline: 22px;
+}
+.unlock-welcome {
+  margin-top: 22px;
+}
+.unlock-card .support-text {
+  line-height: 1.55;
+}
+@media (max-width: 480px) {
+  .unlock-card {
+    padding: 26px 18px 18px;
+  }
 }
