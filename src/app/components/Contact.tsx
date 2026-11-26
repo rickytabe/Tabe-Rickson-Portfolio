@@ -5,7 +5,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { SECTION_STYLES } from "../utils/sectionStyles";
-import { AnimatedText } from "@/components/ui/animated-text";
+import SectionHeader from "./SectionHeader";
 import portfolioData from "../../../portfolio-data.json";
 import NewsletterForm from "./NewsletterForm";
 
@@ -108,11 +108,6 @@ export default function Contact() {
   return (
     <section id="contact" className={SECTION_STYLES.wrapper}>
       <div className={SECTION_STYLES.container}>
-        {/* Backdrop text */}
-        <div className={SECTION_STYLES.backdropWrapper}>
-          <span className={SECTION_STYLES.backdropText}>CONTACT</span>
-        </div>
-
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -120,23 +115,13 @@ export default function Contact() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className={SECTION_STYLES.headerBadgeWrapper}>
-            <span className={SECTION_STYLES.headerBadgeNumber}>06</span>
-            <span className={SECTION_STYLES.headerBadgeLine}></span>
-            <span className={SECTION_STYLES.headerBadgeText}>Contact</span>
-          </div>
-          <div className="flex flex-col items-start mb-4">
-            <AnimatedText
-              as="h2"
-              text={<>Let&apos;s Build<br />Something.</>}
-              className="items-start"
-              textClassName="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight font-sans text-left"
-              underlineClassName="text-[#39FF14]"
-            />
-          </div>
-          <p className={`${SECTION_STYLES.description} mb-12`}>
-            Got a project in mind, a question, or just want to connect? I&apos;m always open to new conversations and opportunities.
-          </p>
+          <SectionHeader
+            className="mb-12"
+            backdrop="CONTACT"
+            eyebrow="Contact"
+            title="Let's build something."
+            lede="Got a project in mind, a question, or just want to connect? I'm always open to new conversations and opportunities."
+          />
         </motion.div>
 
         {/* Main content — two columns */}

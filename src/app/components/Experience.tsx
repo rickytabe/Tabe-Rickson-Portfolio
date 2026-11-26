@@ -4,7 +4,7 @@ import Image from "next/image";
 import { MotionConfig, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SECTION_STYLES } from "../utils/sectionStyles";
+import SectionHeader from "./SectionHeader";
 
 const timelineData = [
   {
@@ -175,22 +175,13 @@ export default function Experience() {
         className="relative overflow-x-clip border-t border-card-border px-8 lg:px-16 py-24 lg:py-32"
       >
         <div className="max-w-7xl mx-auto w-full">
-          <header className="relative mb-12 lg:mb-14">
-            <div className={SECTION_STYLES.backdropWrapper} aria-hidden="true">
-              <span className={SECTION_STYLES.backdropText}>JOURNEY</span>
-            </div>
-
-            <div className="relative z-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-              <div className="max-w-3xl">
-                <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">The story so far</p>
-                <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
-                  How I got here.
-                </h2>
-                <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
-                  The path hasn&apos;t always been clean, but it&apos;s been real. Swipe through the years.
-                </p>
-              </div>
-
+          <SectionHeader
+            className="mb-12 lg:mb-14"
+            backdrop="JOURNEY"
+            eyebrow="The story so far"
+            title="How I got here."
+            lede="The path hasn't always been clean, but it's been real. Swipe through the years."
+            aside={
               <dl className="flex gap-10">
                 <div className="flex flex-col">
                   <dt className="order-2 mt-1 text-[13px] text-foreground/60">years coding</dt>
@@ -201,8 +192,8 @@ export default function Experience() {
                   <dd className="text-4xl font-bold tracking-[-0.03em] text-foreground">15+</dd>
                 </div>
               </dl>
-            </div>
-          </header>
+            }
+          />
         </div>
 
         {/* Full-bleed carousel whose first card lines up with the content column */}
