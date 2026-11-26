@@ -6,6 +6,13 @@ export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca
 export type BookInfo = {
   id: BookId;
   title: string;
+  /**
+   * One-line promise, used in the "new book" email to subscribers (and a good default for the
+   * page description). No free or paid details.
+   */
+  blurb: string;
+  /** Cover image for that email, a site path. Defaults to the book's `${path}/opengraph-image`. */
+  cover?: string;
   path: string;
   /** Link shared from the quiz's "Challenge a classmate" button. */
   quizLink: string;
@@ -42,7 +49,9 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc207: {
     id: "csc207",
     title: "CSC207 Made Easy",
+    blurb: "The whole course in 24 illustrated chapters, with a real life example for every hard idea.",
     path: "/algorithms-made-easy-csc207",
+    cover: "/algorithms-made-easy-csc207/og.png",
     quizLink: "https://taberickson.com/csc207/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc207",
     sectionNoun: "chapter",
@@ -51,6 +60,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc211: {
     id: "csc211",
     title: "CSC211 Tutorial Sheet Solutions",
+    blurb: "Every CSC211 tutorial question, solved step by step. Know exactly which rule to use in the CA.",
     path: "/csc211-tutorial-solutions",
     quizLink: "https://taberickson.com/csc211/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc211",
@@ -62,6 +72,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc207t: {
     id: "csc207t",
     title: "CSC207 Tutorial Sheet Solutions",
+    blurb: "Every CSC207 tutorial question, solved step by step. Know exactly which construct to use in the CA.",
     path: "/csc207-tutorial-solutions",
     quizLink: "https://taberickson.com/csc207/tutorial/quiz?ref=quiz-share",
     // /csc207 and /csc207/quiz belong to CSC207 Made Easy, so the tutorials live under /csc207/tutorial.
@@ -79,6 +90,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc207test1: {
     id: "csc207test1",
     title: "CSC207 CA 2025",
+    blurb: "Every question on the CSC207 CA 2025, solved. Pseudocode, flowchart and exact outputs.",
     path: "/csc207-ca-2025-solutions",
     quizLink: "https://taberickson.com/csc207/ca2025/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc207/ca2025",
@@ -90,6 +102,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc207ca24: {
     id: "csc207ca24",
     title: "CSC207 CA 2024",
+    blurb: "Every question on the CSC207 CA 2024, solved. Pseudocode, flowchart and exact outputs.",
     path: "/csc207-ca-2024-solutions",
     quizLink: "https://taberickson.com/csc207/ca2024/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc207/ca2024",
@@ -101,6 +114,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc205: {
     id: "csc205",
     title: "CSC205 All-In-One Revision",
+    blurb: "Lecture notes and three past papers in one PDF, ordered by what actually comes up.",
     path: "/csc205-revision",
     quizLink: "https://taberickson.com/csc205/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc205",
@@ -114,6 +128,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc205ca: {
     id: "csc205ca",
     title: "CSC205 Past CA Solutions",
+    blurb: "Four past CSC205 papers, every question solved with the working shown.",
     path: "/csc205-ca-solutions",
     quizLink: "https://taberickson.com/csc205/ca/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc205/ca",
@@ -138,6 +153,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
   csc211ca: {
     id: "csc211ca",
     title: "CSC211 Past CA Solutions",
+    blurb: "Three past CSC211 CAs, every question solved step by step.",
     path: "/csc211-ca-solutions",
     quizLink: "https://taberickson.com/csc211/ca/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc211/ca",

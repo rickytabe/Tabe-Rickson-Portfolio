@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getApps } from 'firebase-admin/app';
+import { saveSubscriber } from '@/lib/mailing';
 
-// Newsletter sign-up. Returns ok only when both emails were accepted by
-// Resend: the notification to Tabe (sent first, so a failure leaves nothing
-// half-done for the reader) and the welcome email to the subscriber.
+// Newsletter sign-up. Saves the subscriber to the email list (Firestore, on
+// the server; signing up twice keeps one entry), then sends two emails through
+// Resend: the notification to Tabe (first, so a failure leaves nothing
+// half-done for the reader) and the welcome email. Returns ok only when all
+// three worked.
 
 const FROM = 'Tabe Rickson <hello@taberickson.com>';
 const NOTIFY = 'rickytabe2@gmail.com';
@@ -38,6 +42,17 @@ export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
     console.error('[subscribe] RESEND_API_KEY is not set');
     return fail("Sign-up isn't available right now.", 503);
+  }
+
+  if (!getApps().length) {
+    console.error('[subscribe] Firebase admin is not configured');
+    return fail("Sign-up isn't available right now.", 503);
+  }
+  try {
+    await saveSubscriber(email, firstName);
+  } catch (error) {
+    console.error('[subscribe] could not save the subscriber:', error);
+    return fail("We couldn't sign you up just now.", 502);
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);

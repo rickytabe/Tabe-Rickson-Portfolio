@@ -19,6 +19,15 @@ import { listCodes, type CodeRow } from "@/lib/unlock";
 import { fapshiEnabled, listPayments, type PaymentRow } from "@/lib/fapshi";
 import { NEW_CODE_COOKIE } from "@/lib/insights/admin-auth";
 import { weekKey, weekStartLabel } from "@/lib/quiz/server";
+import {
+  bookLink,
+  LAUNCHED_BEFORE_ANNOUNCEMENTS,
+  listAnnouncements,
+  pendingBooks,
+  recipientCount,
+  type Announcement,
+} from "@/lib/announcements";
+import { mailingEnabled } from "@/lib/mailing";
 import "./insights.css";
 
 export const dynamic = "force-dynamic";
@@ -173,7 +182,7 @@ function Login({ failed }: { failed: boolean }) {
 export default async function BookInsights({
   searchParams,
 }: {
-  searchParams: Promise<{ e?: string; book?: string }>;
+  searchParams: Promise<{ e?: string; book?: string; ann?: string; ab?: string; n?: string }>;
 }) {
   if (!dashboardEnabled()) notFound();
   const jar = await cookies();
@@ -190,7 +199,7 @@ export default async function BookInsights({
   }
   // No book picked: the board of every book. A card opens that book's insights.
   if (!params.book || !BOOK_IDS.includes(params.book as BookInfo["id"])) {
-    return <Overview />;
+    return <Overview ann={params.ann} annBook={params.ab} annCount={params.n} />;
   }
 
   const book = bookFrom(params.book);
@@ -1016,7 +1025,7 @@ async function peopleCounts(now = new Date()): Promise<{ people: number; today: 
 }
 
 /** The board: every book at a glance. Each card opens that book's insights. */
-async function Overview() {
+async function Overview({ ann, annBook, annCount }: { ann?: string; annBook?: string; annCount?: string }) {
   const books = await Promise.all(BOOK_IDS.map((id) => bookSummary(BOOKS[id])));
   const { people: totalReaders, today: totalToday } = await peopleCounts();
   const totalRevenue = books.reduce((a, b) => a + b.revenue, 0);
@@ -1056,6 +1065,8 @@ async function Overview() {
         <Tile label="Revenue" value={`${fmt.format(totalRevenue)} FCFA`} hint="unlocks and tips, after fees" />
         <Tile label="Books" value={String(books.length)} hint={`${books.filter((b) => b.book.paywall).length} paid`} />
       </section>
+
+      <AnnouncePanel ann={ann} annBook={annBook} annCount={annCount} />
 
       {booksByCourse().map((group) => {
         const inCourse = books.filter((b) => group.ids.includes(b.book.id));
@@ -1146,5 +1157,139 @@ async function Overview() {
         );
       })}
     </main>
+  );
+}
+
+const ANNOUNCE_MESSAGES: Record<string, string> = {
+  tested: "Test sent to rickytabe2@gmail.com. Check it, then send it to everyone.",
+  testfailed: "The test email didn't go out. Check the Vercel logs for [announce].",
+  sent: "Sent.",
+  confirm: "Tick the box to confirm, then press Send to everyone again.",
+  already: "That book has already been announced, so nothing was sent.",
+  busy: "That announcement is already being sent. Refresh in a minute.",
+  empty: "There's nobody on the list yet, so nothing was sent.",
+  failed: "Sending stopped partway. Press Send to everyone again to reach the people who were missed. Nobody gets it twice.",
+  skipped: "Done. That book won't be offered here again.",
+  off: "Email isn't configured on this deployment (Firebase admin and RESEND_API_KEY are needed).",
+  badbook: "Unknown book.",
+  badaction: "Unknown action.",
+};
+
+/**
+ * Announce a new book to the newsletter list. Books ship as code, so any book in BOOKS without
+ * an announcement record shows up here after it deploys. One click sends it, once.
+ */
+async function AnnouncePanel({ ann, annBook, annCount }: { ann?: string; annBook?: string; annCount?: string }) {
+  if (!mailingEnabled()) {
+    return (
+      <section className="ins-card" id="announce">
+        <h2 className="ins-h2">Announce a new book</h2>
+        <p className="ins-muted">{ANNOUNCE_MESSAGES.off}</p>
+      </section>
+    );
+  }
+  const [done, people] = await Promise.all([listAnnouncements(), recipientCount()]);
+  const pending = pendingBooks(done);
+  const sent = (Object.values(done) as Announcement[])
+    .filter((a) => a.status === "sent")
+    .sort((a, b) => (b.sentAt?.getTime() ?? 0) - (a.sentAt?.getTime() ?? 0));
+  const earlier = LAUNCHED_BEFORE_ANNOUNCEMENTS.filter((id) => !done[id] || done[id]!.status === "failed");
+  const flashBook = annBook && annBook in BOOKS ? BOOKS[annBook as BookInfo["id"]].title : null;
+  const flash = ann ? ANNOUNCE_MESSAGES[ann] : null;
+  const people$ = `${fmt.format(people)} ${people === 1 ? "person" : "people"}`;
+
+  const form = (book: BookInfo, blurb: string, failed?: Announcement) => (
+    <form method="post" action="/api/book/admin/announce" className="ins-announce-form">
+      <input type="hidden" name="book" value={book.id} />
+      {failed?.status === "failed" ? (
+        <p className="ins-announce-warn">
+          Stopped after {fmt.format(failed.sentCount)} of {fmt.format(failed.total)}
+          {failed.error ? `: ${failed.error}` : ""}. Sending again only reaches the people who were missed.
+        </p>
+      ) : null}
+      <label htmlFor={`blurb-${book.id}`} className="ins-label">
+        One-line promise (after &ldquo;I just published {book.title}.&rdquo;)
+      </label>
+      <textarea id={`blurb-${book.id}`} name="blurb" rows={2} maxLength={400} defaultValue={blurb} className="ins-input ins-announce-blurb" />
+      <label className="ins-announce-confirm">
+        <input type="checkbox" name="confirm" value="yes" /> Send to all {people$}
+      </label>
+      <div className="ins-announce-actions">
+        <button type="submit" name="action" value="test" className="ins-btn ins-btn-ghost">
+          Send me a test
+        </button>
+        <button type="submit" name="action" value="send" className="ins-btn">
+          Send to everyone
+        </button>
+      </div>
+    </form>
+  );
+
+  return (
+    <section className="ins-card" id="announce">
+      <h2 className="ins-h2">Announce a new book</h2>
+      <p className="ins-note">
+        Emails everyone on the newsletter list ({people$}) about a book, once each. Check the live page and send yourself
+        a test first. The email has the title, the line below, the book&apos;s cover card and its short link, with no
+        free or paid details. Everyone gets an unsubscribe link.
+      </p>
+      {flash ? (
+        <p className="ins-announce-flash" role="status">
+          {flashBook ? <strong>{flashBook}: </strong> : null}
+          {flash}
+          {ann === "sent" && annCount ? ` ${fmt.format(Number(annCount))} emails went out.` : ""}
+        </p>
+      ) : null}
+
+      {pending.length ? (
+        pending.map((book) => (
+          <div key={book.id} className="ins-announce">
+            <p className="ins-kicker">New, not announced yet</p>
+            <h3 className="ins-h2">{book.title}</h3>
+            <p className="ins-muted">
+              <a href={book.path} target="_blank" rel="noopener noreferrer">
+                Open the live page
+              </a>{" "}
+              · link in the email: {bookLink(book)}
+            </p>
+            {form(book, done[book.id]?.blurb || book.blurb, done[book.id])}
+            <form method="post" action="/api/book/admin/announce">
+              <input type="hidden" name="book" value={book.id} />
+              <button type="submit" name="action" value="skip" className="ins-btn ins-btn-ghost ins-btn-sm">
+                Don&apos;t announce this one
+              </button>
+            </form>
+          </div>
+        ))
+      ) : (
+        <p className="ins-muted">Nothing new to announce. A new book shows up here as soon as it is live on the site.</p>
+      )}
+
+      {earlier.length ? (
+        <details className="ins-announce-earlier">
+          <summary>Announce an earlier book</summary>
+          {earlier.map((id) => (
+            <div key={id} className="ins-announce">
+              <h3 className="ins-h2">{BOOKS[id].title}</h3>
+              {form(BOOKS[id], done[id]?.blurb || BOOKS[id].blurb, done[id])}
+            </div>
+          ))}
+        </details>
+      ) : null}
+
+      {sent.length ? (
+        <ul className="ins-list ins-announce-sent">
+          {sent.map((a) => (
+            <li key={a.book}>
+              <span>{BOOKS[a.book].title}</span>
+              <span className="ins-muted">
+                sent to {fmt.format(a.sentCount)}
+                {a.sentAt ? ` · ${when.format(a.sentAt)}` : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
   );
 }

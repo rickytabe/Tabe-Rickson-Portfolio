@@ -709,3 +709,70 @@
   margin: 6px 0 0;
   font-size: 12px;
 }
+
+/* Announce a new book */
+.ins-announce {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--i-line);
+}
+.ins-announce .ins-h2 {
+  margin: 2px 0 4px;
+}
+.ins-announce a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.ins-announce-form {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 10px;
+}
+.ins-announce-blurb {
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.45;
+}
+.ins-announce-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--i-soft);
+}
+.ins-announce-confirm input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--i-accent);
+}
+.ins-announce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ins-announce-flash {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--i-track);
+  font-size: 14px;
+}
+.ins-announce-warn {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--i-bad);
+}
+.ins-announce-earlier {
+  margin-top: 18px;
+}
+.ins-announce-earlier summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--i-soft);
+}
+.ins-announce-sent {
+  margin-top: 18px;
+}
+.ins-btn:active {
+  opacity: 0.7;
+}
