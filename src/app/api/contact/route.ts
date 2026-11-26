@@ -21,6 +21,8 @@ const FIELDS: Record<string, { label: string; max: number }> = {
   whatsapp: { label: "WhatsApp", max: 40 },
   phone: { label: "WhatsApp / Phone", max: 40 },
   project_type: { label: "Project type", max: 60 },
+  budget: { label: "Budget", max: 60 },
+  timeline: { label: "Timeline", max: 60 },
   message: { label: "Message", max: 5000 },
   details: { label: "Project details", max: 5000 },
 };
