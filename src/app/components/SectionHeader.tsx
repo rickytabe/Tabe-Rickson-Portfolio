@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 
 /**
@@ -13,6 +13,7 @@ export default function SectionHeader({
   lede,
   aside,
   className = "",
+  as: Heading = "h2",
 }: {
   backdrop: string;
   eyebrow: string;
@@ -20,6 +21,8 @@ export default function SectionHeader({
   lede?: ReactNode;
   aside?: ReactNode;
   className?: string;
+  /** Heading level for the title; a page's main header uses "h1". */
+  as?: ElementType;
 }) {
   return (
     <header className={`relative ${className}`}>
@@ -32,9 +35,9 @@ export default function SectionHeader({
       >
         <div className="max-w-3xl">
           <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">{eyebrow}</p>
-          <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
+          <Heading className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
             {title}
-          </h2>
+          </Heading>
           {lede && (
             <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
               {lede}

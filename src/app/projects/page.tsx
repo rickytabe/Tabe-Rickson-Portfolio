@@ -1,64 +1,43 @@
+import type { Metadata } from "next";
 import portfolioData from "../../../portfolio-data.json";
-import Link from "next/link";
-import Image from "next/image";
-import { Metadata } from "next";
+import { InteractiveBackground } from "../components/InteractiveBackground";
+import SectionHeader from "../components/SectionHeader";
+import type { Project } from "../components/ProjectTile";
+import ProjectsBrowser from "./ProjectsBrowser";
 
 export const metadata: Metadata = {
   title: "Projects | Tabe Rickson",
-  description: "A collection of my full-stack web and mobile applications.",
+  description:
+    "Websites, mobile apps, AI tools and payment systems built by Tabe Rickson, a full-stack engineer in Buea, Cameroon. See the live sites, the code and the case studies.",
   alternates: {
     canonical: "/projects",
+  },
+  openGraph: {
+    title: "Projects | Tabe Rickson",
+    description: "Websites, mobile apps, AI tools and payment systems, designed and built end to end.",
+    url: "/projects",
   },
 };
 
 export default function ProjectsIndex() {
-  const { projects } = portfolioData;
+  const projects = portfolioData.projects as Project[];
 
   return (
-    <div className="min-h-screen pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto">
-      <div className="mb-16">
-        <h1 className="text-4xl md:text-6xl font-black font-sans tracking-tighter uppercase mb-4 text-foreground">
-          All <span className="text-[#39FF14]">Projects</span>
-        </h1>
-        <p className="text-foreground/60 text-lg max-w-2xl font-inter">
-          A comprehensive collection of my software engineering work, spanning full-stack web applications, mobile platforms, and AI integrations.
-        </p>
-      </div>
+    <InteractiveBackground>
+      <main className="relative z-10 overflow-x-clip px-8 lg:px-16 pt-32 pb-24 lg:pt-40 lg:pb-32">
+        <div className="max-w-7xl mx-auto w-full">
+          <SectionHeader
+            as="h1"
+            className="mb-10 lg:mb-12"
+            backdrop="PROJECTS"
+            eyebrow="All projects"
+            title="Everything I've built."
+            lede="Websites, apps, AI tools and payment systems for real businesses and communities. Open any card for the full story."
+          />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project) => (
-          <Link href={`/projects/${project.slug}`} key={project.slug} className="group flex flex-col bg-card-bg border border-card-border rounded-2xl overflow-hidden hover:border-[#39FF14]/50 transition-colors duration-300">
-            <div className="relative w-full h-48 bg-background/50 overflow-hidden">
-              <Image 
-                src={project.image} 
-                alt={project.name} 
-                fill 
-                className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" 
-              />
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-              <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-2xl font-bold font-sans text-foreground">{project.name}</h2>
-              </div>
-              <p className="text-sm text-foreground/60 font-inter line-clamp-3 mb-6 flex-grow">
-                {project.description}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-auto">
-                {project.techIcons.slice(0, 3).map((tech) => (
-                  <span key={tech} className="text-xs px-2 py-1 bg-background/50 border border-card-border rounded text-foreground/70 font-mono">
-                    {tech}
-                  </span>
-                ))}
-                {project.techIcons.length > 3 && (
-                  <span className="text-xs px-2 py-1 bg-background/50 border border-card-border rounded text-foreground/70 font-mono">
-                    +{project.techIcons.length - 3}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+          <ProjectsBrowser projects={projects} />
+        </div>
+      </main>
+    </InteractiveBackground>
   );
 }
