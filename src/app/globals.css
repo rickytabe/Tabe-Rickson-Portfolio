@@ -182,37 +182,9 @@ body {
   }
 }
 
-/* Scroll cue: a short line that drips down */
-.hero-scroll-line {
-  position: relative;
-  width: 1px;
-  height: 40px;
-  overflow: hidden;
-  background: currentColor;
-  opacity: 0.25;
-}
-
-.hero-scroll-line::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -40%;
-  width: 1px;
-  height: 40%;
-  background: var(--hero-accent);
-  animation: hero-scroll 2.2s ease-in-out infinite;
-}
-
-@keyframes hero-scroll {
-  to {
-    top: 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero-rise,
-  .hero-fade,
-  .hero-scroll-line::after {
+  .hero-fade {
     animation: none;
   }
 }

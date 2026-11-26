@@ -109,17 +109,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-
-      {/* Scroll cue */}
-      <a
-        href="#about"
-        aria-label="Scroll to About"
-        className="hero-fade hidden lg:flex absolute bottom-8 inset-x-0 mx-auto w-fit flex-col items-center gap-3 font-mono text-[11px] tracking-[0.25em] uppercase text-foreground/55 hover:text-foreground transition-colors"
-        style={delay(700)}
-      >
-        Scroll
-        <span className="hero-scroll-line" />
-      </a>
     </section>
   );
 }
