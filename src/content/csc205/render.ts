@@ -25,10 +25,14 @@ export const CSC205_PARTS_LIST: Part[] = [
     covers: ["Computer science, IT and software engineering", "Babbage, Lovelace, Hollerith, Turing, von Neumann", "The four generations of computers"] },
 ];
 
-export const CSC205_LABELS: Record<string, string> = Object.fromEntries(CSC205_PARTS_LIST.map((p) => [p.id, p.title]));
-export const CSC205_NUMBERS: Record<string, string> = Object.fromEntries(
-  CSC205_PARTS_LIST.map((p) => [p.id, sectionLabel(BOOK, p.id)])
-);
+export const CSC205_LABELS: Record<string, string> = {
+  ...Object.fromEntries(CSC205_PARTS_LIST.map((p) => [p.id, p.title])),
+  notes: "The revision notes (whole PDF)",
+};
+export const CSC205_NUMBERS: Record<string, string> = {
+  ...Object.fromEntries(CSC205_PARTS_LIST.map((p) => [p.id, sectionLabel(BOOK, p.id)])),
+  notes: "PDF",
+};
 
 const DL_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 11l5 5l5-5"/><path d="M4 20h16"/></svg>`;
 
@@ -42,7 +46,8 @@ function coverHtml(): string {
     <a class="dl" href="${CSC205_PDF}" download>${DL_ICON}Download the revision notes</a>
   </p>
   <p class="dlnote">A ${CSC205_PAGES}-page PDF. Print it, or read it offline on a phone. Then test yourself with Algo below.</p>
-</header>`;
+</header>
+<div class="ch-feedback rev-feedback" data-chapter="notes" data-question="Were these notes helpful?" data-yes="Yes, helpful" data-example="e.g. add more worked IEEE 754 examples"></div>`;
 }
 
 function partHtml(p: Part): string {

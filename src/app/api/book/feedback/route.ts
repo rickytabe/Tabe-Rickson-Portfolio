@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const book = bookFrom(body.book);
   const chapter = String(body.chapter ?? "");
   const vote = body.vote === "up" || body.vote === "down" ? body.vote : null;
-  if (!book.sections.includes(chapter) || !vote) {
+  if (!(book.sections.includes(chapter) || book.feedbackOn?.includes(chapter)) || !vote) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
   const text =

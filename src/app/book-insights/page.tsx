@@ -212,8 +212,17 @@ export default async function BookInsights({
     const down = n(stats.clarity, `${c}_down`);
     return { id: c, num: numbers[c] ?? c, label: labels[c] ?? c, reach: n(stats.reach, c), up, down };
   });
-  const votesUp = rows.reduce((a, r) => a + r.up, 0);
-  const votesDown = rows.reduce((a, r) => a + r.down, 0);
+  // Whole-book votes (e.g. "Were these notes helpful?"): listed in the table, not in reach or drops.
+  const wholeRows = (book.feedbackOn ?? []).map((c) => ({
+    id: c,
+    num: numbers[c] ?? c,
+    label: labels[c] ?? c,
+    reach: -1,
+    up: n(stats.clarity, `${c}_up`),
+    down: n(stats.clarity, `${c}_down`),
+  }));
+  const votesUp = [...rows, ...wholeRows].reduce((a, r) => a + r.up, 0);
+  const votesDown = [...rows, ...wholeRows].reduce((a, r) => a + r.down, 0);
   const reachMax = Math.max(readers, ...rows.map((r) => r.reach), 1);
 
   // Biggest drop between consecutive chapters, and the least clear chapter (3+ votes).
@@ -390,7 +399,7 @@ export default async function BookInsights({
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => {
+              {[...wholeRows, ...rows].map((r) => {
                 const votes = r.up + r.down;
                 return (
                   <tr key={r.id}>
@@ -398,12 +407,18 @@ export default async function BookInsights({
                       <span className="ins-num">{r.num.padStart(2, "0")}</span> {r.label}
                     </th>
                     <td>
-                      <div className="ins-hbar" title={`${r.reach} readers (${pct(r.reach, readers)}%)`}>
-                        <span className="ins-hbar-fill" style={{ width: `${(r.reach / reachMax) * 100}%` }} />
-                      </div>
-                      <span className="ins-val">
-                        {r.reach} <small>{pct(r.reach, readers)}%</small>
-                      </span>
+                      {r.reach < 0 ? (
+                        <span className="ins-muted">whole book</span>
+                      ) : (
+                        <>
+                          <div className="ins-hbar" title={`${r.reach} readers (${pct(r.reach, readers)}%)`}>
+                            <span className="ins-hbar-fill" style={{ width: `${(r.reach / reachMax) * 100}%` }} />
+                          </div>
+                          <span className="ins-val">
+                            {r.reach} <small>{pct(r.reach, readers)}%</small>
+                          </span>
+                        </>
+                      )}
                     </td>
                     <td>
                       {votes ? (

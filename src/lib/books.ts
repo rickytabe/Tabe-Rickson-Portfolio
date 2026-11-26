@@ -15,6 +15,8 @@ export type BookInfo = {
   sectionNoun: string;
   /** Section ids in reading order: every id the stats and the quiz may refer to. */
   sections: string[];
+  /** Extra ids that take "Was this clear?" votes without being a section, e.g. the whole notes. */
+  feedbackOn?: string[];
   /** Paid books: the first `freeSections` solutions are open, the rest unlock. */
   paywall?: { freeSections: number; priceFcfa: number; invitesNeeded: number };
 };
@@ -91,6 +93,8 @@ export const BOOKS: Record<BookId, BookInfo> = {
     sectionNoun: "part",
     // A PDF-only book: the page lists the parts of the notes, and Algo quizzes each one.
     sections: ["p1", "p2", "p3", "p4", "p5", "p6"],
+    // "Were these notes helpful?" under the download button rates the PDF as a whole.
+    feedbackOn: ["notes"],
     // Free for everyone: supported by voluntary tips when the PDF is downloaded.
   },
 };
