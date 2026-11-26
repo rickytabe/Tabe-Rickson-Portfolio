@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Copy, Download, KeyRound, Loader2, Share2, Smartphone, Users, X } from "lucide-react";
+import { Check, Copy, Download, KeyRound, Loader2, Share2, Smartphone, Users, X } from "lucide-react";
 import { settled, track } from "./insights";
 import { Smiley } from "./SupportModal";
 import type { ReaderPaywall } from "./BookReader";
@@ -310,59 +310,59 @@ export default function UnlockModal({ book, status, startWithCode = false, welco
               ) : null}
             </div>
 
+            {codes ? (
+              <>
+                <div className="unlock-or" role="separator">
+                  <span>or use an unlock code</span>
+                </div>
+                <form
+                  className="unlock-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void redeem();
+                  }}
+                >
+                  <label className="unlock-step-title" htmlFor="unlock-code-input">
+                    Have an unlock code? Enter it here
+                  </label>
+                  <div className="unlock-form-row">
+                    <input
+                      ref={codeRef}
+                      id="unlock-code-input"
+                      className="unlock-input"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.toUpperCase())}
+                      placeholder="K7P2-XQ9M"
+                      autoComplete="one-time-code"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                      maxLength={12}
+                      aria-invalid={!!error}
+                      aria-describedby={error ? "unlock-error" : undefined}
+                    />
+                    <button
+                      type="submit"
+                      className="support-btn support-btn-primary unlock-code-btn"
+                      disabled={busy || code.replace(/[^0-9a-z]/gi, "").length < 8}
+                    >
+                      {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Unlock
+                    </button>
+                  </div>
+                  {error && code ? (
+                    <p className="unlock-error" id="unlock-error" role="alert">
+                      {error}
+                    </p>
+                  ) : null}
+                </form>
+              </>
+            ) : null}
+
             {welcome ? (
               <div className="support-actions unlock-welcome">
                 <button type="button" className="support-btn support-btn-ghost" onClick={close}>
                   {book.welcomeOut ?? "View the free solutions first"}
                 </button>
               </div>
-            ) : null}
-
-            {codes ? (
-            <details className="unlock-manual" open={startWithCode}>
-              <summary>
-                Have an unlock code? <ChevronDown className="w-4 h-4" aria-hidden />
-              </summary>
-              <form
-                className="unlock-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void redeem();
-                }}
-              >
-                <label className="unlock-step-title" htmlFor="unlock-code-input">
-                  Enter your unlock code
-                </label>
-                <div className="unlock-form-row">
-                  <input
-                    ref={codeRef}
-                    id="unlock-code-input"
-                    className="unlock-input"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    placeholder="K7P2-XQ9M"
-                    autoComplete="one-time-code"
-                    autoCapitalize="characters"
-                    spellCheck={false}
-                    maxLength={12}
-                    aria-invalid={!!error}
-                    aria-describedby={error ? "unlock-error" : undefined}
-                  />
-                  <button
-                    type="submit"
-                    className="support-btn support-btn-primary"
-                    disabled={busy || code.replace(/[^0-9a-z]/gi, "").length < 8}
-                  >
-                    {busy ? <Loader2 className="w-4 h-4 quiz-spin" aria-hidden /> : null} Unlock
-                  </button>
-                </div>
-                {error ? (
-                  <p className="unlock-error" id="unlock-error" role="alert">
-                    {error}
-                  </p>
-                ) : null}
-              </form>
-            </details>
             ) : null}
 
             {invites ? (
