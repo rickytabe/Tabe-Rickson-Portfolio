@@ -147,12 +147,12 @@ export const BOOKS: Record<BookId, BookInfo> = {
     // "Were these solutions helpful?" rates the book as a whole.
     feedbackOn: ["notes"],
     // Strictly paid (Tabe's call): no free downloads. One payment of 500 FCFA through Fapshi
-    // unlocks all three answer sheets, kept in private/. No invites, no gift codes.
+    // unlocks all three answer sheets, kept in private/. No invites. Tabe can also make unlock
+    // codes on /book-insights?book=csc211ca to test or to give someone access.
     paywall: {
       freeSections: 0,
       priceFcfa: 500,
       invitesNeeded: 0,
-      codes: false,
       pdfs: {
         y24: "csc211-ca-2024-solutions.pdf",
         y23: "csc211-ca-2023-solutions.pdf",

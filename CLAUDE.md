@@ -99,7 +99,7 @@ Four CSC205 past papers solved, at `/csc205-ca-solutions` (book id `csc205ca`, s
 
 The November 2022, 2023 and 2024 CSC211 CAs, solved, at `/csc211-ca-solutions` (book id `csc211ca`, short links `/csc211/ca` and `/csc211/ca/quiz`).
 
-- PDF-only, **strictly paid** (Tabe's call): no free downloads. One payment of 500 FCFA through Fapshi unlocks all three answer sheets; no invites, no gift codes.
+- PDF-only, **strictly paid** (Tabe's call): no free downloads. One payment of 500 FCFA through Fapshi unlocks all three answer sheets; no invites. Unlock codes are on: Tabe makes them on `/book-insights?book=csc211ca` (Unlock codes) to test or to give someone access (8 characters, 2 devices each, as for CSC211 Tutorial).
 - The page has one card per paper. Each card shows the top of the paper's own answer sheet as a PNG (the university heading and paper details, cut above QUESTION 1, so no answers), then the topics that came up, then the download.
 - The three PDFs are in `private/`, served by `/api/book/pdf?book=csc211ca&paper=y24|y23|y22` (`paywall.pdfs`) to unlocked readers only. Source sheets and `build_csc211ca.py` (copies the PDFs and renders the headers with PyMuPDF) are in `csc207-tutorial-1-source/`.
 - Algo (`gen_csc211ca_quiz.py`) practises the same topics with new numbers, so it never gives a paid answer away.
