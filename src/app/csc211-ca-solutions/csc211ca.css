@@ -1,0 +1,45 @@
+/* CSC211 Past CA Solutions: one card per paper, previewed by the top of its own answer sheet,
+   on top of book.css and the CSC205 revision styles (.rev-h, .rev-covers, .rev-feedback). */
+.book-content.book-csc211ca section.ca-card {
+  padding: 22px 0 14px;
+  border-top: 1px solid var(--b-line, rgba(127, 127, 127, 0.2));
+}
+/* The sheet preview: the top of the original answer sheet, on white paper. */
+.book-content.book-csc211ca .ca-sheet {
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid var(--card-border, rgba(127, 127, 127, 0.25));
+  border-radius: 10px;
+  background: #fff;
+}
+.book-content.book-csc211ca .ca-sheet img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.book-content.book-csc211ca .ca-sheet figcaption {
+  padding: 8px 14px 10px;
+  background: #fff;
+  color: #4a525e;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.book-content.book-csc211ca .ca-sec {
+  margin: 14px 0 4px;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.book-content.book-csc211ca .ca-dls {
+  margin: 18px 0 4px;
+}
+@media (max-width: 720px) {
+  .book-content.book-csc211ca .ca-dls .dl {
+    width: 100%;
+    justify-content: center;
+  }
+}

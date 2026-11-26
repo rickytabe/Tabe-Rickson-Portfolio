@@ -16,7 +16,7 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 const APPLY = process.argv.includes("--apply");
 // Book ids with a key prefix; CSC207 Made Easy's keys have none. Longest first, so "csc207test1-"
 // is matched before "csc207t-".
-const PREFIXED = ["csc207test1", "csc207ca24", "csc207t", "csc211", "csc205ca", "csc205"];
+const PREFIXED = ["csc207test1", "csc207ca24", "csc207t", "csc211ca", "csc211", "csc205ca", "csc205"];
 const ALL = ["csc207", ...PREFIXED];
 
 if (!getApps().length) {

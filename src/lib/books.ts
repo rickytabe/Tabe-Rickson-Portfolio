@@ -1,7 +1,7 @@
 // The books on the site. Plain data, safe to import from client components and the server.
 // Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
 
-export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24" | "csc205" | "csc205ca";
+export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24" | "csc205" | "csc205ca" | "csc211ca";
 
 export type BookInfo = {
   id: BookId;
@@ -30,6 +30,8 @@ export type BookInfo = {
     perPart?: boolean;
     codes?: boolean;
     pdf?: string;
+    /** Several paid PDFs by key (e.g. one per paper), served by /api/book/pdf?paper=<key>. */
+    pdfs?: Record<string, string>;
   };
 };
 
@@ -133,6 +135,31 @@ export const BOOKS: Record<BookId, BookInfo> = {
     // 500 FCFA through Fapshi unlocks the rest and the full PDF. No invites, no gift codes.
     paywall: { freeSections: 15, perPart: true, priceFcfa: 500, invitesNeeded: 0, codes: false, pdf: "csc205-past-ca-solutions.pdf" },
   },
+  csc211ca: {
+    id: "csc211ca",
+    title: "CSC211 Past CA Solutions",
+    path: "/csc211-ca-solutions",
+    quizLink: "https://taberickson.com/csc211/ca/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc211/ca",
+    sectionNoun: "paper",
+    // A PDF-only book: one section per past paper, newest first (see src/content/csc211ca).
+    sections: ["y24", "y23", "y22"],
+    // "Were these solutions helpful?" rates the book as a whole.
+    feedbackOn: ["notes"],
+    // Strictly paid (Tabe's call): no free downloads. One payment of 500 FCFA through Fapshi
+    // unlocks all three answer sheets, kept in private/. No invites. Tabe can also make unlock
+    // codes on /book-insights?book=csc211ca to test or to give someone access.
+    paywall: {
+      freeSections: 0,
+      priceFcfa: 500,
+      invitesNeeded: 0,
+      pdfs: {
+        y24: "csc211-ca-2024-solutions.pdf",
+        y23: "csc211-ca-2023-solutions.pdf",
+        y22: "csc211-ca-2022-solutions.pdf",
+      },
+    },
+  },
 };
 
 export const BOOK_IDS = Object.keys(BOOKS) as BookId[];
@@ -192,6 +219,8 @@ export function sectionLabel(book: BookInfo, section: string): string {
     const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
     return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
   }
+  // CSC211 Past CA: papers are numbered in book order, "y24" -> "1".
+  if (book.id === "csc211ca") return String(book.sections.indexOf(section) + 1);
   // CSC205 Past CA: "y24-b3" -> "B3", "y23-e1-2" -> "E1.2", "y22-1c" -> "1(c)", "y22-2-3" -> "2.3"
   if (book.id === "csc205ca") {
     const rest = section.slice(section.indexOf("-") + 1);

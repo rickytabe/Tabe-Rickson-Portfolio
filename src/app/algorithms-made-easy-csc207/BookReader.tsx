@@ -36,14 +36,20 @@ export type ReaderPaywall = {
   invitesNeeded: number;
   codes?: boolean;
   pdf?: string;
+  /** Several paid PDFs (one per paper), offered on the thank-you screen. */
+  downloads?: { label: string; href: string }[];
   askOnOpen?: boolean;
   freeLine?: string;
   unlockTitle?: string;
   unlockText?: string;
+  /** Thank-you line after unlocking, and the way out of the arrival offer. */
+  doneText?: string;
+  welcomeOut?: string;
 };
 
 /** "Questions 1 to 15 are free. Unlock the other 33 for 200 FCFA, or free by inviting 3 classmates." */
 export function lockLine(w: ReaderPaywall): string {
+  if (w.unlockText) return w.unlockText;
   const free = w.freeLine ?? `Questions 1 to ${w.freeSections} are free`;
   const invites = w.invitesNeeded ? `, or free by inviting ${w.invitesNeeded} classmates` : "";
   return `${free}. Unlock the other ${w.lockedCount}${w.pdf ? " and the full PDF" : ""} for ${w.priceFcfa} FCFA${invites}.`;
