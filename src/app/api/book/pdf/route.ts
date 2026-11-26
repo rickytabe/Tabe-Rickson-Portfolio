@@ -8,13 +8,15 @@ import { getUnlock } from "@/lib/unlock";
 export const runtime = "nodejs";
 
 /**
- * A paid book's full PDF (?book=), for readers who have unlocked it. The file lives in private/,
- * never in public/, so there is no direct link to it. Anyone else is sent to the book, where the
- * unlock sheet explains how to get it.
+ * A paid book's PDF (?book=, and ?paper= for books with one PDF per paper), for readers who have
+ * unlocked it. The files live in private/, never in public/, so there is no direct link to them.
+ * Anyone else is sent to the book, where the unlock sheet explains how to get them.
  */
 export async function GET(request: Request) {
-  const book = bookFrom(new URL(request.url).searchParams.get("book"));
-  const file = book.paywall?.pdf;
+  const params = new URL(request.url).searchParams;
+  const book = bookFrom(params.get("book"));
+  const paper = params.get("paper");
+  const file = paper ? book.paywall?.pdfs?.[paper] : book.paywall?.pdf;
   if (!file) return NextResponse.json({ error: "No PDF for this book" }, { status: 404 });
 
   const unlock = insightsEnabled() ? await getUnlock(readerFromRequest(request), book) : null;

@@ -231,9 +231,25 @@ export default function UnlockModal({ book, status, startWithCode = false, welco
               )}
             </p>
             <p className="support-text unlock-done-note">
-              <Check className="w-4 h-4" aria-hidden /> All {book.lockedCount} solutions
-              {book.pdf ? " and the full PDF" : ""} are open on this device and stay open when you come back.
+              <Check className="w-4 h-4" aria-hidden />{" "}
+              {book.doneText ??
+                `All ${book.lockedCount} solutions${book.pdf ? " and the full PDF" : ""} are open on this device and stay open when you come back.`}
             </p>
+            {book.downloads?.length ? (
+              <div className="unlock-downloads">
+                {book.downloads.map((d) => (
+                  <a
+                    key={d.href}
+                    className="support-btn support-btn-ghost"
+                    href={d.href}
+                    download
+                    onClick={() => track("download_direct")}
+                  >
+                    <Download className="w-4 h-4" aria-hidden /> {d.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
             <div className="support-actions">
               {book.pdf ? (
                 <a className="support-btn support-btn-ghost" href={book.pdf} download onClick={() => track("download_direct")}>
@@ -241,7 +257,7 @@ export default function UnlockModal({ book, status, startWithCode = false, welco
                 </a>
               ) : null}
               <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
-                Back to the solutions
+                {book.downloads?.length ? "Back to the book" : "Back to the solutions"}
               </button>
             </div>
             <p className="support-fine">Good luck in the CA. You&apos;ve got this.</p>
@@ -297,7 +313,7 @@ export default function UnlockModal({ book, status, startWithCode = false, welco
             {welcome ? (
               <div className="support-actions unlock-welcome">
                 <button type="button" className="support-btn support-btn-ghost" onClick={close}>
-                  View the free solutions first
+                  {book.welcomeOut ?? "View the free solutions first"}
                 </button>
               </div>
             ) : null}

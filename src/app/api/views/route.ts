@@ -10,6 +10,7 @@ const COUNTED: Record<string, string[]> = {
   "/csc207-ca-2024-solutions": ["/csc207-ca-2024-solutions"],
   "/csc205-revision": ["/csc205-revision"],
   "/csc205-ca-solutions": ["/csc205-ca-solutions"],
+  "/csc211-ca-solutions": ["/csc211-ca-solutions"],
 };
 
 export async function GET(request: Request) {

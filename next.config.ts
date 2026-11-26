@@ -38,6 +38,9 @@ const nextConfig: NextConfig = {
       // CSC205 All-In-One Revision (a PDF-only book).
       { source: "/csc205", destination: "/csc205-revision", permanent: false },
       { source: "/csc205/quiz", destination: "/csc205-revision?quiz=1", permanent: false },
+      // CSC211 Past CA Solutions (paid, three past papers as PDFs).
+      { source: "/csc211/ca", destination: "/csc211-ca-solutions", permanent: false },
+      { source: "/csc211/ca/quiz", destination: "/csc211-ca-solutions?quiz=1", permanent: false },
       // CSC205 Past CA Solutions (paid, four past papers).
       { source: "/csc205/ca", destination: "/csc205-ca-solutions", permanent: false },
       { source: "/csc205/ca/quiz", destination: "/csc205-ca-solutions?quiz=1", permanent: false },

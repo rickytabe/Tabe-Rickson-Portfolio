@@ -1341,6 +1341,12 @@ a.is-active .book-toc-num {
   justify-content: center;
   flex-wrap: wrap;
 }
+/* Paid PDFs on the thank-you screen: one full-width button per file. */
+.unlock-downloads {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
 .support-btn {
   flex: 1 1 140px;
   display: inline-flex;

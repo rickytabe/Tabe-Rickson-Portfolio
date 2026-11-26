@@ -11,6 +11,7 @@ import { CSC207TEST1_LABELS, CSC207TEST1_NUMBERS } from "@/content/csc207test1/r
 import { CSC207CA24_LABELS, CSC207CA24_NUMBERS } from "@/content/csc207ca24/render";
 import { CSC205_LABELS, CSC205_NUMBERS } from "@/content/csc205/render";
 import { CSC205CA_LABELS, CSC205CA_NUMBERS } from "@/content/csc205ca/render";
+import { CSC211CA_LABELS, CSC211CA_NUMBERS } from "@/content/csc211ca/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, bookFrom, type BookInfo, BOOKS, booksByCourse, sectionLabel, titleInCourse } from "@/lib/books";
@@ -97,6 +98,7 @@ const LABELS: Record<BookInfo["id"], Record<string, string>> = {
   csc207ca24: CSC207CA24_LABELS,
   csc205: CSC205_LABELS,
   csc205ca: CSC205CA_LABELS,
+  csc211ca: CSC211CA_LABELS,
 };
 const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
@@ -106,6 +108,7 @@ const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207ca24: CSC207CA24_NUMBERS,
   csc205: CSC205_NUMBERS,
   csc205ca: CSC205CA_NUMBERS,
+  csc211ca: CSC211CA_NUMBERS,
 };
 // Older URLs whose views still count toward a book.
 const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
@@ -116,6 +119,7 @@ const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207ca24: ["/csc207-ca-2024-solutions"],
   csc205: ["/csc205-revision"],
   csc205ca: ["/csc205-ca-solutions"],
+  csc211ca: ["/csc211-ca-solutions"],
 };
 
 async function load(book: BookInfo) {

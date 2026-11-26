@@ -19,6 +19,7 @@ import { CSC207TEST1_COUNT, CSC207TEST1_PDF, csc207test1BookHtml } from "@/conte
 import { CSC207CA24_COUNT, CSC207CA24_PDF, csc207ca24BookHtml } from "@/content/csc207ca24/render";
 import { CSC205_PAGES, CSC205_PDF } from "@/content/csc205/render";
 import { CSC205_QUESTIONS } from "../csc205-revision/quiz-questions";
+import { CSC211CA_PAGES, CSC211CA_PAPERS } from "@/content/csc211ca/render";
 import { CSC205CA_COUNT, CSC205CA_LOCKED_COUNT, CSC205CA_PAGES, csc205caBookHtml } from "@/content/csc205ca/render";
 import { InteractiveBackground } from "../components/InteractiveBackground";
 import BookSearch from "./BookSearch";
@@ -142,11 +143,24 @@ const books: Book[] = [
     readTime: formatReadTime(readingMinutes(csc205caBookHtml())),
     topics: ["Past papers", "Number bases", "2's complement", "IEEE 754", "Ethics", "Architecture"],
   },
+  {
+    title: BOOKS.csc211ca.title,
+    subtitle: "Three past CAs, every question solved",
+    description: `The CSC211 Probability and Statistics CAs of November 2022, 2023 and 2024, solved step by step: grouped mean, mode, median and variance, percentiles, conditional probability, joint distributions, and the binomial and hypergeometric distributions. Three PDF answer sheets for ${BOOKS.csc211ca.paywall!.priceFcfa} FCFA.`,
+    href: BOOKS.csc211ca.path,
+    cover: `${BOOKS.csc211ca.path}/opengraph-image`,
+    facts: [`${CSC211CA_PAPERS.length} PAPERS`, `${CSC211CA_PAGES} PAGES`],
+    price: `${BOOKS.csc211ca.paywall!.priceFcfa} FCFA`,
+    author: BOOK_AUTHOR,
+    avatar: BOOK_AUTHOR_AVATAR,
+    readTime: `${CSC211CA_PAGES} pages`,
+    topics: ["Past papers", "Grouped data", "Conditional probability", "Binomial", "Hypergeometric"],
+  },
 ];
 
 const title = "My Books | Tabe Rickson";
 const description =
-  "Free books by Tabe Rickson for University of Buea computer science students: CSC207 Made Easy, CSC207 and CSC211 Tutorial Sheet Solutions, solved CSC207 CA papers (2024 and 2025), CSC205 All-In-One Revision and CSC205 Past CA Solutions.";
+  "Free books by Tabe Rickson for University of Buea computer science students: CSC207 Made Easy, CSC207 and CSC211 Tutorial Sheet Solutions, solved CSC207 CA papers (2024 and 2025), CSC205 All-In-One Revision, and CSC205 and CSC211 Past CA Solutions.";
 
 export const metadata: Metadata = {
   title,
