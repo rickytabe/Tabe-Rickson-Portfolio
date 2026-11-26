@@ -5,19 +5,44 @@
   border-top: 1px solid var(--b-line, rgba(127, 127, 127, 0.2));
 }
 /* The sheet preview: the top of the original answer sheet, on white paper. */
-.book-content.book-csc211ca .ca-sheet {
+/* It is a link to the paper: locked readers get the payment sheet, unlocked readers the PDF. */
+.book-content.book-csc211ca a.ca-sheet {
+  display: block;
   margin: 0 0 18px;
   overflow: hidden;
   border: 1px solid var(--card-border, rgba(127, 127, 127, 0.25));
   border-radius: 10px;
   background: #fff;
+  color: #4a525e;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s ease-out, border-color 0.2s;
+}
+.book-content.book-csc211ca a.ca-sheet:hover {
+  border-color: var(--b-accent);
+}
+.book-content.book-csc211ca a.ca-sheet:active {
+  transform: scale(0.99);
+}
+.book-content.book-csc211ca a.ca-sheet:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-content.book-csc211ca a.ca-sheet {
+    transition: none;
+  }
+  .book-content.book-csc211ca a.ca-sheet:active {
+    transform: none;
+  }
 }
 .book-content.book-csc211ca .ca-sheet img {
   display: block;
   width: 100%;
   height: auto;
 }
-.book-content.book-csc211ca .ca-sheet figcaption {
+.book-content.book-csc211ca .ca-sheet-cap {
+  display: block;
   padding: 8px 14px 10px;
   background: #fff;
   color: #4a525e;
