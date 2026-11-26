@@ -660,6 +660,14 @@ body {
 .svc-art .i-donut { fill: none; stroke: color-mix(in srgb, var(--foreground) 10%, transparent); stroke-width: 10; }
 .svc-art .i-donut-fill { fill: none; stroke: var(--hero-accent); stroke-width: 10; stroke-dasharray: 86 138.2; stroke-linecap: round; }
 
+/* Scroll text reveal (src/components/ui/text-reveal.tsx): with reduced motion,
+   every word is fully lit instead of following the scroll. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word {
+    opacity: 1 !important;
+  }
+}
+
 /* Selection styling */
 ::selection {
   background: rgba(57, 255, 20, 0.25);

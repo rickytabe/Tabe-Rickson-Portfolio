@@ -1,69 +1,68 @@
 "use client";
 
-import { FC, ReactNode, useRef } from "react";
-import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
+import { useRef, type ElementType } from "react";
+import { motion, type MotionValue, useScroll, useTransform } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
 interface TextRevealByWordProps {
   text: string;
+  /** The element to render, e.g. "h3" for a heading. Defaults to "p". */
+  as?: ElementType;
   className?: string;
 }
 
-const TextRevealByWord: FC<TextRevealByWordProps> = ({
-  text,
-  className,
-}) => {
-  const targetRef = useRef<HTMLDivElement | null>(null);
+/** How bright a word is before the scroll reaches it: dim, but always readable. */
+const REST_OPACITY = 0.25;
 
+/**
+ * Words light up one by one as the reader scrolls, tied directly to the scroll
+ * (no autoplay, no loop). The reveal starts when the text enters the lower part of
+ * the screen and is complete by the time it reaches the middle. Screen readers get
+ * the sentence once; with reduced motion every word is fully lit (see globals.css).
+ */
+function TextRevealByWord({ text, as: Tag = "p", className }: TextRevealByWordProps) {
+  const ref = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start 80%", "end 40%"],
+    target: ref,
+    offset: ["start 85%", "center 50%"],
   });
   const words = text.split(" ");
 
   return (
-    <div ref={targetRef} className={cn("relative z-0 w-full", className)}>
-      <div className="mx-auto flex w-full items-center bg-transparent py-2">
-        <p
-          className={
-            "flex flex-wrap text-3xl font-bold text-foreground/20 md:text-4xl lg:text-5xl leading-tight tracking-tight capitalize"
-          }
-        >
-          {words.map((word, i) => {
-            const start = i / words.length;
-            const end = start + 1 / words.length;
-            return (
-              <Word key={i} progress={scrollYProgress} range={[start, end]}>
-                {word}
-              </Word>
-            );
-          })}
-        </p>
-      </div>
-    </div>
+    <Tag ref={ref} className={cn("reveal-text", className)}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {words.map((word, i) => {
+          const start = i / words.length;
+          const end = start + 1 / words.length;
+          return (
+            <Word key={`${word}-${i}`} progress={scrollYProgress} range={[start, end]}>
+              {word}
+              {i < words.length - 1 ? " " : ""}
+            </Word>
+          );
+        })}
+      </span>
+    </Tag>
   );
-};
-
-interface WordProps {
-  children: ReactNode;
-  progress: MotionValue<number>;
-  range: [number, number];
 }
 
-const Word: FC<WordProps> = ({ children, progress, range }) => {
-  const opacity = useTransform(progress, range, [0, 1]);
+function Word({
+  children,
+  progress,
+  range,
+}: {
+  children: React.ReactNode;
+  progress: MotionValue<number>;
+  range: [number, number];
+}) {
+  const opacity = useTransform(progress, range, [REST_OPACITY, 1]);
   return (
-    <span className="xl:lg-3 relative mx-1 lg:mx-2.5">
-      <span className={"absolute opacity-30"}>{children}</span>
-      <motion.span
-        style={{ opacity: opacity }}
-        className={"text-foreground"}
-      >
-        {children}
-      </motion.span>
-    </span>
+    <motion.span className="reveal-word" style={{ opacity }}>
+      {children}
+    </motion.span>
   );
-};
+}
 
 export { TextRevealByWord };

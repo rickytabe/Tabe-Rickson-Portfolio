@@ -5,6 +5,7 @@ import Image from "next/image";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import SectionHeader from "./SectionHeader";
+import { TextRevealByWord } from "@/components/ui/text-reveal";
 import { ArrowDown } from "lucide-react";
 
 // Inline SVG components for updated brand logos
@@ -56,9 +57,11 @@ export default function About() {
 
           {/* Story and details */}
           <ScrollReveal direction="up" margin="-100px" className="min-w-0">
-            <h3 className="text-[clamp(1.75rem,1.2rem+1.6vw,2.5rem)] font-bold leading-[1.12] tracking-[-0.025em] text-foreground">
-              Hi, I&apos;m Tabe. I turn ideas into software people enjoy using.
-            </h3>
+            <TextRevealByWord
+              as="h3"
+              text="Hi, I'm Tabe. I turn ideas into software people enjoy using."
+              className="text-[clamp(1.75rem,1.2rem+1.6vw,2.5rem)] font-bold leading-[1.12] tracking-[-0.025em] text-foreground"
+            />
 
             <div className="mt-6 space-y-4 font-inter text-[17px] leading-relaxed text-foreground/75">
               <p>
