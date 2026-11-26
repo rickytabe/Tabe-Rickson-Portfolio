@@ -5,9 +5,7 @@ import Image from "next/image";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import SectionHeader from "./SectionHeader";
-import { TextRevealByWord } from "@/components/ui/text-reveal";
-import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { ArrowDown } from "lucide-react";
 
 // Inline SVG components for updated brand logos
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -28,148 +26,100 @@ const TwitterIcon = ({ size = 24 }: { size?: number }) => (
   </svg>
 );
 
+const SOCIALS = [
+  { href: portfolioData.socials.github, label: "GitHub", Icon: GithubIcon },
+  { href: portfolioData.socials.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
+  { href: portfolioData.socials.twitter, label: "X (Twitter)", Icon: TwitterIcon },
+].filter((s) => s.href);
+
 export default function About() {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <section
-      id="about"
-      className={SECTION_STYLES.wrapper}
-    >
+    <section id="about" className={SECTION_STYLES.wrapper}>
       <div className={SECTION_STYLES.container}>
         <ScrollReveal direction="up" margin="-100px">
-          <SectionHeader backdrop="ABOUT-ME" eyebrow="About me" title="Who I am." />
-        </ScrollReveal>
-      </div>
-
-      <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-        {/* Left Column: Image */}
-        <ScrollReveal
-          direction="left"
-          margin="-100px"
-          className="relative w-full aspect-square md:aspect-4/5 "
-        >
-          <Image
-            src="/my_pic1.png"
-            alt="Tabe Rickson"
-            width={900}
-            height={900}
-            sizes="(max-width: 767px) calc(100vw - 4rem), 45vw"
-            className="w-full h-full md:h-4/5 object-cover shadow-2xl  hover:grayscale-0 transition-all duration-700 relative z-10 mt-20"
-          />
+          <SectionHeader className="mb-12 lg:mb-16" backdrop="ABOUT-ME" eyebrow="About me" title="Who I am." />
         </ScrollReveal>
 
-        {/* Right Column: Text & Info */}
-        <ScrollReveal
-          direction="right"
-          margin="-100px"
-          className="flex flex-col justify-center relative"
-        >
-
-
-          <div className="relative z-10">
-            <div className="mb-6 relative z-20">
-              <TextRevealByWord 
-                text="I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer" 
-                className="w-full"
+        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+          {/* Photo, framed like the hero portrait */}
+          <ScrollReveal direction="up" margin="-100px" className="w-full max-w-[460px]">
+            <div className="hero-portrait-frame aspect-[4/5]">
+              <Image
+                src="/my_pic1.png"
+                alt="Tabe Rickson smiling, in a patterned shirt"
+                fill
+                sizes="(max-width: 767px) calc(100vw - 4rem), 460px"
+                className="object-cover object-top"
               />
             </div>
+          </ScrollReveal>
 
-            <p className="text-foreground/60 text-md leading-relaxed mb-8 font-light font-inter">
-              I develop modern web and mobile applications with a focus on performance, scalability, and clean user experience. I also work with AI automation systems and RAG pipelines to build smarter and more efficient digital solutions. My goal is to create software that solves real-world problems and helps businesses and communities grow.
-            </p>
+          {/* Story and details */}
+          <ScrollReveal direction="up" margin="-100px" className="min-w-0">
+            <h3 className="text-[clamp(1.75rem,1.2rem+1.6vw,2.5rem)] font-bold leading-[1.12] tracking-[-0.025em] text-foreground">
+              Hi, I&apos;m Tabe. I turn ideas into software people enjoy using.
+            </h3>
 
-            <hr className="border-card-border mb-8" />
-
-            {/* Info Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-10 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-foreground min-w-[60px]">Name:</span>
-                <span className="text-foreground/60">Tabe Rickson</span>
-              </div>
-              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
-                <span className="font-bold text-foreground min-w-[60px]">From:</span>
-                <span className="text-foreground/60">Cameroon</span>
-              </div>
-              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
-                <span className="font-bold text-foreground min-w-[60px]">Email:</span>
-                <span className="text-foreground/60">rickytabe2@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-4 text-sm md:text-base font-inter">
-                <span className="font-bold text-foreground min-w-[60px]">Status:</span>
-                <span className="text-foreground/60">Available for Work</span>
-              </div>
+            <div className="mt-6 space-y-4 font-inter text-[17px] leading-relaxed text-foreground/75">
+              <p>
+                I&apos;m a full-stack engineer from Buea, Cameroon. I build websites, mobile apps and AI tools for
+                businesses, startups and communities, and I care about software that is fast, simple to use and
+                solves a real problem.
+              </p>
+              <p>
+                When I&apos;m not building for clients, I write study books for computer science students, so the
+                hard topics finally make sense.
+              </p>
             </div>
 
-            <div>
-              <div className="flex flex-wrap items-center gap-6">
-                <a
-                  href="/Tabe_Rickson_CV.pdf"
-                  className="group relative inline-flex items-center justify-center px-8 py-3 text-sm font-semibold font-mono tracking-widest text-[#121212] hover:text-background overflow-hidden transition-all duration-300 uppercase"
-                  style={{ backgroundColor: "#39FF14" }}
-                >
-                  <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-                  <span className="relative z-10">Download CV</span>
-                </a>
+            <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 border-t border-card-border pt-6 text-[15px]">
+              <div>
+                <dt className="text-[13px] text-foreground/55">Email</dt>
+                <dd className="mt-1">
+                  <a
+                    href="mailto:rickytabe2@gmail.com"
+                    className="font-medium text-foreground hover:text-[var(--hero-accent)] transition-colors"
+                  >
+                    rickytabe2@gmail.com
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[13px] text-foreground/55">Status</dt>
+                <dd className="mt-1 inline-flex items-center gap-2 font-medium text-foreground">
+                  <span className="w-2 h-2 rounded-full bg-[var(--hero-accent)]" aria-hidden="true" />
+                  Available for work
+                </dd>
+              </div>
+            </dl>
 
-                <div className="flex items-center gap-4">
-                  {portfolioData.socials.github && (
-                    <a
-                      href={portfolioData.socials.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
-                    >
-                      <GithubIcon size={24} />
-                    </a>
-                  )}
-                  {portfolioData.socials.linkedin && (
-                    <a
-                      href={portfolioData.socials.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
-                    >
-                      <LinkedinIcon size={24} />
-                    </a>
-                  )}
-                  {portfolioData.socials.twitter && (
-                    <a
-                      href={portfolioData.socials.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground/40 hover:text-[#39FF14] transition-all duration-300 hover:scale-110"
-                    >
-                      <TwitterIcon size={24} />
-                    </a>
-                  )}
-                </div>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href="/Tabe_Rickson_CV.pdf"
+                download
+                className="group inline-flex h-12 items-center gap-2 px-7 text-sm font-bold text-[#121212] bg-[#39FF14] hover:bg-foreground hover:text-background active:scale-[0.97] transition-[color,background-color,transform] duration-300"
+              >
+                Download CV
+                <ArrowDown size={16} className="transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+              </a>
+
+              <div className="flex items-center gap-1">
+                {SOCIALS.map(({ href, label, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${label} (opens in a new tab)`}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full text-foreground/55 hover:text-[var(--hero-accent)] hover:bg-foreground/5 active:scale-95 transition-[color,background-color,transform] duration-200"
+                  >
+                    <Icon size={20} />
+                  </a>
+                ))}
               </div>
             </div>
-          </div>
-        </ScrollReveal>
-
-      </div>
-
-      {/* Globe Background Illustration — dynamically rendered based on theme */}
-      <div className="absolute bottom-[5%] right-[2%] lg:right-[5%] w-[200px] md:w-[300px] lg:w-[350px] opacity-[0.12] pointer-events-none z-0 animate-float" style={{ animationDuration: '10s' }}>
-        {mounted && (
-          <Image
-            src={resolvedTheme === 'light' ? "/globe.png" : "/globe-light.png"}
-            alt="Decorative globe illustration"
-            width={350}
-            height={350}
-            sizes="(max-width: 767px) 200px, (max-width: 1023px) 300px, 350px"
-            className="w-full h-auto object-contain"
-          />
-        )}
+          </ScrollReveal>
+        </div>
       </div>
     </section>
   );
