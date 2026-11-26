@@ -1,272 +1,160 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import {
-  MonitorSmartphone,
-  Cpu,
-  PenTool,
-  Landmark,
-  Cloud,
-  Building2
-} from "lucide-react";
+import Link from "next/link";
+import { MotionConfig, motion } from "framer-motion";
 import { SECTION_STYLES } from "../utils/sectionStyles";
 import SectionHeader from "./SectionHeader";
+import { SERVICE_ART, type ServiceArtKey } from "./ServiceArt";
 
-interface Service {
-  id: string;
+type Service = {
+  art: ServiceArtKey;
+  /** Plain-English name a non-technical visitor would search for. */
   title: string;
-  desc: string;
-  icon: React.ReactNode;
-  techIcons: { name: string; src: string }[];
-}
+  /** One or two sentences on what the visitor gets, not how it is built. */
+  promise: string;
+  /** Everyday examples, also the words people type into Google. */
+  goodFor: string[];
+};
 
-const services: Service[] = [
+const SERVICES: Service[] = [
   {
-    id: "01",
-    title: "Custom Web &\nMobile Apps",
-    desc: "I build custom websites and mobile apps that help businesses and ideas become real, useful digital products. Whether you need a business website, booking platform, dashboard, customer app, or full web application, I create solutions that are fast, reliable, and built around the way your business actually works. My goal is to build software that improves operations, attracts customers, and helps businesses grow with confidence.",
-    icon: <MonitorSmartphone size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "React", src: "/react.svg" },
-      { name: "Next.js", src: "/nextdotjs.svg" },
-      { name: "TypeScript", src: "/typescript.svg" },
-      { name: "TailwindCSS", src: "/tailwindcss.svg" },
-      { name: "HTML5", src: "/html5.svg" },
-      { name: "JavaScript", src: "/javascript.svg" },
-    ]
+    art: "web",
+    title: "Websites & Mobile Apps",
+    promise:
+      "A fast, good-looking website or app that works on every phone and brings you new customers.",
+    goodFor: ["business websites", "online shops", "booking sites", "mobile apps"],
   },
   {
-    id: "02",
-    title: "AI Integration &\nAutomation",
-    desc: "I help businesses save time and reduce stress by using AI and automation to handle repetitive tasks and improve workflows. This can include AI-powered features, automated customer support, document processing, smart dashboards, AI agents, and RAG-based systems for intelligent applications. The goal is simple: less manual work, faster processes, better service, and more time to focus on what truly matters.",
-    icon: <Cpu size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "Python", src: "/python.svg" },
-      { name: "OpenAI", src: "/openai.svg" },
-      { name: "Gemini", src: "/googlegemini.svg" },
-      { name: "Node.js", src: "/nodedotjs.svg" },
-    ]
+    art: "ai",
+    title: "AI That Saves You Time",
+    promise:
+      "Let AI answer customer questions, read documents and handle the repetitive work, so your team can focus on people.",
+    goodFor: ["chat assistants", "automatic replies", "document reading", "smart reports"],
   },
   {
-    id: "03",
-    title: "UI/UX & Product\nExperience",
-    desc: "I design modern, clean, and easy-to-use digital experiences that help users trust your product and navigate it with ease. I focus on creating interfaces that feel smooth, professional, and simple to understand while helping businesses turn visitors into active users, customers, or loyal clients.",
-    icon: <PenTool size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "Framer", src: "/framer.svg" },
-      { name: "TailwindCSS", src: "/tailwindcss.svg" },
-      { name: "React", src: "/react.svg" },
-      { name: "HTML5", src: "/html5.svg" },
-    ]
+    art: "design",
+    title: "Simple, Clear Design",
+    promise:
+      "Screens people understand at first glance, so visitors trust you and turn into customers.",
+    goodFor: ["website redesigns", "app screens", "sign-up and checkout pages"],
   },
   {
-    id: "04",
-    title: "Secure Financial\n& Payment Systems",
-    desc: "I build secure systems for platforms that handle payments, transactions, user accounts, and sensitive data. Whether it is an online payment flow, wallet system, subscription platform, or financial dashboard, I focus on creating software that is stable, secure, and easy for users to trust and use every day.",
-    icon: <Landmark size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "Supabase", src: "/supabase.svg" },
-      { name: "PostgreSQL", src: "/postgresql.svg" },
-      { name: "Node.js", src: "/nodedotjs.svg" },
-      { name: "TypeScript", src: "/typescript.svg" },
-    ]
+    art: "payments",
+    title: "Safe Online Payments",
+    promise:
+      "Get paid online, including Mobile Money, with wallets and subscriptions built to keep money and personal data safe.",
+    goodFor: ["checkout pages", "digital wallets", "subscriptions", "finance dashboards"],
   },
   {
-    id: "05",
-    title: "Backend & Cloud\nInfrastructure",
-    desc: "I build the systems behind the scenes that keep applications fast, organized, and dependable. From databases and APIs to cloud infrastructure and system integrations, I create strong foundations that help apps run smoothly, handle growth, and stay reliable as businesses expand.",
-    icon: <Cloud size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "Node.js", src: "/nodedotjs.svg" },
-      { name: "Firebase", src: "/firebase.svg" },
-      { name: "MongoDB", src: "/mongodb.svg" },
-      { name: "PostgreSQL", src: "/postgresql.svg" },
-      { name: "Git", src: "/git.svg" },
-    ]
+    art: "backend",
+    title: "The Engine Behind Your App",
+    promise:
+      "Databases, servers and cloud hosting that keep your app fast and online, even as more people use it.",
+    goodFor: ["APIs", "databases", "cloud hosting", "connecting your tools"],
   },
   {
-    id: "06",
-    title: "Business Digitization\n& Internal Tools",
-    desc: "I help businesses move from manual processes to modern digital systems that make daily operations easier and more organized. This can include admin dashboards, inventory systems, booking platforms, customer portals, internal tools, and business management software designed to save time, improve visibility, and simplify the way teams work.",
-    icon: <Building2 size={40} strokeWidth={1.5} />,
-    techIcons: [
-      { name: "Next.js", src: "/nextdotjs.svg" },
-      { name: "Supabase", src: "/supabase.svg" },
-      { name: "React", src: "/react.svg" },
-      { name: "TypeScript", src: "/typescript.svg" },
-      { name: "MongoDB", src: "/mongodb.svg" },
-    ]
-  }
+    art: "business",
+    title: "Tools to Run Your Business",
+    promise:
+      "Swap paper, spreadsheets and endless chat threads for one simple system to manage stock, bookings, staff and customers.",
+    goodFor: ["admin dashboards", "stock management", "booking systems", "customer portals"],
+  },
 ];
 
-function ServiceCard({ service, idx }: { service: Service; idx: number }) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+// Structured data so search engines can read the services list.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Services by Tabe Rickson",
+  itemListElement: SERVICES.map((s, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Service",
+      name: s.title,
+      description: s.promise,
+      serviceType: s.goodFor.join(", "),
+      areaServed: ["Cameroon", "Worldwide"],
+      provider: { "@type": "Person", name: "Tabe Rickson", url: "https://taberickson.com" },
+    },
+  })),
+};
 
-  useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
+// Critically damped (no overshoot): content arriving on scroll isn't a flick.
+const SPRING = { type: "spring", bounce: 0, duration: 0.5 } as const;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+function ServiceCard({ service, index }: { service: Service; index: number }) {
+  const Art = SERVICE_ART[service.art];
 
   return (
     <motion.div
-      custom={idx}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-      variants={{
-        hidden: (i: number) => {
-          const col = i % 3;
-          // Scatter outwards based on column (left, center, right)
-          const xOffset = col === 0 ? -100 : col === 2 ? 100 : 0;
-          return { 
-            opacity: 0, 
-            scale: 1.2,
-            x: xOffset,
-            y: 80 
-          };
-        },
-        visible: (i: number) => ({
-          opacity: 1,
-          scale: 1,
-          x: 0,
-          y: 0,
-          transition: {
-            type: "spring",
-            stiffness: 200,
-            damping: 18,
-            mass: 1,
-            delay: i * 0.1,
-          }
-        })
-      }}
-      onMouseMove={handleMouseMove}
-      className="group relative p-[1px] overflow-hidden"
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ ...SPRING, delay: (index % 3) * 0.06 }}
+      className="h-full"
     >
-      {/* Cursor-tracking border glow */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(57, 255, 20, 0.5), transparent 40%)`,
-        }}
-      />
-
-      {/* Card body */}
-      <div className="relative bg-card-bg border border-card-border shadow-sm dark:shadow-none flex flex-col h-full overflow-hidden">
-        {/* Inner cursor glow */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(57, 255, 20, 0.04), transparent 40%)`,
-          }}
-        />
-
-        {/* Floating ambient tech icons in background */}
-        {service.techIcons.map((tech, i) => {
-          const positions = [
-            { top: '20%', right: '20%' },
-            { bottom: '25%', left: '20%' },
-            { top: '50%', right: '25%' },
-            { bottom: '20%', right: '35%' },
-            { top: '25%', left: '50%' },
-            { top: '65%', left: '25%' },
-          ];
-          const pos = positions[i % positions.length];
-          const sizes = [42, 51, 36, 45, 39, 48];
-          const size = sizes[i % sizes.length];
-          const rotations = [-12, 8, -5, 15, -8, 10];
-          const rotation = rotations[i % rotations.length];
-          const delays = [0, 2, 4, 1.5, 3, 5];
-          const delay = delays[i % delays.length];
-          const durations = [24, 28, 32, 26, 30, 22];
-          const duration = durations[i % durations.length];
-
-          return (
-            <div
-              key={tech.name}
-              className="absolute pointer-events-none z-[1] opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-700 animate-float-around"
-              style={{
-                ...pos,
-                animationDuration: `${duration}s`,
-                animationDelay: `${delay}s`,
-              }}
+      <article className="work-tile group h-full">
+        <div className="px-6 pt-7 pb-6 sm:px-8 sm:pt-8">
+          <h3 className="work-title text-foreground">
+            {/* Stretched over the whole card: every service leads to "start a project". */}
+            <Link
+              href="/lets-work"
+              className="after:absolute after:inset-0 after:z-[1] after:content-[''] focus-visible:outline-none"
             >
-              <Image
-                src={tech.src}
-                width={size}
-                height={size}
-                alt={`${tech.name} technology icon`}
-                className={mounted && resolvedTheme === "dark" ? "invert" : ""}
-                style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
-              />
-            </div>
-          );
-        })}
-
-        <div className="relative z-10 flex flex-col h-full p-8 md:p-9">
-          <div className="flex justify-between items-start mb-10">
-            <div className="text-foreground/50 group-hover:text-[#39FF14] group-hover:scale-110 transition-all duration-400 ease-out origin-top-left">
-              {service.icon}
-            </div>
-            <div className="text-[10px] font-mono tracking-widest text-foreground/30 group-hover:text-[#39FF14] transition-colors duration-400 mt-1">
-              {service.id}
-            </div>
-          </div>
-          <h3 className="text-lg md:text-xl font-bold font-sans text-foreground mb-4 whitespace-pre-line tracking-tight leading-tight">
-            {service.title}
+              {service.title}
+            </Link>
           </h3>
-          <p className="text-foreground/50 font-inter text-[13px] leading-relaxed mt-auto">
-            {service.desc}
+
+          <p className="work-tagline mt-3 text-foreground/80">{service.promise}</p>
+
+          <p className="mt-4 text-[14px] leading-relaxed text-foreground/60">
+            <span className="font-semibold text-foreground/75">Good for: </span>
+            {service.goodFor.join(", ")}
+          </p>
+
+          <p className="mt-5 text-[15px]">
+            <span className="work-link" aria-hidden="true">
+              Start a project ›
+            </span>
           </p>
         </div>
-      </div>
+
+        <div className="work-drawer">
+          <span className="work-drawer-handle" aria-hidden="true" />
+          <div className="work-drawer-shot svc-art aspect-[2/1]">
+            <Art />
+          </div>
+        </div>
+      </article>
     </motion.div>
   );
 }
 
 export default function Services() {
   return (
-    <section
-      id="services"
-      className={SECTION_STYLES.wrapper}
-    >
-      <div className={SECTION_STYLES.container}>
-        {/* Header Block */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16"
-        >
+    <MotionConfig reducedMotion="user">
+      <section id="services" className={SECTION_STYLES.wrapper}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+        />
+        <div className={SECTION_STYLES.container}>
           <SectionHeader
+            className="mb-12 lg:mb-16"
             backdrop="SERVICES"
             eyebrow="Services"
             title="What I do."
-            lede="I build software that improves operations, attracts customers, and helps businesses grow with confidence."
+            lede="Websites, mobile apps, AI tools and business software for companies in Cameroon and beyond, explained in plain words."
           />
-        </motion.div>
 
-        {/* Grid with backdrop text behind it */}
-        <div className="relative">
-
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map((service, idx) => (
-              <ServiceCard key={service.id} service={service} idx={idx} />
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((service, i) => (
+              <ServiceCard key={service.art} service={service} index={i} />
             ))}
           </div>
         </div>
-
-      </div>
-    </section>
+      </section>
+    </MotionConfig>
   );
 }
