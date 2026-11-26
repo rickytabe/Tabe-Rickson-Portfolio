@@ -80,26 +80,26 @@ export const CSC211CA_NUMBERS: Record<string, string> = {
 
 const pdfUrl = (paper: string) => `/api/book/pdf?book=${BOOK.id}&paper=${paper}`;
 /** Every paper's PDF, offered on the thank-you screen. */
-export const CSC211CA_DOWNLOADS = CSC211CA_PAPERS.map((p) => ({ label: p.name, href: pdfUrl(p.id) }));
+export const CSC211CA_DOWNLOADS = CSC211CA_PAPERS.map((p) => ({ label: `${p.name} Solutions`, href: pdfUrl(p.id) }));
 
 const LOCK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
 
 function paperHtml(p: Csc211CaPaper): string {
   return `<section class="ch ca-card" id="${p.id}">
-  <figure class="ca-sheet">
+  <a class="ca-sheet" href="${pdfUrl(p.id)}" data-paid-pdf aria-label="Get the ${p.name} Solutions">
     <img src="${p.header.src}" width="${p.header.width}" height="${p.header.height}" alt="The top of the ${p.name} answer sheet: University of Buea, Faculty of Science, CSC 211 Probability and Statistics" loading="lazy" decoding="async" />
-    <figcaption>${p.pages}-page answer sheet &middot; ${p.questions} questions solved</figcaption>
-  </figure>
+    <span class="ca-sheet-cap">${p.pages}-page answer sheet &middot; ${p.questions} questions solved</span>
+  </a>
   <div class="ch-head">
     <div class="ch-num">${sectionLabel(BOOK, p.id)}</div>
     <div>
-      <h3>${p.name}</h3>
+      <h3>${p.name} Solutions</h3>
       <p class="oneline">${p.meta}</p>
     </div>
   </div>
   <p class="ca-sec">What came up</p>
   <ul class="rev-covers">${p.topics.map((t) => `<li>${t}</li>`).join("")}</ul>
-  <p class="ca-dls"><a class="dl" href="${pdfUrl(p.id)}" data-paid-pdf>${LOCK_ICON}Download the ${p.name} solutions</a></p>
+  <p class="ca-dls"><a class="dl" href="${pdfUrl(p.id)}" data-paid-pdf>${LOCK_ICON}Download the ${p.name} Solutions</a></p>
 </section>`;
 }
 
