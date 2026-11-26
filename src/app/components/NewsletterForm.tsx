@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
 import toast from "react-hot-toast";
 
 export default function NewsletterForm() {
@@ -18,24 +16,7 @@ export default function NewsletterForm() {
 
     setIsSubmitting(true);
     try {
-      try {
-        // Add to Firestore with a timeout to prevent infinite loading if DB doesn't exist
-        const addDocPromise = addDoc(collection(db, "subscribers"), {
-          email,
-          firstName,
-          createdAt: serverTimestamp(),
-        });
-
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error("Request timed out. Please check your Firebase Database.")), 5000);
-        });
-
-        await Promise.race([addDocPromise, timeoutPromise]);
-      } catch (fbError) {
-        console.warn("Firebase save failed or timed out, proceeding to backend API...", fbError);
-      }
-      
-      // 2. Trigger the Welcome Email and Notification via Backend API
+      // The server saves the subscriber and sends the emails; it says ok only if all of it worked.
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
