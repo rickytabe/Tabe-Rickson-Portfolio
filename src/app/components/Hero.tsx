@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import HeroScrollCue from "./HeroScrollCue";
 
 const delay = (ms: number) => ({ "--hero-delay": `${ms}ms` }) as CSSProperties;
 
@@ -109,6 +110,8 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <HeroScrollCue />
     </section>
   );
 }
