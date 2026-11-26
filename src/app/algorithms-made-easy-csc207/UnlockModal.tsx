@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Copy, KeyRound, Loader2, Share2, Smartphone, Users, X } from "lucide-react";
+import { Check, ChevronDown, Copy, Download, KeyRound, Loader2, Share2, Smartphone, Users, X } from "lucide-react";
 import { settled, track } from "./insights";
 import { Smiley } from "./SupportModal";
+import type { ReaderPaywall } from "./BookReader";
 
 
 export type UnlockStatus = {
@@ -15,10 +16,12 @@ export type UnlockStatus = {
 };
 
 type Props = {
-  book: { id: string; title: string; priceFcfa: number; lockedCount: number; freeSections: number };
+  book: { id: string; title: string } & ReaderPaywall;
   status: UnlockStatus | null;
   /** Open straight on the "enter your code" step. */
   startWithCode?: boolean;
+  /** Opened by itself on arrival: offer reading the free solutions as the way out. */
+  welcome?: boolean;
   onUnlocked: () => void;
   onClose: () => void;
 };
@@ -47,7 +50,9 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 /** The unlock sheet for a paid book: pay with Mobile Money and enter the code, or invite classmates. */
-export default function UnlockModal({ book, status, startWithCode = false, onUnlocked, onClose }: Props) {
+export default function UnlockModal({ book, status, startWithCode = false, welcome = false, onUnlocked, onClose }: Props) {
+  const codes = book.codes !== false;
+  const invites = book.invitesNeeded > 0;
   const [closing, setClosing] = useState(false);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -226,10 +231,15 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
               )}
             </p>
             <p className="support-text unlock-done-note">
-              <Check className="w-4 h-4" aria-hidden /> All {book.lockedCount} solutions are open on this device and
-              stay open when you come back.
+              <Check className="w-4 h-4" aria-hidden /> All {book.lockedCount} solutions
+              {book.pdf ? " and the full PDF" : ""} are open on this device and stay open when you come back.
             </p>
             <div className="support-actions">
+              {book.pdf ? (
+                <a className="support-btn support-btn-ghost" href={book.pdf} download onClick={() => track("download_direct")}>
+                  <Download className="w-4 h-4" aria-hidden /> Download the PDF
+                </a>
+              ) : null}
               <button ref={firstRef} type="button" className="support-btn support-btn-primary" onClick={close}>
                 Back to the solutions
               </button>
@@ -241,13 +251,17 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
             <div className="unlock-badge" aria-hidden>
               <KeyRound className="w-7 h-7" />
             </div>
-            <p className="support-kicker">Questions 1 to {book.freeSections} are free</p>
+            <p className="support-kicker">{book.freeLine ?? `Questions 1 to ${book.freeSections} are free`}</p>
             <h2 id="unlock-title" className="support-title">
-              Unlock all {book.lockedCount} worked solutions
+              {book.unlockTitle ?? `Unlock all ${book.lockedCount} worked solutions`}
             </h2>
             <p className="support-text">
-              One payment of <strong>{book.priceFcfa} FCFA</strong> opens every remaining solution for good. Or invite{" "}
-              {invite?.needed ?? 3} classmates and unlock it free.
+              {book.unlockText ?? (
+                <>
+                  One payment of <strong>{book.priceFcfa} FCFA</strong> opens every remaining solution for good.
+                </>
+              )}
+              {invites ? ` Or invite ${invite?.needed ?? book.invitesNeeded} classmates and unlock it free.` : ""}
             </p>
 
             <div className="unlock-pay">
@@ -269,7 +283,8 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
                 </>
               ) : (
                 <p className="unlock-step-text unlock-pay-note">
-                  Mobile Money payments are paused for a moment. Please try again shortly, or unlock free below.
+                  Mobile Money payments are paused for a moment. Please try again shortly
+                  {invites ? ", or unlock free below" : ""}.
                 </p>
               )}
               {error && !code ? (
@@ -279,6 +294,15 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
               ) : null}
             </div>
 
+            {welcome ? (
+              <div className="support-actions unlock-welcome">
+                <button type="button" className="support-btn support-btn-ghost" onClick={close}>
+                  View the free solutions first
+                </button>
+              </div>
+            ) : null}
+
+            {codes ? (
             <details className="unlock-manual" open={startWithCode}>
               <summary>
                 Have an unlock code? <ChevronDown className="w-4 h-4" aria-hidden />
@@ -323,7 +347,10 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
                 ) : null}
               </form>
             </details>
+            ) : null}
 
+            {invites ? (
+            <>
             <div className="unlock-or" role="separator">
               <span>or unlock free</span>
             </div>
@@ -383,6 +410,8 @@ export default function UnlockModal({ book, status, startWithCode = false, onUnl
                 </p>
               )}
             </div>
+            </>
+            ) : null}
           </div>
         )}
       </div>

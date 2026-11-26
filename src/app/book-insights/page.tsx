@@ -10,6 +10,7 @@ import { CSC207T_LABELS, CSC207T_NUMBERS } from "@/content/csc207t/render";
 import { CSC207TEST1_LABELS, CSC207TEST1_NUMBERS } from "@/content/csc207test1/render";
 import { CSC207CA24_LABELS, CSC207CA24_NUMBERS } from "@/content/csc207ca24/render";
 import { CSC205_LABELS, CSC205_NUMBERS } from "@/content/csc205/render";
+import { CSC205CA_LABELS, CSC205CA_NUMBERS } from "@/content/csc205ca/render";
 import { quizBank } from "@/lib/quiz/bank";
 import { loadBoard } from "@/lib/quiz/board";
 import { BOOK_IDS, bookFrom, type BookInfo, BOOKS, booksByCourse, sectionLabel, titleInCourse } from "@/lib/books";
@@ -95,6 +96,7 @@ const LABELS: Record<BookInfo["id"], Record<string, string>> = {
   csc207test1: CSC207TEST1_LABELS,
   csc207ca24: CSC207CA24_LABELS,
   csc205: CSC205_LABELS,
+  csc205ca: CSC205CA_LABELS,
 };
 const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207: Object.fromEntries(BOOKS.csc207.sections.map((id) => [id, sectionLabel(BOOKS.csc207, id)])),
@@ -103,6 +105,7 @@ const NUMBERS: Record<BookInfo["id"], Record<string, string>> = {
   csc207test1: CSC207TEST1_NUMBERS,
   csc207ca24: CSC207CA24_NUMBERS,
   csc205: CSC205_NUMBERS,
+  csc205ca: CSC205CA_NUMBERS,
 };
 // Older URLs whose views still count toward a book.
 const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
@@ -112,6 +115,7 @@ const VIEW_PATHS: Record<BookInfo["id"], string[]> = {
   csc207test1: ["/csc207-ca-2025-solutions", "/csc207-test-1-solutions"],
   csc207ca24: ["/csc207-ca-2024-solutions"],
   csc205: ["/csc205-revision"],
+  csc205ca: ["/csc205-ca-solutions"],
 };
 
 async function load(book: BookInfo) {
@@ -747,6 +751,8 @@ function PaywallPanel({
     ["sidebar", "Sidebar"],
     ["footer", "Footer"],
     ["quiz", "End of a quiz"],
+    ["open", "Opening the book"],
+    ["download", "PDF download"],
   ];
   const waMessage = (code: string) =>
     encodeURIComponent(
@@ -793,6 +799,8 @@ function PaywallPanel({
             </li>
           ))}
         </ul>
+        {wall.invitesNeeded ? (
+          <>
         <h3 className="ins-h3">Invites</h3>
         <ul className="ins-list">
           <li>
@@ -814,6 +822,8 @@ function PaywallPanel({
             <b>{fmt.format(Number(pw.unlockedByInvite ?? 0))}</b>
           </li>
         </ul>
+          </>
+        ) : null}
       </section>
 
       <section className="ins-card" id="payments">
@@ -844,6 +854,7 @@ function PaywallPanel({
         )}
       </section>
 
+      {wall.codes === false ? null : (
       <section className="ins-card" id="codes">
         <h2 className="ins-h2">Unlock codes</h2>
         <p className="ins-note">
@@ -905,6 +916,7 @@ function PaywallPanel({
           <p className="ins-muted">No codes yet.</p>
         )}
       </section>
+      )}
     </div>
   );
 }

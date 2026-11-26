@@ -85,6 +85,16 @@ The CSC207 tutorial sheets, solved in the course pseudocode, at `/csc207-tutoria
 - Code is mobile-first: each line is a `.ln` block with its indentation in `--ind`, and end-of-line comments are `.c-trail` spans. On phones (≤720px) lines wrap with a hanging indent and comments move onto their own line, so there is no sideways scroll.
 - The PDF of Tutorial Sheet 1 is published at `/csc207-tutorial-solutions/csc207-tutorial-sheet-1-solutions.pdf` (cover, sidebar, footer and Books page). Downloads go through the support ask, which always offers "Download free". Its build script (`build.py`, `to_ts.py`) is in `csc207-tutorial-1-source/` next to the repo: rebuild the PDF and `questions.ts` from it when the content changes.
 
+## The book: CSC205 Past CA Solutions (paid, payment only)
+
+Four CSC205 past papers solved, at `/csc205-ca-solutions` (book id `csc205ca`, short links `/csc205/ca` and `/csc205/ca/quiz`; `/csc205` belongs to CSC205 All-In-One Revision).
+
+- Content: `src/content/csc205ca/questions.ts` (papers `y24`, `y23`, `y22b`, `y22`; ids `<paper>-<question>`), rendered by `render.ts`. Working blocks are one `.ln` per line with `--ind`, so phones wrap with a hanging indent.
+- Paywall (Tabe's call): `paywall: { freeSections: 15, perPart: true, priceFcfa: 500, invitesNeeded: 0, codes: false, pdf }`. The first 15 solutions **of each paper** are free; 500 FCFA through Fapshi unlocks the other 17 and the full PDF. No invites and no gift codes (the unlock and code-maker routes refuse them).
+- The book offers the unlock once per visit on arrival (`askOnOpen`), with "View the free solutions first" as the way out.
+- The full PDF is in `private/` (never `public/`), built by `csc207-tutorial-1-source/build_csc205ca.py` from the four answer sheets plus a cover. `/api/book/pdf?book=csc205ca` sends it only to unlocked readers and redirects everyone else to the book with `?unlock=1`. `next.config` traces `private/` into that route.
+- Algo: `gen_csc205ca_quiz.py` writes `quiz-questions.ts` and `answers-csc205ca.ts`, built from free solutions only so the quiz never gives a locked answer away.
+
 ## New books and solution sets: always this format
 
 Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Solutions format exactly, unless Tabe says otherwise.

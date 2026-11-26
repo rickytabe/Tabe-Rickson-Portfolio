@@ -42,6 +42,9 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { book?: unknown; code?: unknown };
   const book = bookFrom(body.book);
   if (!book.paywall) return NextResponse.json({ error: "Not a paid book" }, { status: 404 });
+  if (book.paywall.codes === false) {
+    return NextResponse.json({ error: "This book unlocks with Mobile Money only." }, { status: 400 });
+  }
 
   const existing = readerFromRequest(request);
   const { rid, isNew } = existing ? { rid: existing, isNew: false } : await ensureReader(request, book);

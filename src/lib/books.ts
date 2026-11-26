@@ -1,7 +1,7 @@
 // The books on the site. Plain data, safe to import from client components and the server.
 // Each book's stats, quiz board, feedback and unlocks are kept apart by its id.
 
-export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24" | "csc205";
+export type BookId = "csc207" | "csc211" | "csc207t" | "csc207test1" | "csc207ca24" | "csc205" | "csc205ca";
 
 export type BookInfo = {
   id: BookId;
@@ -17,8 +17,20 @@ export type BookInfo = {
   sections: string[];
   /** Extra ids that take "Was this clear?" votes without being a section, e.g. the whole notes. */
   feedbackOn?: string[];
-  /** Paid books: the first `freeSections` solutions are open, the rest unlock. */
-  paywall?: { freeSections: number; priceFcfa: number; invitesNeeded: number };
+  /**
+   * Paid books: the first `freeSections` solutions are open, the rest unlock.
+   * `perPart`: count the free ones per part (the id before the first "-", e.g. one past paper).
+   * `invitesNeeded: 0` turns invites off; `codes: false` turns gift codes off (payment only).
+   * `pdf`: the full PDF, kept out of public/ and served only to unlocked readers.
+   */
+  paywall?: {
+    freeSections: number;
+    priceFcfa: number;
+    invitesNeeded: number;
+    perPart?: boolean;
+    codes?: boolean;
+    pdf?: string;
+  };
 };
 
 const range = (prefix: string, from: number, to: number) =>
@@ -97,6 +109,30 @@ export const BOOKS: Record<BookId, BookInfo> = {
     feedbackOn: ["notes"],
     // Free for everyone: supported by voluntary tips when the PDF is downloaded.
   },
+  csc205ca: {
+    id: "csc205ca",
+    title: "CSC205 Past CA Solutions",
+    path: "/csc205-ca-solutions",
+    quizLink: "https://taberickson.com/csc205/ca/quiz?ref=quiz-share",
+    shortLink: "https://taberickson.com/csc205/ca",
+    sectionNoun: "question",
+    // Four past papers, newest first. Ids are `<paper>-<question>`, matching src/content/csc205ca.
+    sections: [
+      ...range("y24-a", 1, 7),
+      ...range("y24-b", 1, 7),
+      ...range("y24-c", 1, 8),
+      ...range("y23-a", 1, 10),
+      ...range("y23-b", 1, 3),
+      ...range("y23-e1-", 1, 5),
+      ...range("y23-e2-", 1, 7),
+      ...range("y22b-a", 1, 10),
+      ..."abcdefghij".split("").map((l) => `y22-1${l}`),
+      ...range("y22-2-", 1, 4),
+    ],
+    // Paid, payment only (Tabe's call): the first 15 solutions of each paper are free, then
+    // 500 FCFA through Fapshi unlocks the rest and the full PDF. No invites, no gift codes.
+    paywall: { freeSections: 15, perPart: true, priceFcfa: 500, invitesNeeded: 0, codes: false, pdf: "csc205-past-ca-solutions.pdf" },
+  },
 };
 
 export const BOOK_IDS = Object.keys(BOOKS) as BookId[];
@@ -135,8 +171,9 @@ export function bookFrom(value: unknown): BookInfo {
 /** Whether a section's solution is behind the paywall. */
 export function isLocked(book: BookInfo, section: string): boolean {
   if (!book.paywall) return false;
-  const i = book.sections.indexOf(section);
-  return i >= book.paywall.freeSections;
+  const part = section.split("-")[0];
+  const list = book.paywall.perPart ? book.sections.filter((s) => s.split("-")[0] === part) : book.sections;
+  return list.indexOf(section) >= book.paywall.freeSections;
 }
 
 /**
@@ -154,6 +191,12 @@ export function sectionLabel(book: BookInfo, section: string): string {
     // "s1-e2-3" -> "II.3", "s1-e4-a" -> "IV.a"
     const m = /^s\d+-e(\d)-(\w+)$/.exec(section);
     return m ? `${["", "I", "II", "III", "IV"][Number(m[1])] ?? m[1]}.${m[2]}` : section;
+  }
+  // CSC205 Past CA: "y24-b3" -> "B3", "y23-e1-2" -> "E1.2", "y22-1c" -> "1(c)", "y22-2-3" -> "2.3"
+  if (book.id === "csc205ca") {
+    const rest = section.slice(section.indexOf("-") + 1);
+    if (/^1[a-j]$/.test(rest)) return `1(${rest[1]})`;
+    return rest.replace(/-/g, ".").toUpperCase();
   }
   // CSC207 CA 2025 and CA 2024: "a3b" -> "A3b", "b1" -> "B1"
   if (book.id === "csc207test1" || book.id === "csc207ca24") return `${section[0].toUpperCase()}${section.slice(1)}`;
