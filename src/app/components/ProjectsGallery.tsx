@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MotionConfig, motion } from "framer-motion";
 import portfolioData from "../../../portfolio-data.json";
-import { SECTION_STYLES } from "../utils/sectionStyles";
+import SectionHeader from "./SectionHeader";
 
 type Project = {
   name: string;
@@ -122,22 +122,13 @@ export default function ProjectsGallery() {
       <section id="portfolio" className="relative overflow-x-clip border-t border-card-border px-8 lg:px-16 py-24 lg:py-32">
         {/* Same frame as the other sections: padding on the section, a full max-w-7xl container */}
         <div className="max-w-7xl mx-auto w-full">
-          <header className="relative mb-12 lg:mb-16">
-            {/* Backdrop text, shared with the other sections (ABOUT-ME, JOURNEY) */}
-            <div className={SECTION_STYLES.backdropWrapper} aria-hidden="true">
-              <span className={SECTION_STYLES.backdropText}>PORTFOLIO</span>
-            </div>
-
-            <div className="relative z-10 max-w-3xl">
-              <p className="text-[15px] font-semibold tracking-[0.01em] text-[var(--hero-accent)]">Selected work</p>
-              <h2 className="mt-3 text-[clamp(2.5rem,1.6rem+3vw,4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-foreground">
-                Things I&apos;ve shipped.
-              </h2>
-              <p className="mt-5 max-w-xl font-inter text-[17px] sm:text-lg leading-relaxed text-foreground/70">
-                Products I designed and built end to end, from the first idea to real people using them.
-              </p>
-            </div>
-          </header>
+          <SectionHeader
+            className="mb-12 lg:mb-16"
+            backdrop="PORTFOLIO"
+            eyebrow="Selected work"
+            title="Things I've shipped."
+            lede="Products I designed and built end to end, from the first idea to real people using them."
+          />
 
           {/* Liquid-glass distortion for the tiles' backdrop (used by .work-tile where supported) */}
           <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">

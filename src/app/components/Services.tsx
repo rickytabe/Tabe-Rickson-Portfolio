@@ -13,7 +13,7 @@ import {
   Building2
 } from "lucide-react";
 import { SECTION_STYLES } from "../utils/sectionStyles";
-import { AnimatedText } from "@/components/ui/animated-text";
+import SectionHeader from "./SectionHeader";
 
 interface Service {
   id: string;
@@ -240,13 +240,6 @@ export default function Services() {
       className={SECTION_STYLES.wrapper}
     >
       <div className={SECTION_STYLES.container}>
-        {/* Backdrop text — positioned behind the section title */}
-        <div className={SECTION_STYLES.backdropWrapper}>
-          <span className={SECTION_STYLES.backdropText}>
-            Services
-          </span>
-        </div>
-
         {/* Header Block */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -255,21 +248,12 @@ export default function Services() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16"
         >
-          <div className={SECTION_STYLES.headerBadgeWrapper}>
-            <span className={SECTION_STYLES.headerBadgeNumber}>02</span>
-            <span className={SECTION_STYLES.headerBadgeLine}></span>
-            <span className={SECTION_STYLES.headerBadgeText}>Services</span>
-          </div>
-          <AnimatedText
-            as="h2"
-            text="What I Do"
-            className="items-start mb-6"
-            textClassName={SECTION_STYLES.title}
-            underlineClassName="text-[#39FF14]"
+          <SectionHeader
+            backdrop="SERVICES"
+            eyebrow="Services"
+            title="What I do."
+            lede="I build software that improves operations, attracts customers, and helps businesses grow with confidence."
           />
-          <p className={SECTION_STYLES.description}>
-            I build software that improves operations, attracts customers, and helps businesses grow with confidence.
-          </p>
         </motion.div>
 
         {/* Grid with backdrop text behind it */}

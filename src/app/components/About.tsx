@@ -4,6 +4,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import Image from "next/image";
 import portfolioData from "../../../portfolio-data.json";
 import { SECTION_STYLES } from "../utils/sectionStyles";
+import SectionHeader from "./SectionHeader";
 import { TextRevealByWord } from "@/components/ui/text-reveal";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
@@ -42,21 +43,8 @@ export default function About() {
       className={SECTION_STYLES.wrapper}
     >
       <div className={SECTION_STYLES.container}>
-        {/* Backdrop text — positioned behind the section title */}
-        <div className={SECTION_STYLES.backdropWrapper}>
-          <span className={SECTION_STYLES.backdropText}>
-            ABOUT-ME
-          </span>
-        </div>
-
-        <ScrollReveal
-          direction="up"
-          margin="-100px"
-          className={SECTION_STYLES.headerBadgeWrapper}
-        >
-          <span className={SECTION_STYLES.headerBadgeNumber}>01</span>
-          <span className={SECTION_STYLES.headerBadgeLine}></span>
-          <span className={SECTION_STYLES.headerBadgeText}>About Me</span>
+        <ScrollReveal direction="up" margin="-100px">
+          <SectionHeader backdrop="ABOUT-ME" eyebrow="About me" title="Who I am." />
         </ScrollReveal>
       </div>
 
@@ -87,9 +75,6 @@ export default function About() {
 
 
           <div className="relative z-10">
-            <h2 className={SECTION_STYLES.subtitle}>
-              Who am I?
-            </h2>
             <div className="mb-6 relative z-20">
               <TextRevealByWord 
                 text="I'm Tabe Rickson, a Full-Stack Web & Mobile Software Engineer" 
