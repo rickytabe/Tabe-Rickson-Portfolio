@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import HeroScrollCue from "./HeroScrollCue";
 
 const delay = (ms: number) => ({ "--hero-delay": `${ms}ms` }) as CSSProperties;
 
@@ -35,7 +36,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex items-center min-h-svh px-6 sm:px-8 lg:px-16 pt-28 pb-16 lg:pt-32 lg:pb-24"
+      className="relative flex items-center min-h-svh lg:min-h-[calc(100svh-5rem)] px-6 sm:px-8 lg:px-16 pt-28 pb-16 lg:pt-32 lg:pb-16"
     >
       <div className="hero-grid w-full max-w-7xl mx-auto">
         {/* Copy */}
@@ -110,16 +111,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll cue */}
-      <a
-        href="#about"
-        aria-label="Scroll to About"
-        className="hero-fade hidden lg:flex absolute bottom-8 inset-x-0 mx-auto w-fit flex-col items-center gap-3 font-mono text-[11px] tracking-[0.25em] uppercase text-foreground/55 hover:text-foreground transition-colors"
-        style={delay(700)}
-      >
-        Scroll
-        <span className="hero-scroll-line" />
-      </a>
+      <HeroScrollCue />
     </section>
   );
 }
