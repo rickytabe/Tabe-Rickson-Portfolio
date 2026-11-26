@@ -731,7 +731,9 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
               chapter={slot.dataset.chapter!}
               book={book.id}
               noun={book.feedback.noun}
-              example={book.feedback.example}
+              example={slot.dataset.example ?? book.feedback.example}
+              question={slot.dataset.question}
+              yes={slot.dataset.yes}
             />,
             slot,
             slot.dataset.chapter

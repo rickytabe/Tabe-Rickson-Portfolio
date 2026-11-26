@@ -16,3 +16,8 @@
 .book-content.book-csc205 .rev-covers li {
   margin: 4px 0;
 }
+
+/* "Were these notes helpful?" sits right under the download, above the how-to box. */
+.book-content.book-csc205 .rev-feedback .cf {
+  margin: 8px 0 28px;
+}

@@ -27,12 +27,18 @@ export default function ChapterFeedback({
   book = "csc207",
   noun = "chapter",
   example = "e.g. the part about the frequency count lost me",
+  question,
+  yes = "Yes, it clicked",
 }: {
   chapter: string;
   book?: string;
   noun?: string;
   example?: string;
+  /** Overrides "Was this {noun} clear?", e.g. "Were these notes helpful?" for a whole PDF. */
+  question?: string;
+  yes?: string;
 }) {
+  const ask = question ?? `Was this ${noun} clear?`;
   const store = `${book}-feedback`;
   const [state, setState] = useState(() => load(store)[chapter] ?? null);
   const [text, setText] = useState("");
@@ -64,15 +70,15 @@ export default function ChapterFeedback({
   return (
     <div className="cf" aria-label="Chapter feedback">
       <div className="cf-row">
-        <p className="cf-q">Was this {noun} clear?</p>
-        <div className="cf-votes" role="group" aria-label={`Was this ${noun} clear?`}>
+        <p className="cf-q">{ask}</p>
+        <div className="cf-votes" role="group" aria-label={ask}>
           <button
             type="button"
             className={`cf-btn ${state?.vote === "up" ? "is-on" : ""}`}
             aria-pressed={state?.vote === "up"}
             onClick={() => vote("up")}
           >
-            <ThumbsUp className="w-4 h-4" aria-hidden /> Yes, it clicked
+            <ThumbsUp className="w-4 h-4" aria-hidden /> {yes}
           </button>
           <button
             type="button"
