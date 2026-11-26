@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   allowedDevOrigins: ["172.20.10.12", "192.168.1.128"],
+  // Paid PDFs live in private/ (never public/) and are read by /api/book/pdf for unlocked readers.
+  outputFileTracingIncludes: { "/api/book/pdf": ["./private/**/*"] },
   images: {
     remotePatterns: [
       {
@@ -36,6 +38,9 @@ const nextConfig: NextConfig = {
       // CSC205 All-In-One Revision (a PDF-only book).
       { source: "/csc205", destination: "/csc205-revision", permanent: false },
       { source: "/csc205/quiz", destination: "/csc205-revision?quiz=1", permanent: false },
+      // CSC205 Past CA Solutions (paid, four past papers).
+      { source: "/csc205/ca", destination: "/csc205-ca-solutions", permanent: false },
+      { source: "/csc205/ca/quiz", destination: "/csc205-ca-solutions?quiz=1", permanent: false },
       // CSC207 CA 2024 (the 20/11/2024 paper).
       { source: "/csc207/ca2024", destination: "/csc207-ca-2024-solutions", permanent: false },
       { source: "/csc207/ca2024/quiz", destination: "/csc207-ca-2024-solutions?quiz=1", permanent: false },

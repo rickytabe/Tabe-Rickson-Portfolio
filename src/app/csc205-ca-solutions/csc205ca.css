@@ -1,0 +1,85 @@
+/* CSC205 Past CA Solutions: paper headings, working blocks and answer lines, on top of book.css
+   and csc211.css (lock cards and the unlock sheet). */
+.book-content.book-csc205ca .ca-paper {
+  margin: 64px 0 8px;
+  padding-top: 22px;
+  border-top: 2px solid var(--b-ink, currentColor);
+}
+.book-content.book-csc205ca .ca-paper-k {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.book-content.book-csc205ca .ca-paper-h {
+  margin: 6px 0 6px;
+}
+.book-content.book-csc205ca .ca-paper-meta {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.75;
+}
+.book-content.book-csc205ca .ca-paper-free {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--b-real, #15847b);
+}
+
+/* Working: plain, readable, never wider than the phone. */
+.book-content.book-csc205ca pre.work {
+  margin: 14px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
+}
+@media (max-width: 720px) {
+  /* Long lines wrap with a hanging indent instead of scrolling sideways; short aligned sums stay intact. */
+  .book-content.book-csc205ca pre.work {
+    font-size: 11.5px;
+    padding: 12px 12px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .book-content.book-csc205ca pre.work .ln {
+    padding-left: calc(var(--ind, 0ch) + 3ch);
+    text-indent: -3ch;
+  }
+}
+/* Each line carries its own indentation in --ind (leading spaces are stripped). */
+.book-content.book-csc205ca pre.work .ln {
+  display: block;
+  padding-left: var(--ind, 0ch);
+}
+.book-content.book-csc205ca .ans {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 4px solid var(--b-real, #15847b);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--b-real, #15847b) 10%, transparent);
+  font-weight: 600;
+}
+.book-content.book-csc205ca .ans b {
+  margin-right: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.book-content.book-csc205ca ol.mcq {
+  margin: 10px 0 0;
+  padding-left: 26px;
+}
+.book-content.book-csc205ca ol.mcq li {
+  margin: 4px 0;
+}
+.book-content.book-csc205ca .tbl {
+  margin: 14px 0;
+  overflow-x: auto;
+}
+.book-content.book-csc205ca .tbl table {
+  margin: 0;
+  min-width: 100%;
+}

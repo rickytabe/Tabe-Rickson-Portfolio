@@ -24,6 +24,31 @@ export type BookChapter = {
 };
 export type BookPart = { name: string; chapters: BookChapter[] };
 
+/**
+ * A paid book's offer. `invitesNeeded: 0` hides invites and `codes: false` hides gift codes.
+ * `pdf`: the paid PDF's URL (downloads ask to unlock first). `askOnOpen`: offer the unlock once per
+ * visit, with a "view the free ones" way out. The `free…`/`unlock…` lines replace the default wording.
+ */
+export type ReaderPaywall = {
+  priceFcfa: number;
+  freeSections: number;
+  lockedCount: number;
+  invitesNeeded: number;
+  codes?: boolean;
+  pdf?: string;
+  askOnOpen?: boolean;
+  freeLine?: string;
+  unlockTitle?: string;
+  unlockText?: string;
+};
+
+/** "Questions 1 to 15 are free. Unlock the other 33 for 200 FCFA, or free by inviting 3 classmates." */
+export function lockLine(w: ReaderPaywall): string {
+  const free = w.freeLine ?? `Questions 1 to ${w.freeSections} are free`;
+  const invites = w.invitesNeeded ? `, or free by inviting ${w.invitesNeeded} classmates` : "";
+  return `${free}. Unlock the other ${w.lockedCount}${w.pdf ? " and the full PDF" : ""} for ${w.priceFcfa} FCFA${invites}.`;
+}
+
 /** Everything the reader needs to know about its book. Plain data, from the server page. */
 export type ReaderBook = {
   id: string;
@@ -32,7 +57,7 @@ export type ReaderBook = {
   quiz: Omit<QuizBook, "help">;
   feedback: { noun: string; example: string };
   /** Paid books: the solutions after `freeSections` unlock. */
-  paywall?: { priceFcfa: number; freeSections: number; lockedCount: number; invitesNeeded: number };
+  paywall?: ReaderPaywall;
   /** Free books: the support prompt's ask in this book's words. */
   support?: { title: string; text: string; download?: string };
 };
@@ -77,6 +102,8 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
   const [unlock, setUnlock] = useState<UnlockStatus | null>(null);
   const [solutions, setSolutions] = useState<Record<string, string> | null>(null);
   const [unlockOpen, setUnlockOpen] = useState<false | "offer" | "code">(false);
+  // The unlock sheet opened by itself on arrival: it then offers "view the free ones" as the way out.
+  const [unlockWelcome, setUnlockWelcome] = useState(false);
   const unlocked = !!unlock?.unlocked;
   const unlockedRef = useRef(false);
   useEffect(() => {
@@ -329,6 +356,39 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
     setUnlockOpen(step);
   }, []);
 
+  // A locked PDF link sends readers back with ?unlock=1: open the sheet there.
+  useEffect(() => {
+    if (!paid) return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("unlock")) return;
+    url.searchParams.delete("unlock");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    const frame = requestAnimationFrame(() => openUnlock("download"));
+    return () => cancelAnimationFrame(frame);
+  }, [paid, openUnlock]);
+
+  // Books that ask on open: once the reader is known to be locked, offer the unlock once per visit
+  // (pay, or read the free solutions). Not on top of the quiz, a checkout return, or another sheet.
+  const askOnOpen = !!book.paywall?.askOnOpen;
+  useEffect(() => {
+    if (!askOnOpen || !unlock || unlock.unlocked || autoPrompted.current) return;
+    const params = new URL(window.location.href).searchParams;
+    if (params.has("quiz") || params.has("paid") || params.has("unlock")) return;
+    const key = `${book.id}-asked`;
+    try {
+      if (window.sessionStorage.getItem(key)) return;
+      window.sessionStorage.setItem(key, "1");
+    } catch {
+      return; // storage blocked: don't risk asking on every page load
+    }
+    const frame = requestAnimationFrame(() => {
+      if (unlockedRef.current) return;
+      setUnlockWelcome(true);
+      openUnlock("open");
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [askOnOpen, unlock, book.id, openUnlock]);
+
   // Count one minute of actual reading: time only passes while the tab is visible.
   // Paid books don't ask for a tip: their lock cards already make the one ask.
   useEffect(() => {
@@ -381,6 +441,22 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
     setSupportMode(mode);
     setSupportOpen(true);
   }, []);
+
+  // A paid book's PDF: unlocked readers download straight away, everyone else sees the unlock sheet.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as Element).closest?.<HTMLAnchorElement>("a[data-paid-pdf]");
+      if (!link || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (unlockedRef.current) {
+        track("download_direct");
+        return;
+      }
+      e.preventDefault();
+      openUnlock("download");
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [openUnlock]);
 
   // PDF downloads inside the book go through the prompt, which always offers a free download.
   // Readers who already supported download straight away.
@@ -466,7 +542,7 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
       ))}
       <div className="book-toc-extra">
         {pdf ? (
-          <a href={pdf} download className="book-toc-pdf">
+          <a href={pdf} download className="book-toc-pdf" data-paid-pdf={book.paywall?.pdf ? "" : undefined}>
             <Download className="w-3.5 h-3.5" aria-hidden />
             Download the PDF
           </a>
@@ -581,7 +657,7 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
             <p>{about}</p>
             <div className="book-foot-links">
               {pdf ? (
-                <a href={pdf} download>
+                <a href={pdf} download data-paid-pdf={book.paywall?.pdf ? "" : undefined}>
                   <Download className="w-4 h-4" aria-hidden /> Download the PDF
                 </a>
               ) : null}
@@ -715,8 +791,12 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
                   book={{ id: book.id, title: book.title, ...book.paywall }}
                   status={unlock}
                   startWithCode={unlockOpen === "code"}
+                  welcome={unlockWelcome}
                   onUnlocked={() => void refreshUnlock()}
-                  onClose={() => setUnlockOpen(false)}
+                  onClose={() => {
+                    setUnlockOpen(false);
+                    setUnlockWelcome(false);
+                  }}
                 />
               ) : null}
             </div>,
@@ -751,16 +831,15 @@ export default function BookReader({ book, parts, pdf, className = "", about, cr
                 <div className="sol-lock-card">
                   <Lock className="sol-lock-icon" aria-hidden />
                   <p className="sol-lock-title">Solution locked</p>
-                  <p className="sol-lock-text">
-                    Questions 1 to {wall.freeSections} are free. Unlock all {wall.lockedCount} worked solutions for{" "}
-                    {wall.priceFcfa} FCFA, or free by inviting {wall.invitesNeeded} classmates.
-                  </p>
+                  <p className="sol-lock-text">{lockLine(wall)}</p>
                   <button type="button" className="sol-lock-btn" onClick={() => openUnlock("inline")}>
                     <KeyRound className="w-4 h-4" aria-hidden /> Unlock all solutions
                   </button>
-                  <button type="button" className="sol-lock-code" onClick={() => openUnlock("inline", "code")}>
-                    I already have a code
-                  </button>
+                  {wall.codes === false ? null : (
+                    <button type="button" className="sol-lock-code" onClick={() => openUnlock("inline", "code")}>
+                      I already have a code
+                    </button>
+                  )}
                 </div>
               ),
               slot,
@@ -793,7 +872,7 @@ function quizHelp(book: ReaderBook, unlocked: boolean): QuizBook["help"] {
         }
       : {
           title: "Want every worked solution?",
-          text: `Questions 1 to ${book.paywall.freeSections} are free. Unlock the other ${book.paywall.lockedCount} for ${book.paywall.priceFcfa} FCFA, or free by inviting ${book.paywall.invitesNeeded} classmates.`,
+          text: lockLine(book.paywall),
           button: "Unlock all solutions",
         };
   }

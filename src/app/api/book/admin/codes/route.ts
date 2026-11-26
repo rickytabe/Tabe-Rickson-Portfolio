@@ -18,7 +18,9 @@ export async function POST(request: Request) {
 
   const form = await request.formData().catch(() => null);
   const book = bookFrom(form?.get("book"));
-  if (!book.paywall) return NextResponse.json({ error: "Not a paid book" }, { status: 400 });
+  if (!book.paywall || book.paywall.codes === false) {
+    return NextResponse.json({ error: "This book has no unlock codes" }, { status: 400 });
+  }
   const back = NextResponse.redirect(new URL(`/book-insights?book=${book.id}#codes`, request.url), 303);
 
   const id = String(form?.get("id") ?? "");

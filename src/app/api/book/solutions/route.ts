@@ -3,10 +3,12 @@ import { insightsEnabled, readerFromRequest } from "@/lib/insights/server";
 import { bookFrom, type BookId } from "@/lib/books";
 import { getUnlock } from "@/lib/unlock";
 import { lockedSolutions as csc211LockedSolutions } from "@/content/csc211/render";
+import { csc205caLockedSolutions } from "@/content/csc205ca/render";
 
 // Each paid book's locked solutions, by question id.
 const LOCKED: Partial<Record<BookId, () => Record<string, string>>> = {
   csc211: csc211LockedSolutions,
+  csc205ca: csc205caLockedSolutions,
 };
 
 /**
