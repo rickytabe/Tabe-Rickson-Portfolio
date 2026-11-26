@@ -130,16 +130,25 @@ Every new book or tutorial solution set follows the CSC211 Tutorial Sheet Soluti
 **Marketing**
 - `opengraph-image.tsx`: a pure marketing card. The title "<COURSE> Tutorial Sheet Solutions", a one-line promise, and the short link, in two fixed columns so art never covers text. No free/paid details.
 - Announcements to classmates: short, the promise and the link (tag it, e.g. `?ref=whatsapp`), with no free or paid details.
+- Give the book a `blurb` in `src/lib/books.ts` (one-line promise, no free/paid details; tsc fails without it). After it is live, Tabe emails the newsletter list from `/book-insights` (see "Email list and new-book announcements"). Never add a new book to `LAUNCHED_BEFORE_ANNOUNCEMENTS`.
 
 **Before shipping**
 - `tsc` and ESLint on changed files, `next build`, check that no locked answer appears in the built HTML, and test the page, unlock and quiz against the Firestore emulator (never against the live database).
+
+## Email list and new-book announcements
+
+- The list is the newsletter's subscribers. `/api/subscribe` saves them on the server (`subscribers/{sha256(email)}`, via `src/lib/mailing.ts`), then emails Tabe and the reader through Resend. Older `subscribers` docs have random ids from when the browser wrote them; `loadRecipients()` de-duplicates by address.
+- Unsubscribes live in `emailUnsubscribes/{sha256(email)}` and win over any subscriber doc; signing up again clears it. Every list email goes one per person (`sendToList`, Resend batch API) with a signed unsubscribe link (`/unsubscribe`, which asks first) and one-click `List-Unsubscribe` headers (`/api/unsubscribe`). Never BCC the list.
+- Books ship as code, so the books list is `BOOKS`. Any book not in `LAUNCHED_BEFORE_ANNOUNCEMENTS` and without a `bookAnnouncements/{book}` doc shows on the `/book-insights` overview under "Announce a new book": edit the line, send a test to Tabe, tick the box, send. Each book is announced once (claimed in a transaction; each batch is recorded, so a retry after a failure only reaches the people missed). Earlier books can still be sent from "Announce an earlier book".
+- The Sanity webhook (blog posts and events) uses the same list and sender.
+- Test with the Firestore emulator and Resend's `delivered+<anything>@resend.dev` test addresses as subscribers, never real people.
 
 ## Readers, insights and security model
 
 - No logins. Each reader gets an anonymous id in a signed (HMAC with `INSIGHTS_SECRET`), HttpOnly cookie `bk_rid`, scoped to `Path=/api/book`. See `src/lib/insights/server.ts` (`ensureReader`, `dayKey`).
 - All Firestore writes happen on the server through `firebase-admin` (`src/lib/firebase`). The browser never writes to the database.
-- Firestore collections: `bookStats/{book}` (counters), `bookReaders/{rid}` (with `marks` and `votes` subcollections; `unlocks`, `invites`, `invitedBy` maps per book), `bookFeedback`, `quizSessions`, `quizBoard`, `unlockCodes/{sha256}`, `inviteCodes/{code}`.
-- API routes live under `src/app/api/book/`: `events`, `feedback`, `unlock`, `solutions`, `admin`, `admin/board`, `admin/codes`, `quiz/profile`, `quiz/start`, `quiz/answer`, `quiz/board`.
+- Firestore collections: `bookStats/{book}` (counters), `bookReaders/{rid}` (with `marks` and `votes` subcollections; `unlocks`, `invites`, `invitedBy` maps per book), `bookFeedback`, `quizSessions`, `quizBoard`, `unlockCodes/{sha256}`, `inviteCodes/{code}`, `subscribers`, `emailUnsubscribes/{sha256}`, `bookAnnouncements/{book}`.
+- API routes live under `src/app/api/book/`: `events`, `feedback`, `unlock`, `solutions`, `admin`, `admin/board`, `admin/codes`, `admin/announce`, `quiz/profile`, `quiz/start`, `quiz/answer`, `quiz/board`.
 - `/book-insights` is a private dashboard. It is unlocked with `INSIGHTS_PASSWORD`, which sets an admin session cookie `bk_admin` (`src/lib/insights/admin-auth.ts`). Never put the password in code or chat logs, and rotate it if it was shared.
 - Page views come from Vercel Web Analytics via `src/lib/vercel/analytics.ts` (`getPathViews`) and `src/app/api/views/route.ts`. The count is edge-cached, and ad blockers hide some visits, so it lags and undercounts.
 

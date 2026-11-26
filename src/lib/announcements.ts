@@ -62,10 +62,10 @@ export function bookLink(book: BookInfo): string {
 /** The email. A pure announcement: what the book is and the link, no free or paid details. */
 export function announcementEmail(book: BookInfo, blurb: string, firstName: string, unsubscribe: string): ListEmail {
   const link = bookLink(book);
-  const image = `${SITE}${book.path}/opengraph-image`;
+  const image = `${SITE}${book.cover ?? `${book.path}/opengraph-image`}`;
   const hi = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
   const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#f4f1ea;">
+<html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head><body style="margin:0;padding:0;background:#f4f1ea;">
   <div style="max-width:560px;margin:0 auto;padding:32px 20px;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#20242B;line-height:1.55;">
     <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#15847B;font-weight:700;">New book</p>
     <h1 style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:700;">${escapeHtml(book.title)}</h1>

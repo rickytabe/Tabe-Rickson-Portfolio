@@ -11,6 +11,8 @@ export type BookInfo = {
    * page description). No free or paid details.
    */
   blurb: string;
+  /** Cover image for that email, a site path. Defaults to the book's `${path}/opengraph-image`. */
+  cover?: string;
   path: string;
   /** Link shared from the quiz's "Challenge a classmate" button. */
   quizLink: string;
@@ -49,6 +51,7 @@ export const BOOKS: Record<BookId, BookInfo> = {
     title: "CSC207 Made Easy",
     blurb: "The whole course in 24 illustrated chapters, with a real life example for every hard idea.",
     path: "/algorithms-made-easy-csc207",
+    cover: "/algorithms-made-easy-csc207/og.png",
     quizLink: "https://taberickson.com/csc207/quiz?ref=quiz-share",
     shortLink: "https://taberickson.com/csc207",
     sectionNoun: "chapter",
