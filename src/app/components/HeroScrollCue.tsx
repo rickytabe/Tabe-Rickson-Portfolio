@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 
 /**
- * A quiet scroll cue for the hero: a glass circle holding a chevron made of two
- * strokes. It nudges down once on load (never loops), opens wider on hover, and
- * the moment the page scrolls it flattens into a dash and fades: job done.
+ * A quiet scroll cue for the hero: a glass circle holding two stacked chevrons that
+ * light up one after the other, like a current flowing down, with a rest between
+ * waves. On hover it turns green; the moment the page scrolls, the chevrons flatten
+ * into a dash and fade: job done. Drawn as SVG, centred on the circle's middle.
  */
 export default function HeroScrollCue() {
   const [scrolled, setScrolled] = useState(false);
@@ -25,10 +26,11 @@ export default function HeroScrollCue() {
       tabIndex={scrolled ? -1 : 0}
       aria-hidden={scrolled}
     >
-      <span className="hero-cue-chevron" aria-hidden="true">
-        <span className="hero-cue-stroke hero-cue-left" />
-        <span className="hero-cue-stroke hero-cue-right" />
-      </span>
+      {/* Both chevrons together span 7–17 on each axis, so the pair sits on (12, 12). */}
+      <svg className="hero-cue-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <polyline className="hero-cue-a" points="7,7 12,12 17,7" />
+        <polyline className="hero-cue-b" points="7,12 12,17 17,12" />
+      </svg>
     </a>
   );
 }
